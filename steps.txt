@@ -1,0 +1,63 @@
+ns3 - υλοποίηση
+github 
+υπερελλειπτικές καμπύλες genus 2 (genus 3 θέλει υλοποίηση)
+
+Not checked:
+	https://github.com/signetlabdei/millicar/blob/master/examples/vehicular-simple-four.cc
+	https://arxiv.org/abs/2002.10347
+
+Installation:
+	https://karimmd.github.io/post/tutorial/ns3_installation/
+
+Vehicle Network useful:
+	Print payload:
+		https://groups.google.com/g/ns-3-users/c/Em4gmkxFAEQ/m/ilgWQdGFDAAJ
+		https://stackoverflow.com/questions/43584021/ns3-packet-payload-printing
+	WAVE Network: 
+		https://www.youtube.com/watch?v=CkTKXYN3TZI
+		https://github.com/addola/NS3-HelperScripts/blob/master/examples/WaveTest/wave-test.cc
+	Mobility + Acceleration:
+		https://www.youtube.com/watch?v=IULyaGOXJd4
+		https://github.com/addola/NS3-HelperScripts/tree/master/examples/MobilityExample	
+	Help from:
+		NS-3 google groups
+		Ask ubuntu 
+	Build NS-3 project with libg2hec:
+		step 1: add on wscript conf.env.append_value("LINKFLAGS", ["-L/home/el18018/Desktop/lib", "-L/home/el18018/Desktop/libg2hec/lib", "-lntl", "-lm"])
+		step 2: add on wscript conf.env.append_value("CXXFLAGS", ["-I/home/el18018/Desktop/libg2hec/include", "-I/home/el18018/Desktop/include"])
+		step 3: add on wscript conf.env.append_value("CXXFLAGS", ["-O2"])
+		step 4: path: ~/ns-allinone-3.30/ns-3.30/./waf...../waflib/Tools/cxx.py, change positions of LINKFLAGS in run_str
+		step 5: If "ambiguous method set" is present, change in NTL source code set -> NTL::set
+
+
+
+Hyperelliptic Curves:
+	Genus 2:
+		https://github.com/syncom/libg2hec
+		g++ -O2 -I../include -I/home/el18018/Desktop/include -L../src -L/home/el18018/Desktop/lib -o <executable> <src_code>.C -lm -lg2hec -lntl
+	Genus 3:
+		https://github.com/bernoreitsma/g3hyptorsion
+		https://github.com/google-code-export/purplesage/blob/f15aa1992c2a51fd97492bdbd3792db59f8ba1f0/psage/libs/smalljac/hecurve3.c
+	Theory:
+		Kenneth rosen hyperelliptic curves
+		https://kazutomatsuo.github.io/publications/pdf/8b-2_1244.pdf
+	
+Elliptic Curve - ElGamal encryption for understanding:
+	Libs:	
+		https://gist.github.com/bellbind/1414867/04ccbaa3fe97304d3d9d91c36520a662f2e28a45
+		https://github.com/libecc/libecc
+		https://github.com/kmackay/micro-ecc
+		https://github.com/poojagarg/ECC
+		https://github.com/Safeheron/crypto-curve-cpp
+	Build NS-3 with micro-ecc:
+		Add "/home/el18018/Desktop/micro-ecc/uECC.c" to ~/ns-allinone-3.30/ns-3.30/./waf...../waflib/Tools/cxx.py on cxx_program
+
+
+Big prime numbers:
+	https://t5k.org/lists/small/small3.html
+
+
+
+
+
+

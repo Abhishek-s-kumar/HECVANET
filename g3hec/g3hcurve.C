@@ -46,6 +46,25 @@ namespace g3HEC {
         }
     }
 
+    bool_t dnegate_g3(g3divisor& x, const g3divisor& a)
+    {
+        bool_t OK = a.is_valid_divisor();
+
+        assert(OK);
+
+        poly_t u = a.get_upoly(), v = a.get_vpoly();
+
+        x.set_upoly(u);
+
+        x.set_vpoly( (-v - a.get_curve().get_h()) % u );
+
+        x.update();
+
+        assert(x.is_valid_divisor());
+
+        return OK;
+    }
+
     /* Addition based on the Cantor algorithm for the cases that are not 
     handled by the explicit addition (Algorithm 14.52). Implemented from libg2hec
     as Cantor's algorithm is irrelevant of genus. */
@@ -456,7 +475,7 @@ namespace g3HEC {
 
         if (n < 0) { // n < 0
             OK = OK && SAM(x, a, -n);
-            OK = OK && dnegate(x, x);
+            OK = OK && dnegate_g3(x, x);
             return OK;
         }
 
@@ -501,7 +520,7 @@ namespace g3HEC {
 
         if ( n < 0) {
             OK = OK && NAF(x, a, -n);
-            OK = OK && dnegate(x, x);
+            OK = OK && dnegate_g3(x, x);
         } else {
             /* Get NAF first */
 
@@ -567,7 +586,7 @@ namespace g3HEC {
 
         if ( n < 0) {
             OK = OK && ML(x, a, -n);
-            OK = OK && dnegate(x, x);
+            OK = OK && dnegate_g3(x, x);
             return OK;
         }
 
@@ -598,7 +617,7 @@ namespace g3HEC {
     bool_t sub(g3divisor& x, const g3divisor& a, const g3divisor& b)
     {
         g3divisor c;
-        return ( dnegate(c, b) && add(x, a, c) );
+        return ( dnegate_g3(c, b) && add(x, a, c) );
     }
 
     void g3hcurve :: set_f (const poly_tc& poly) 
@@ -843,56 +862,56 @@ namespace g3HEC {
     }
 }
 
-int main() {
-    /* Set PRNG seed */
-  SetSeed(to_ZZ(19800729));
+// int main() {
+//     /* Set PRNG seed */
+//   SetSeed(to_ZZ(19800729));
 
-  char p[300];
+//   char p[300];
 
-  cout << "Please choose your modulus p (up to " 
-       << 300 << " decimal digits):" << endl;
-  cout << "p = ";
-  cin.getline(p, 300);
+//   cout << "Please choose your modulus p (up to " 
+//        << 300 << " decimal digits):" << endl;
+//   cout << "p = ";
+//   cin.getline(p, 300);
 
-  ZZ pZZ = to_ZZ(p);
+//   ZZ pZZ = to_ZZ(p);
 
-  field_t::init(pZZ); // define GF(p)
+//   field_t::init(pZZ); // define GF(p)
 
-  ZZ x, k;
+//   ZZ x, k;
 
-  g3HEC::g3hcurve curve;
+//   g3HEC::g3hcurve curve;
 
-  g3HEC::g3divisor m, g, h, a, b;
+//   g3HEC::g3divisor m, g, h, a, b;
 
-  curve.random();
+//   curve.random();
 
-   /* private key x */
-  RandomBnd(x, pZZ*pZZ);
-   /* random number k */
-  RandomBnd(k, pZZ*pZZ);
+//    /* private key x */
+//   RandomBnd(x, pZZ*pZZ);
+//    /* random number k */
+//   RandomBnd(k, pZZ*pZZ);
 
-  m.set_curve(curve);
-   /* random message m as divisor */
-  m.random();
+//   m.set_curve(curve);
+//    /* random message m as divisor */
+//   m.random();
 
-  std::cout << m << std::endl;
-   /* random base point */
-  g.random();
+//   std::cout << m << std::endl;
+//    /* random base point */
+//   g.random();
 
-   /* public key h */
-  h = x * g;
+//    /* public key h */
+//   h = x * g;
 
-   /* cipher text (a, b) */
-  a = k * g;
-  b = k * h + m;
+//    /* cipher text (a, b) */
+//   a = k * g;
+//   b = k * h + m;
 
-  /* message decryption  */
+//   /* message decryption  */
 
-  if ( b - x * a == m )
-    cout << "ElGamal decryption succeeded!" << endl;
-  else
-    cout << "ElGamal decryption failed!" << endl;
+//   if ( b - x * a == m )
+//     cout << "ElGamal decryption succeeded!" << endl;
+//   else
+//     cout << "ElGamal decryption failed!" << endl;
 
-   return 0;
+//    return 0;
     
-}
+// }

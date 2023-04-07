@@ -14,9 +14,6 @@ typedef bool bool_t;
 
 typedef long ndeg_t;
 
-// Divisor degree
-enum divdeg_t { DEGREE_1 = 1, DEGREE_2 = 2, DEGREE_3 = 3};
-typedef enum divdeg_t divdeg_t;
 
 using namespace std;
 using namespace NTL;
@@ -175,25 +172,8 @@ namespace g3HEC {
     bool_t sub(g3divisor& x, const g3divisor& a, const g3divisor& b);
 
 
-    bool_t dnegate(g3divisor& x, const g3divisor& a)
+    bool_t dnegate_g3(g3divisor& x, const g3divisor& a);
      // x + a = [1, 0]
-    {
-        bool_t OK = a.is_valid_divisor();
-
-        assert(OK);
-
-        poly_t u = a.get_upoly(), v = a.get_vpoly();
-
-        x.set_upoly(u);
-
-        x.set_vpoly( (-v - a.get_curve().get_h()) % u );
-
-        x.update();
-
-        assert(x.is_valid_divisor());
-
-        return OK;
-    }
 
     bool_t scalar_mul(g3divisor& x, const g3divisor& a, const ZZ& n, 
                     bool_t (*method)(g3divisor&, const g3divisor&, const ZZ&));
@@ -233,7 +213,7 @@ namespace g3HEC {
     {g3divisor x; sub(x, a, b); return x;}
 
     inline g3divisor operator-(const g3divisor& a)
-    {g3divisor x; dnegate(x, a); return x;}
+    {g3divisor x; dnegate_g3(x, a); return x;}
 
     inline g3divisor operator*(long n, const g3divisor& a)
     {g3divisor x; scalar_mul(x, a, n, NULL); return x;}

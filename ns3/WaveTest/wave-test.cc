@@ -11,6 +11,7 @@
 #include <cstring>
 #include "uECC.h"
 #include "ns3/node.h"
+#include "g3hec_ops.h"
 
 //For colorful console printing
 /*
@@ -451,6 +452,11 @@ int main (int argc, char *argv[])
     vli_print(secret1, 32);
     std::cout << std::endl;
   }
+
+  /* Genus 3 HECC ElGamal: */
+  g3HEC::g3hcurve curveg3;
+  curveg3.random();
+  std::cout << "Genus 3 curve: " << curveg3 << std::endl;
 
   //Number of nodes
   uint32_t nNodes = 2;

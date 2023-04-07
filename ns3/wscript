@@ -390,7 +390,7 @@ def configure(conf):
 
     env['PLATFORM'] = sys.platform
     env['BUILD_PROFILE'] = Options.options.build_profile
-    env.append_value("LINKFLAGS", ["-L/home/el18018/Desktop/lib", "-L/home/el18018/Desktop/libg2hec/src", "-lm", "-lg2hec", "-lntl"])
+    env.append_value("LINKFLAGS", ["-L/home/el18018/Desktop/lib", "-L/home/el18018/Desktop/libg2hec/src", "-lm", "-lg2hec", "-lntl", "/home/el18018/Desktop/g3hec/g3hcurve.a"])
     if Options.options.build_profile == "release":
         env['BUILD_SUFFIX'] = ''
     else:
@@ -675,7 +675,7 @@ def configure(conf):
     except WafError:
         pass
     
-    conf.env.append_value("CXXFLAGS", ["-I/home/el18018/Desktop/libg2hec/include", "-I/home/el18018/Desktop/include"])
+    conf.env.append_value("CXXFLAGS", ["-I/home/el18018/Desktop/libg2hec/include", "-I/home/el18018/Desktop/include", "-I/home/el18018/Desktop/g3hec"])
     conf.env.append_value("CXXFLAGS", ["-O2"])
     # append user defined flags after all our ones
     for (confvar, envvar) in [['CCFLAGS', 'CCFLAGS_EXTRA'],

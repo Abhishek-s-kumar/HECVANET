@@ -594,14 +594,14 @@ namespace g3HEC {
         b1 = a; b2 = a + a;     
         for ( --nbits; OK && nbits > 0; --nbits) {
             if ( !bit(n, nbits - 1) ) {
-            OK = OK && add(b2, b1, b2); // b2 = b1 + b2
-            OK = OK && add(b1, b1, b1); // b1 = [2]*b1
+                OK = OK && add(b2, b1, b2); // b2 = b1 + b2
+                OK = OK && add(b1, b1, b1); // b1 = [2]*b1
 
             } else { 
-            OK = OK && add(b1, b1, b2); // b1 = b1 + b2;
-            OK = OK && add(b2, b2, b2); // b2 = [2]*b2;
+                OK = OK && add(b1, b1, b2); // b1 = b1 + b2;
+                OK = OK && add(b2, b2, b2); // b2 = [2]*b2;
 
-            assert(OK);  
+                assert(OK);  
 
             }
 

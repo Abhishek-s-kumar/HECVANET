@@ -32,15 +32,29 @@ Vehicle Network useful:
 
 
 Hyperelliptic Curves:
+	Certificates:
+		https://arxiv.org/ftp/arxiv/papers/1206/1206.0305.pdf
+		https://www.golinuxcloud.com/openssl-generate-ecc-certificate/#5_Create_CA_certificate_with_ECC_Key
+		https://iajit.org/portal/PDF/vol.13,no.1/7437.pdf
+		https://www.secg.org/sec4-1.0.pdf
+	Signcryption:	
+		https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6048467
+		https://link.springer.com/article/10.1007/s12083-020-01044-8
 	Genus 2:
 		https://github.com/syncom/libg2hec
 		g++ -O2 -I../include -I/home/el18018/Desktop/include -L../src -L/home/el18018/Desktop/lib -o <executable> <src_code>.C -lm -lg2hec -lntl
 	Genus 3:
 		https://github.com/bernoreitsma/g3hyptorsion
 		https://github.com/google-code-export/purplesage/blob/f15aa1992c2a51fd97492bdbd3792db59f8ba1f0/psage/libs/smalljac/hecurve3.c
+		Χρησιμοποιούνται 64 bit prime fields.
+		https://www.researchgate.net/profile/Annegret-Weng/publication/265325554_A_class_of_hyperelliptic_CM-curves_of_genus_three/links/5da96119299bf111d4be3931/A-class-of-hyperelliptic-CM-curves-of-genus-three.pdf
 	Theory:
 		Kenneth rosen hyperelliptic curves
 		https://kazutomatsuo.github.io/publications/pdf/8b-2_1244.pdf
+		https://link.springer.com/chapter/10.1007/978-3-642-17455-1_17
+	Encodings:
+		https://gist.github.com/MichelSeck/50ca60e7ef4acb8196e3af78aa5ef2a1
+		https://link.springer.com/article/10.1007/s11042-019-7738-6#Bib1
 	
 Elliptic Curve - ElGamal encryption for understanding:
 	Libs:	
@@ -49,15 +63,22 @@ Elliptic Curve - ElGamal encryption for understanding:
 		https://github.com/kmackay/micro-ecc
 		https://github.com/poojagarg/ECC
 		https://github.com/Safeheron/crypto-curve-cpp
+		Crypto++ implementation - simple
+	Encode bytes:
+		https://github.com/dedis/Dissent/blob/84c79e038d4137004244ca41f2d06726c67dc632/src/Crypto/AbstractGroup/CppECGroup.cpp
+		
 	Build NS-3 with micro-ecc:
 		Add "/home/el18018/Desktop/micro-ecc/uECC.c" to ~/ns-allinone-3.30/ns-3.30/./waf...../waflib/Tools/cxx.py on cxx_program
 
 
 Big prime numbers:
 	https://t5k.org/lists/small/small3.html
+	https://t5k.org/lists/2small/0bit.html
 
-
-
+SUMO:
+	https://www.youtube.com/watch?v=9Tt5GNMuOpc
+	https://www.youtube.com/watch?v=IVGgDph51Vg
+	https://www.youtube.com/watch?v=PAAY1zvHeoE
 
 
 

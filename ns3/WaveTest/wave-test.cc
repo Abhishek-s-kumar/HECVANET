@@ -4,14 +4,8 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "custom-mobility-model.h"
-#include <g2hec_nsfieldtype.h>
-#include <assert.h>
-#include <g2hec_Genus2_ops.h>
-#include <cstdlib>
-#include <cstring>
-#include "uECC.h"
 #include "ns3/node.h"
-#include "g3hec_ops.h"
+#include "hec_cert.h"
 
 //For colorful console printing
 /*
@@ -33,15 +27,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
 uint8_t *buff;
-ZZ pZZ;
 ZZ x, k;
-int flag=0;
-
-char p[MAX_STRING_LEN];
-uint8_t private1[32] = {0};
-uint8_t public1[64] = {0};
-uint8_t private2[32] = {0};
-uint8_t public2[64] = {0};
 
 void vli_print(uint8_t *vli, unsigned int size) {
     for(unsigned i=0; i<size; ++i) {
@@ -74,156 +60,65 @@ void PrintInfo ()
 //Note: this is a promiscuous trace for all packet reception. This is also on physical layer, so packets still have WifiMacHeader
 void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz,  WifiTxVector txVector,MpduInfo aMpdu, SignalNoiseDbm signalNoise)
 {
-  if(flag == 1) {
-	  //std::cout << BOLD_CODE << context << END_CODE << std::endl;
-    std::string::iterator it;
-    it = context.begin();
-    it += 10;
-    int nodeId = *it - '0';
-    std::cout << "Node ID: " << nodeId << std::endl;
-    std::cout << "Now computing shared secret based on ECC: " << std::endl;
-    uint8_t secret_comp[32] = {0};
-    const struct uECC_Curve_t *ecc_curve = uECC_secp160r1();
+  //context will include info about the source of this event. Use string manipulation if you want to extract info.
+  ZZ ptest = to_ZZ(pt);
+  field_t::init(ptest);
+  UnifiedEncoding enc(ptest, 10, 4, 2, ZZ_p::zero());
+  int size = NumBytes(ptest);
+  std::cout << BOLD_CODE <<  context << END_CODE << std::endl;
+  Ptr <Packet> myPacket = packet->Copy();
+  //Print the info.
+  std::cout << "\tSize=" << packet->GetSize()
+        << " Freq="<<channelFreqMhz
+        << " Mode=" << txVector.GetMode()
+        << " Signal=" << signalNoise.signal
+        << " Noise=" << signalNoise.noise << std::endl;
 
-    Ptr<Packet> ecc_pack = packet->Copy();
-    WifiMacHeader h1;
-    WifiMacTrailer tr1;
-    ecc_pack->RemoveHeader(h1);
-    ecc_pack->RemoveTrailer(tr1);
-    uint8_t *rec = (uint8_t *)malloc(packet->GetSize()*sizeof(uint8_t));
-    uint8_t *public_from_packet = new uint8_t[64];
-    ecc_pack->CopyData(rec, packet->GetSize());
-    memcpy(public_from_packet, rec+8, 64);
-    if (!uECC_shared_secret(public_from_packet, private2, secret_comp, ecc_curve)) {
-                printf("shared_secret() failed (2)\n");
-                exit(1);
-            }
-    else{
-      printf("Computed secret on node 2 = ");
-      vli_print(secret_comp, 32);
-      printf("\n");
-    }
+  //We can also examine the WifiMacHeader
+  WifiMacHeader hdr;
+  WifiMacHeader hdr1;
+  WifiMacTrailer trl;
+  buff = new uint8_t[packet->GetSize()];
+  uint8_t *buffa = new uint8_t[2*size+1];
+  uint8_t *buffb = new uint8_t[2*size+1];
+  if (packet->PeekHeader(hdr))
+  {
+    std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl;
+    myPacket->RemoveHeader(hdr1);
+    myPacket->RemoveTrailer(trl);
+    myPacket->CopyData(buff, packet->GetSize());
+    // for(unsigned int i=8; i < packet->GetSize(); i++){
+    //   std::cout << +buff[i];
+    // }
+    // std::cout << std::endl;
+
+    std::cout << "Received Cypher Text: ";
+
+    memcpy(buffa, buff+8, 2*size+1);
+    memcpy(buffb, buff+9+2*size, 2*size+1);
+
   }
-  else{
-    flag=1;
-    //context will include info about the source of this event. Use string manipulation if you want to extract info.
-    unsigned int len1=0, len2=0, len3=0, len4=0;
-    std::cout << BOLD_CODE <<  context << END_CODE << std::endl;
-    Ptr <Packet> myPacket = packet->Copy();
-    ZZ *cypher_received = new ZZ[packet->GetSize()];
-    //Print the info.
-    std::cout << "\tSize=" << packet->GetSize()
-          << " Freq="<<channelFreqMhz
-          << " Mode=" << txVector.GetMode()
-          << " Signal=" << signalNoise.signal
-          << " Noise=" << signalNoise.noise << std::endl;
-
-    //We can also examine the WifiMacHeader
-    WifiMacHeader hdr;
-    WifiMacHeader hdr1;
-    WifiMacTrailer trl;
-    buff = (uint8_t *) malloc((packet->GetSize())*sizeof(uint8_t));
-    if (packet->PeekHeader(hdr))
-    {
-      std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl;
-      myPacket->RemoveHeader(hdr1);
-      myPacket->RemoveTrailer(trl);
-      myPacket->CopyData(buff, packet->GetSize());
-
-      // for(unsigned int i=8; i < packet->GetSize(); i++){
-      //   std::cout << +buff[i];
-      // }
-      // std::cout << std::endl;
-
-      std::cout << "Received Cypher Text: ";
-
-      len1 = buff[8];
-      len2 = buff[9 + len1*120];
-      len3 = buff[10 + len1*120 + len2*120];
-      len4 = buff[11 + len1*120 + len2*120 + len3*120];
-      uint8_t *temp;
-      for(unsigned int i=0; i < len1; i++){
-        temp = new uint8_t[120];
-        memcpy(temp, buff+9+120*i, 120);
-        cypher_received[i] = NTL::ZZFromBytes(temp, 120);
-        free(temp);
-      }
-
-      for(unsigned int i=0; i < len2; i++){
-        temp = new uint8_t[120];
-        memcpy(temp, buff+10+120*(len1+i), 120);
-        cypher_received[len1 + i] = NTL::ZZFromBytes(temp, 120);
-        free(temp);
-      }
-
-      for(unsigned int i=0; i < len3; i++){
-        temp = new uint8_t[120];
-        memcpy(temp, buff+11+120*(len1+len2+i), 120);
-        cypher_received[len1 + len2 + i] = NTL::ZZFromBytes(temp, 120);
-        free(temp);
-      }
-
-      for(unsigned int i=0; i < len4; i++){
-        temp = new uint8_t[120];
-        memcpy(temp, buff+12+120*(len1+len2+len3+i), 120);
-        cypher_received[len1 + len2 + len3 + i] = NTL::ZZFromBytes(temp, 120);
-        free(temp);
-      }
-
-      for(unsigned int i=0; i < len1+len2+len3+len4; i++){
-        std::cout << cypher_received[i] << " ";
-      }
-      std::cout << std::endl;
-    }
-    pZZ = to_ZZ(p);
-    field_t::init(pZZ); 
-
-    NS_G2_NAMESPACE::g2hcurve curve;
-    
-    poly_t hx;
-    NTL::SetCoeff(hx, 0, 0);
-    NTL::SetCoeff(hx, 1, 1);
-    NTL::SetCoeff(hx, 2, 12);
-
-    poly_t fx;
-    NTL::SetCoeff(fx, 0, 7);
-    NTL::SetCoeff(fx, 1, 7);
-    NTL::SetCoeff(fx, 2, 8);
-    NTL::SetCoeff(fx, 3, 12);
-    NTL::SetCoeff(fx, 4, 6);
-    NTL::SetCoeff(fx, 5, 1);
-
-    curve.set_f(fx);
-    curve.set_h(hx);
-    curve.update();
-    if(!curve.is_valid_curve()) {
-      std::cout << "Not a valid curve." << std::endl;
-      exit(1);
-    }
-    poly_t au, av, bu, bv;
-    for(unsigned int i=0; i < len1; i++) {
-      NTL::SetCoeff(au, i, to_ZZ_p(cypher_received[i]));
-    }
-    for(unsigned int i=0; i < len2; i++) {
-      NTL::SetCoeff(av, i, to_ZZ_p(cypher_received[len1+i]));
-    }
-    for(unsigned int i=0; i < len3; i++) {
-      NTL::SetCoeff(bu, i, to_ZZ_p(cypher_received[len1 + len2 + i]));
-    }
-    for(unsigned int i=0; i < len4; i++) {
-      NTL::SetCoeff(bv, i, to_ZZ_p(cypher_received[len1 + len2 + len3 + i]));
-    }
-
-    NS_G2_NAMESPACE::divisor m;
-    NS_G2_NAMESPACE::divisor a(au, av, curve);
-    NS_G2_NAMESPACE::divisor b(bu, bv, curve);
-    a.update();
-    b.update();
-    m = b - x * a;
-    std::cout << "Calculated m: " << m << std::endl;
+  else {
+    return;
   }
 
+  NS_G2_NAMESPACE::g2hcurve curve;
+  
+  
+  curve = enc.getcurve();
+  NS_G2_NAMESPACE::divisor m, a, b;
+  bytes_to_divisor(a, buffa, curve, ptest);
+  bytes_to_divisor(b, buffb, curve, ptest);
+
+  m = b - x * a;
+  std::string str22;
+  int rt = divisor_to_text(str22, m, ptest, enc);
+  if(rt)
+    std::cout << "Could not decode divisor!" << std::endl;
+  else 
+    std::cout << "Decrypted message on node 1: " << str22 << std::endl;
 }
+
 
 /*
  * This function works for ns-3.30 onwards. For previous version, remove the last parameter (the "WifiPhyRxfailureReason")
@@ -271,192 +166,187 @@ void DequeueTrace(std::string context, Ptr<const WifiMacQueueItem> item)
 
 int main (int argc, char *argv[])
 {
+    NTL::SetSeed(to_ZZ(19800729));
+    
+    CryptoPP::AutoSeededRandomPool prng;    
+    GroupParameters group;
+    group.Initialize(CryptoPP::ASN1::secp256r1());
+    
+    std::string messtr = "Accept";
+    Element messecc = text_to_ecpoint(messtr, messtr.length(), group, 32);
+    bool f = group.GetCurve().VerifyPoint(messecc);
+
+    if(!f)
+      std::cout << "Failed to encode message to point" << std::endl;
+    
+    // private key
+    CryptoPP::Integer priv2(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+
+    CryptoPP::Integer kecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+
+    CryptoPP::Integer randecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+    
+    ECQV cert(group);
+    
+
+    std::cout << "Private exponent:" << std::endl;
+    std::cout << "  " << std::hex << priv2 << std::endl;
+  
+    // public key
+    Element y1 = group.ExponentiateBase(priv2);
+    
+    int size1 = group.GetCurve().FieldSize().ByteCount();
+    uint8_t *encoded = new uint8_t[31 + 2*size1+1];
+    cert.cert_generate(encoded, "VEH0001", y1, kecc);
+
+    cert.cert_pk_extraction(encoded);
+    cert.cert_reception(encoded, priv2);
+
+    uint8_t buffecc[65] = {0};
+    
+    group.GetCurve().EncodePoint(buffecc, y1, false);
+    vli_print(buffecc, 65);
+    printf("\n");
+
+    Element check;
+
+    group.GetCurve().DecodePoint(check, buffecc, 65);
+
+
+    Element aecc = group.ExponentiateBase(kecc);
+
+    //Element messecc = group.ExponentiateBase(randecc);
+    Element becctemp = group.GetCurve().ScalarMultiply(y1, kecc);
+
+    std::cout << "Public element:" << std::endl;
+    std::cout << "  " << std::hex << check.x << std::endl;
+    std::cout << "  " << std::hex << check.y << std::endl;
+    
+    // element addition
+    Element becc = group.GetCurve().Add(becctemp, messecc);
+    std::cout << "Add:" << std::endl;
+    std::cout << "  " << std::hex << becc.x << std::endl;
+    std::cout << "  " << std::hex << becc.y << std::endl;
+
+    Element dectemp = group.GetCurve().ScalarMultiply(aecc, priv2);
+    Element decmess = group.GetCurve().Subtract(becc, dectemp);
+
+    std::cout << "Mess:" << std::endl;
+    std::cout << "  " << std::hex << messecc.x << std::endl;
+    std::cout << "  " << std::hex << messecc.y << std::endl;
+
+    std::cout << "Decrypted Mess:" << std::endl;
+    std::cout << "  " << std::hex << decmess.x << std::endl;
+    std::cout << "  " << std::hex << decmess.y << std::endl;
+    std::string decrymes = ecpoint_to_text(decmess, 32);
+    std::cout << decrymes << std::endl;
+
   CommandLine cmd;
 
   /* HECC of genus 2 encrypted message using ElGamal Encryption: */
 
-  NTL::SetSeed(to_ZZ(19800729));
-  cout << "Please choose your modulus p (up to " 
-       << MAX_STRING_LEN << " decimal digits):" << endl;
-  cout << "p = ";
-  cin.getline(p, MAX_STRING_LEN);
 
-  pZZ = to_ZZ(p);
-  field_t::init(pZZ); 
+  ZZ ptest = to_ZZ(pt);
+  field_t::init(ptest);
 
   NS_G2_NAMESPACE::g2hcurve curve;
 
-  NS_G2_NAMESPACE::divisor m, g, h, a, b;
-  
-  poly_t hx;
-  NTL::SetCoeff(hx, 0, 0);
-  NTL::SetCoeff(hx, 1, 1);
-  NTL::SetCoeff(hx, 2, 12);
-
-  poly_t fx;
-  NTL::SetCoeff(fx, 0, 7);
-  NTL::SetCoeff(fx, 1, 7);
-  NTL::SetCoeff(fx, 2, 8);
-  NTL::SetCoeff(fx, 3, 12);
-  NTL::SetCoeff(fx, 4, 6);
-  NTL::SetCoeff(fx, 5, 1);
-
-  curve.set_f(fx);
-  curve.set_h(hx);
-  curve.update();
-  if(!curve.is_valid_curve()) {
-    std::cout << "Not a valid curve." << std::endl;
+  NS_G2_NAMESPACE::divisor m, g, h, a, b, achk, bchk;
+  UnifiedEncoding enc(ptest, 10, 4, 2);
+  std::string str11 = "Join 01234";
+  std::string base = "BaseforGenerat";
+  int rt = text_to_divisor(m, str11, ptest, curve, enc);
+  rt = text_to_divisor(g, base, ptest, curve, enc);
+  if(rt) {
     exit(1);
   }
-
+  
   std::cout << curve << std::endl;
    /* private key x */
-  RandomBnd(x, pZZ*pZZ);
+  RandomBnd(x, ptest*ptest);
    /* random number k */
-  RandomBnd(k, pZZ*pZZ);
+  RandomBnd(k, ptest*ptest);
 
-  m.set_curve(curve);
 
    /* random message m as divisor */
-  m.random();
-  g.random();
-
+  
+  //g.random();
    /* public key h */
   h = x * g;
+
+  g2HECQV cert2(curve, ptest, g);
+  int size2 = NumBytes(ptest);
+    uint8_t *encoded2 = new uint8_t[31 + 2*size2+1];
+    cert2.cert_generate(encoded2, "VEH0001", h, k);
+
+    cert2.cert_pk_extraction(encoded2);
+    cert2.cert_reception(encoded2, x);
 
    /* cipher text (a, b) */
   a = k * g;
   b = k * h + m;
+
+  int size = NumBytes(ptest);
+  uint8_t *buffa = new uint8_t[2*size+1];
+
+  divisor_to_bytes(buffa, a, curve, ptest);
+  bytes_to_divisor(achk, buffa, curve, ptest);
+
+
+  uint8_t *buffb = new uint8_t[2*size+1];
+
+  divisor_to_bytes(buffb, b, curve, ptest);
+  bytes_to_divisor(bchk, buffb, curve, ptest);
+
+  std::cout << "Is it correct? " << (b == bchk) << std::endl;
   
-
-  NTL::vec_ZZ_p aupoly;
-  aupoly = NTL::VectorCopy(a.get_upoly(), 10);
-  NTL::vec_ZZ_p avpoly;
-  avpoly = NTL::VectorCopy(a.get_vpoly(), 10);
-  NTL::vec_ZZ_p bupoly;
-  bupoly = NTL::VectorCopy(b.get_upoly(), 10);
-  NTL::vec_ZZ_p bvpoly;
-  bvpoly = NTL::VectorCopy(b.get_vpoly(), 10);
-
-  uint8_t len1=0, len2=0, len3=0, len4=0;
-  int counter = 0;
-  do {
-    len1++;
-    counter++;
-  }
-  while (aupoly[counter] != 0);
-
-  counter = 0;
-  do {
-    len2++;
-    counter++;
-  }
-  while (avpoly[counter] != 0);
-
-  counter = 0;
-  do {
-    len3++;
-    counter++;
-  }
-  while (bupoly[counter] != 0);
-
-  counter = 0;
-  do {
-    len4++;
-    counter++;
-  }
-  while (bvpoly[counter] != 0);
-
-  uint8_t *temp;
-  uint8_t *cypher_buff = new uint8_t[120*(len1 + len2 + len3 + len4) + 4];
-  unsigned int full_length = 120*(len1+len2+len3+len4)+4;
-  cypher_buff[0] = len1;
-  for(unsigned int i=0; i < len1; i++) {
-    temp = new uint8_t[120];
-    NTL::BytesFromZZ(temp, NTL::rep(aupoly[i]), 120);
-    memcpy(cypher_buff+1+120*i, temp, 120);
-    free(temp);
-  }
-  cypher_buff[120*len1+1] = len2;
-  for(unsigned int i=0; i < len2; i++) {
-    temp = new uint8_t[120];
-    NTL::BytesFromZZ(temp, NTL::rep(avpoly[i]), 120);
-    memcpy(cypher_buff+120*len1+2+120*i, temp, 120);
-    free(temp);
-    //NTL::conv(cypher_buff[len1 + i + 2], NTL::rep(avpoly[i]));
-  }
-
-  cypher_buff[120*(len1+len2)+2] = len3;
-  for(unsigned int i=0; i < len3; i++) {
-    temp = new uint8_t[120];
-    NTL::BytesFromZZ(temp, NTL::rep(bupoly[i]), 120);
-    memcpy(cypher_buff+120*(len1+len2+i)+3, temp, 120);
-    free(temp);
-    //NTL::conv(cypher_buff[len1 + len2 + i + 3], NTL::rep(bupoly[i]));
-  }
-  cypher_buff[120*(len1+len2+len3)+3] = len4;
-  for(unsigned int i=0; i < len4; i++) {
-    temp = new uint8_t[120];
-    NTL::BytesFromZZ(temp, NTL::rep(bvpoly[i]), 120);
-    memcpy(cypher_buff+120*(len1+len2+len3+i)+4, temp, 120);
-    free(temp);
-    //NTL::conv(cypher_buff[len1 + len2 + len3 + i + 4], NTL::rep(bvpoly[i]));
-  }
+  uint8_t *cypher_buff = new uint8_t[4*size+2];
+  memcpy(cypher_buff, buffa, 2*size+1);
+  memcpy(cypher_buff+2*size+1, buffb, 2*size+1);
 
   std::cout << "Message to send for HECC genus 2: " << m << std::endl;
 
-  /* Simple ECC Diffie Hellman shared secret exchange: */
-  
-  uint8_t secret1[32] = {0};
-  uint8_t secret2[32] = {0};
 
-
-  const struct uECC_Curve_t *ecc_curve = uECC_secp160r1();
-  if(!uECC_make_key(public1, private1, ecc_curve) || !uECC_make_key(public2, private2, ecc_curve)){
-    std::cout << "Failed to create key pair!" << std::endl;
-    exit(1);
-  }
-  if (!uECC_shared_secret(public2, private1, secret1, ecc_curve)) {
-    printf("shared_secret() failed (1)\n");
-    return 1;
-  }
-
-  if (!uECC_shared_secret(public1, private2, secret2, ecc_curve)) {
-    printf("shared_secret() failed (2)\n");
-    return 1;
-  }
-  if (memcmp(secret1, secret2, sizeof(secret1)) != 0) {
-    printf("Shared secrets are not identical!\n");
-    printf("Private key 1 = ");
-    vli_print(private1, 32);
-    printf("\n");
-    printf("Private key 2 = ");
-    vli_print(private2, 32);
-    printf("\n");
-    printf("Public key 1 = ");
-    vli_print(public1, 64);
-    printf("\n");
-    printf("Public key 2 = ");
-    vli_print(public2, 64);
-    printf("\n");
-    printf("Shared secret 1 = ");
-    vli_print(secret1, 32);
-    printf("\n");
-    printf("Shared secret 2 = ");
-    vli_print(secret2, 32);
-    printf("\n");
-  }
-  else{
-    printf("Shared secret computed successfully!\n");
-    std::cout << "Secret on node 1 is: ";
-    vli_print(secret1, 32);
-    std::cout << std::endl;
-  }
 
   /* Genus 3 HECC ElGamal: */
+  UnifiedEncoding enc3(ptest, 10, 4, 3);
+
+
   g3HEC::g3hcurve curveg3;
-  curveg3.random();
-  std::cout << "Genus 3 curve: " << curveg3 << std::endl;
+  
+  ZZ x1, k1;
+  RandomBnd(x1, ptest*ptest*ptest);
+  RandomBnd(k1, ptest*ptest*ptest);
+  g3HEC::g3divisor m3t, m3, g1, h1, a1, b1;
+
+
+
+  std::string g3str = "Accept 01234";
+  int fl3 = text_to_divisorg3(m3, g3str, ptest, curveg3, enc3);
+  if(fl3) {
+    std::cout << "Conv from text to divisorG3 failed!" << std::endl;
+  }
+
+  std::cout << m3 << std::endl;
+
+  std::string g3dec;
+  divisorg3_to_text(g3dec, m3, ptest, enc3);
+
+  std::cout << "Decoded from divisorG3: " << g3dec << std::endl;
+  uint8_t *buff3 = new uint8_t[6*size];
+  divisorg3_to_bytes(buff3, m3, curveg3, ptest); 
+  bytes_to_divisorg3(m3t, buff3, curveg3, ptest);
+
+  std::cout << "Is it okay? " << (m3t == m3) << std::endl;
+  g1.random();
+  h1 = x1 * g1;
+  a1 = k1*g1;
+  b1 = k1*h1 + m3;
+
+  if( b1 - x1 * a1 == m3)
+    std::cout << "ElGamal of g3 curve ok!" << std::endl;
+  else 
+    std::cout << "Not ok :/" << std::endl;
 
   //Number of nodes
   uint32_t nNodes = 2;
@@ -588,11 +478,11 @@ int main (int argc, char *argv[])
    Ptr <Packet> packet_i = Create<Packet>((uint8_t*)msg.str().c_str(), packetSize);
    //Simulator::Schedule ( Seconds (2) , &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
   
-   Ptr <Packet> packet_j = Create<Packet>((uint8_t*)cypher_buff, full_length);
+   Ptr <Packet> packet_j = Create<Packet>((uint8_t*)cypher_buff, 4*size+2);
    Simulator::Schedule ( Seconds (2) , &WaveNetDevice::SendX, wd0, packet_j, dest, protocol, tx);
 
-   Ptr <Packet> packet_ecc = Create<Packet>(public1, 64);
-   Simulator::Schedule ( Seconds (4) , &WaveNetDevice::SendX, wd0, packet_ecc, dest, protocol, tx);
+  //  Ptr <Packet> packet_ecc = Create<Packet>(public1, 64);
+  //  Simulator::Schedule ( Seconds (4) , &WaveNetDevice::SendX, wd0, packet_ecc, dest, protocol, tx);
     
   // //Let us schedule try to have all three nodes schedule messages for broadcast
   // for (uint32_t t=0 ; t<simTime-2; t++)

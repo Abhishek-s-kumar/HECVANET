@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "${NS3}/build",
                 "/home/el18018/Desktop/libg2hec/include",
-                "/home/el18018/Desktop/include"
+                "/home/el18018/Desktop/include",
+                "/home/el18018/Desktop/g3hec"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

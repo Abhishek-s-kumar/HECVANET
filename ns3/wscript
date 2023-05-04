@@ -390,7 +390,7 @@ def configure(conf):
 
     env['PLATFORM'] = sys.platform
     env['BUILD_PROFILE'] = Options.options.build_profile
-    env.append_value("LINKFLAGS", ["-L/home/el18018/Desktop/lib", "-L/home/el18018/Desktop/libg2hec/src", "-lm", "-lg2hec", "-lntl", "/home/el18018/Desktop/g3hec/g3hcurve.a"])
+    env.append_value("LINKFLAGS", ["-L/home/el18018/Desktop/lib", "-L/home/el18018/Desktop/libg2hec/src", "-lm", "-lg2hec", "-lntl", "/home/el18018/Desktop/g3hec/g3hcurve.a", "-l:libcryptopp.a"])
     if Options.options.build_profile == "release":
         env['BUILD_SUFFIX'] = ''
     else:

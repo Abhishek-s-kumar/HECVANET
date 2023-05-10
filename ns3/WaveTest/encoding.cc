@@ -1,5 +1,11 @@
 #include "encoding.h"
 
+void vli_print(uint8_t *vli, unsigned int size) {
+    for(unsigned i=0; i<size; ++i) {
+        printf("%02X ", (unsigned)vli[i]);
+    }
+}
+
 void swap_endian(uint8_t* buffer, size_t size) {
     size_t i = 0;
     size_t j = size - 1;
@@ -258,7 +264,11 @@ void divisor_to_points (NS_G2_NAMESPACE::divisor D, ZZ_p &x1, ZZ_p &y1, ZZ_p &x2
   GetCoeff(a,u,1);
   GetCoeff(d,v,0);
   GetCoeff(c,v,1);
-
+  
+  if(DetIrredTest(u)){
+    std::cout << "Sth is wrong.." << std::endl;
+    exit(1);
+  }
   x1 = FindRoot(u);
   x2 = -x1 - a;
 
@@ -271,6 +281,10 @@ void divisorg3_to_points(g3HEC::g3divisor D, ZZ_p &x1, ZZ_p &y1, ZZ_p &x2, ZZ_p 
     u = D.get_upoly();
     v = D.get_vpoly();
 
+    if(DetIrredTest(u)) {
+        std::cout << "Invalid divisor of genus 3 for converting to text" << std::endl;
+        exit(1);
+    }
     vec_ZZ_p roots = FindRoots(u);
     x1 = roots[0];
     x2 = roots[1];
@@ -284,29 +298,33 @@ void divisorg3_to_points(g3HEC::g3divisor D, ZZ_p &x1, ZZ_p &y1, ZZ_p &x2, ZZ_p 
 
 
 int text_to_divisor (NS_G2_NAMESPACE::divisor &D, std::string txt, ZZ p, NS_G2_NAMESPACE::g2hcurve &curve, UnifiedEncoding enc) {
+    int maxlen = 26;
     int len = txt.length();
-    uint8_t *chk = new uint8_t[14];
-    chk = (uint8_t *)txt.c_str();
-    for(int i =0; i < 14 - len; i++) {
-        chk[13-i] = '\0';
+    if(len > maxlen) {
+        return 1;
+    }
+    uint8_t *chk = new uint8_t[maxlen];
+    memcpy(chk, txt.c_str(), len);
+    for(int i = 0; i < maxlen - len; i++) {
+        chk[maxlen-1-i] = '\0';
     }
     ZZ chkzz = NTL::ZZFromBytes(chk, len);
-    
-    if(chkzz >= p*p) {
+
+    uint8_t *str1, *str2;
+    str1 = new uint8_t [maxlen/2];
+    str2 = new uint8_t [maxlen/2];
+
+    memcpy(str1, chk, maxlen/2);
+    memcpy(str2, chk + maxlen/2, maxlen/2);
+
+    ZZ msgzz1, msgzz2;
+    msgzz1 = NTL::ZZFromBytes(str1, maxlen/2);
+    msgzz2 = NTL::ZZFromBytes(str2, maxlen/2);
+
+    if(msgzz1 >= p || msgzz2 >= p) {
         std::cout << "Needs segmentation." << std::endl; 
         return 1;
     }
-
-    uint8_t *str1, *str2;
-    str1 = new uint8_t [7];
-    str2 = new uint8_t [7];
-
-    memcpy(str1, chk, 7);
-    memcpy(str2, chk + 7, 7);
-
-    ZZ msgzz1, msgzz2;
-    msgzz1 = NTL::ZZFromBytes(str1, 7);
-    msgzz2 = NTL::ZZFromBytes(str2, 7);
 
     ZZ_p x1, y1, x2, y2;
     curve = enc.getcurve();
@@ -330,33 +348,37 @@ int text_to_divisor (NS_G2_NAMESPACE::divisor &D, std::string txt, ZZ p, NS_G2_N
 }
 
 int text_to_divisorg3 (g3HEC::g3divisor &D, std::string txt, ZZ p, g3HEC::g3hcurve &curve, UnifiedEncoding enc) {
+    int maxlen = 27;
     int len = txt.length();
-    uint8_t *chk = new uint8_t[15];
-    chk = (uint8_t *)txt.c_str();
-    for(int i =0; i < 15 - len; i++) {
-        chk[14-i] = '\0';
+    if(len > maxlen) {
+        return 1;
+    }
+    uint8_t *chk = new uint8_t[maxlen];
+    memcpy(chk, txt.c_str(), len);
+    for(int i =0; i < maxlen - len; i++) {
+        chk[maxlen-1-i] = '\0';
     }
     ZZ chkzz = NTL::ZZFromBytes(chk, len);
     
-    if(chkzz >= power(p, 3)) {
+    uint8_t *str1, *str2, *str3;
+    ZZ msgzz1, msgzz2, msgzz3;
+    str1 = new uint8_t [maxlen/3+1];
+    str2 = new uint8_t [maxlen/3+1];
+    str3 = new uint8_t [maxlen/3+1];
+    str1[0] = '1';
+    memcpy(str1+1, chk, maxlen/3);
+    str2[0] = '2';
+    memcpy(str2+1, chk + maxlen/3, maxlen/3);
+    str3[0] = '3';
+    memcpy(str3+1, chk + 2*maxlen/3, maxlen/3);
+    msgzz1 = NTL::ZZFromBytes(str1, maxlen/3+1);
+    msgzz2 = NTL::ZZFromBytes(str2, maxlen/3+1);
+    msgzz3 = NTL::ZZFromBytes(str3, maxlen/3+1);
+
+    if(msgzz1 >= p || msgzz2 >= p || msgzz3 >=p) {
         std::cout << "Needs segmentation." << std::endl; 
         return 1;
     }
-
-    uint8_t *str1, *str2, *str3;
-    ZZ msgzz1, msgzz2, msgzz3;
-    str1 = new uint8_t [6];
-    str2 = new uint8_t [6];
-    str3 = new uint8_t [6];
-    str1[0] = '1';
-    memcpy(str1+1, chk, 5);
-    str2[0] = '2';
-    memcpy(str2+1, chk + 5, 5);
-    str3[0] = '3';
-    memcpy(str3+1, chk + 10, 5);
-    msgzz1 = NTL::ZZFromBytes(str1, 6);
-    msgzz2 = NTL::ZZFromBytes(str2, 6);
-    msgzz3 = NTL::ZZFromBytes(str3, 6);
    
     
     ZZ_p x1, y1, x2, y2, x3, y3;
@@ -434,9 +456,10 @@ uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size) {
 }
 
 int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedEncoding enc) {
-    uint8_t *zer = new uint8_t[7];
-    memset(zer, '0', 7);
-    uint8_t *ret = new uint8_t[15];
+    int maxlen = 26;
+    uint8_t *zer = new uint8_t[maxlen/2];
+    memset(zer, '0', maxlen/2);
+    uint8_t *ret = new uint8_t[maxlen+1];
     ZZ_p x1, y1, x2, y2;
     divisor_to_points(D, x1, y1, x2, y2, p);
 
@@ -449,44 +472,45 @@ int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedE
         return 1;
     }
 
-    uint8_t *str1 = new uint8_t[7];
+    uint8_t *str1 = new uint8_t[maxlen/2];
 
-    str1 = find_string(val1, val2, 7);
+    str1 = find_string(val1, val2, maxlen/2);
 
-    if(memcmp(str1, zer, 7) == 0) {
+    if(memcmp(str1, zer, maxlen/2) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
-    uint8_t *str2 = new uint8_t[7];
+    uint8_t *str2 = new uint8_t[maxlen/2];
 
-    str2 = find_string(val3, val4, 7);
+    str2 = find_string(val3, val4, maxlen/2);
 
-    if(memcmp(str2, zer, 7) == 0) {
+    if(memcmp(str2, zer, maxlen/2) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
     if(memcmp(str1, "Accept", 6) == 0 ||  memcmp(str1, "Join", 4) == 0) {
-        memcpy(ret, str1, 7);
-        memcpy(ret+7, str2, 7);
-        ret[14] = '\0';
+        memcpy(ret, str1, maxlen/2);
+        memcpy(ret+maxlen/2, str2, maxlen/2);
+        ret[maxlen] = '\0';
         txt = (char*)ret;
         return 0;
     }
     else{
-        memcpy(ret, str2, 7);
-        memcpy(ret+7, str1, 7);
-        ret[14] = '\0';
+        memcpy(ret, str2, maxlen/2);
+        memcpy(ret+maxlen/2, str1, maxlen/2);
+        ret[maxlen] = '\0';
         txt = (char*)ret;
         return 0;
     }
 }
 
 int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncoding enc) {
-    uint8_t *zer = new uint8_t[6];
-    memset(zer, '0', 6);
-    uint8_t *ret = new uint8_t[16];
+    int maxlen = 27;
+    uint8_t *zer = new uint8_t[maxlen/3+1];
+    memset(zer, '0', maxlen/3+1);
+    uint8_t *ret = new uint8_t[maxlen+1];
 
     ZZ_p x1, y1, x2, y2, x3, y3;
     divisorg3_to_points(D, x1, y1, x2, y2, x3, y3, p);
@@ -501,29 +525,29 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
         return 1;
     }
     
-    uint8_t *str1 = new uint8_t[6];
+    uint8_t *str1 = new uint8_t[maxlen/3+1];
 
-    str1 = find_string(val1, val2, 6);
+    str1 = find_string(val1, val2, maxlen/3+1);
 
-    if(memcmp(str1, zer, 6) == 0) {
+    if(memcmp(str1, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
-    uint8_t *str2 = new uint8_t[6];
+    uint8_t *str2 = new uint8_t[maxlen/3+1];
 
-    str2 = find_string(val3, val4, 6);
+    str2 = find_string(val3, val4, maxlen/3+1);
 
-    if(memcmp(str2, zer, 6) == 0) {
+    if(memcmp(str2, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
-    uint8_t *str3 = new uint8_t[6];
+    uint8_t *str3 = new uint8_t[maxlen/3+1];
 
-    str3 = find_string(val5, val6, 6);
+    str3 = find_string(val5, val6, maxlen/3+1);
 
-    if(memcmp(str3, zer, 6) == 0) {
+    if(memcmp(str3, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
@@ -532,12 +556,11 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
     p1 = str1[0] - 49;
     p2 = str2[0] - 49;
     p3 = str3[0] - 49;
-
     
-    memcpy(ret+p1*5, str1+1, 5);
-    memcpy(ret+p2*5, str2+1, 5);
-    memcpy(ret+p3*5, str3+1, 5);
-    ret[15] = '\0';
+    memcpy(ret+p1*maxlen/3, str1+1, maxlen/3);
+    memcpy(ret+p2*maxlen/3, str2+1, maxlen/3);
+    memcpy(ret+p3*maxlen/3, str3+1, maxlen/3);
+    ret[maxlen] = '\0';
     txt = (char*)ret;
     
     return 0;
@@ -622,21 +645,43 @@ int divisor_to_bytes(uint8_t *buff, NS_G2_NAMESPACE::divisor D, NS_G2_NAMESPACE:
     ZZ_p s0, v0, f0;
     GetCoeff(v0, v, 0);
     GetCoeff(f0, f, 0);
-    ZZ_p f2, f3, f4, v1;
+    
+    ZZ_p f1, f2, f3, f4, v1;
+    GetCoeff(v1, v, 1);
+    GetCoeff(f1, f, 1);
+    GetCoeff(f2, f, 2);
+    GetCoeff(f3, f, 3);
+    GetCoeff(f4, f, 4);
     if(c2 != 0)
         s0 = (v0*v0-f0)/c2;
     else {
-        GetCoeff(v1, v, 1);
-        GetCoeff(f2, f, 2);
-        GetCoeff(f3, f, 3);
-        GetCoeff(f4, f, 4);
+        
         s0 = v1*v1 - f2 +f3*c1 + f4*(c2 - c1*c1) - c1*(2*c2 - c1*c1);
     }
     if((c1*c1 - 4*c2) != 0) {
-        if(rep(s0)%2 == 0)
+        poly_t bsq, ap, gp;
+        SetX(bsq);
+        SetCoeff(bsq, 1, c1);
+        SetCoeff(bsq, 0, (f1 - f3*c2 + f4*c2*c1 + c2*(c2 - c1*c1)));
+        bsq = bsq*bsq;
+        
+        SetX(ap);
+        SetCoeff(ap, 0, (f2 - f3*c1 - f4*(c2 - c1*c1) + c1*(2*c2 - c1*c1)));
+        SetX(gp);
+        SetCoeff(gp, 1, c2);
+        SetCoeff(gp, 0, f0);
+
+        poly_t ds0 = bsq - 4*ap*gp;
+        MakeMonic(ds0);
+        vec_ZZ_p roots = FindRoots(ds0);
+        if((s0 == roots[0]) && (rep(roots[0]) < rep(roots[1])))
             buff[2*size] = 0;
-        else 
+        else if ((s0 == roots[0]) && (rep(roots[0]) > rep(roots[1])))
             buff[2*size] = 1;
+        else if ((s0 == roots[1]) && (rep(roots[1]) > rep(roots[0])))
+            buff[2*size] = 1;
+        else
+            buff[2*size] = 0;
     }
     else {
         buff[2*size] = 0;
@@ -726,15 +771,18 @@ int bytes_to_divisor(NS_G2_NAMESPACE::divisor &D, uint8_t *buff, NS_G2_NAMESPACE
 
     poly_t ds0 = bsq - 4*ap*gp;
     MakeMonic(ds0);
+    if(DetIrredTest(ds0)) {
+        return 1;
+    }
     vec_ZZ_p roots = FindRoots(ds0);
     ZZ_p s0;
     if(roots[0] == roots[1])
         s0 = roots[0];
     else{
         if((bits & 1) == 1)
-            s0 = (rep(roots[0])%2 == 1) ? roots[0] : roots[1];
+            s0 = (rep(roots[0]) < rep(roots[1])) ? roots[1] : roots[0];
         else 
-            s0 = (rep(roots[0])%2 == 1) ? roots[1] : roots[0];
+            s0 = (rep(roots[0]) < rep(roots[1])) ? roots[0] : roots[1];
     }
 
     ZZ_p v0sq, v0, v1;
@@ -793,4 +841,25 @@ int bytes_to_divisorg3(g3HEC::g3divisor &D, uint8_t *buff, g3HEC::g3hcurve curve
     D.set_vpoly(v);
     D.update();
     return 0;
+}
+
+
+int validate_timestamp(std::string tmstmp) {
+    struct tm tm;
+    strptime(tmstmp.c_str(), "%d-%m-%Y %H:%M:%S", &tm);
+    time_t time = mktime(&tm);
+    std::string valid = "01-01-2019 00:00:00";
+    time_t t1;
+    struct tm tm1;
+
+    if(strptime(valid.c_str(), "%d-%m-%Y %H:%M:%S",&tm1) == NULL)
+            printf("\nstrptime failed\n");
+
+    t1 = mktime(&tm1);
+    if(difftime(time, t1) > 0.0) {
+        return 0;
+    }
+    else{
+        return 1;
+    }    
 }

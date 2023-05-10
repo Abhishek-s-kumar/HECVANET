@@ -6,6 +6,8 @@
 #include "custom-mobility-model.h"
 #include "ns3/node.h"
 #include "hec_cert.h"
+#include "sign.h"
+#include "messages.h"
 
 //For colorful console printing
 /*
@@ -26,14 +28,20 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
-uint8_t *buff;
-ZZ x, k;
+int ec_algo = 1;
 
-void vli_print(uint8_t *vli, unsigned int size) {
-    for(unsigned i=0; i<size; ++i) {
-        printf("%02X ", (unsigned)vli[i]);
-    }
-}
+Vehicle_data_g2 veh1g2;
+RSU_data_g2 rsu1g2;
+
+Vehicle_data_g3 veh1g3;
+RSU_data_g3 rsu1g3;
+
+Vehicle_data_ec veh1ec;
+RSU_data_ec rsu1ec;
+
+uint8_t hpk[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
+0x17,0x4c,0x4f,0x01,0x4d,0x16,0x78,0xe8,0x56,0x6e,0x03,0x02};
+
 
 void PrintInfo ()
 {
@@ -60,11 +68,9 @@ void PrintInfo ()
 //Note: this is a promiscuous trace for all packet reception. This is also on physical layer, so packets still have WifiMacHeader
 void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz,  WifiTxVector txVector,MpduInfo aMpdu, SignalNoiseDbm signalNoise)
 {
+
   //context will include info about the source of this event. Use string manipulation if you want to extract info.
-  ZZ ptest = to_ZZ(pt);
-  field_t::init(ptest);
-  UnifiedEncoding enc(ptest, 10, 4, 2, ZZ_p::zero());
-  int size = NumBytes(ptest);
+  
   std::cout << BOLD_CODE <<  context << END_CODE << std::endl;
   Ptr <Packet> myPacket = packet->Copy();
   //Print the info.
@@ -78,45 +84,83 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
   WifiMacHeader hdr;
   WifiMacHeader hdr1;
   WifiMacTrailer trl;
-  buff = new uint8_t[packet->GetSize()];
-  uint8_t *buffa = new uint8_t[2*size+1];
-  uint8_t *buffb = new uint8_t[2*size+1];
+
+  uint8_t *buffrc = new uint8_t[packet->GetSize()];
+
+  int state;
+  if(ec_algo == 0) {
+    state = veh1g2.state;
+  } 
+  else if(ec_algo == 1) {
+    state = veh1ec.state;
+  }
+  else{
+    state = veh1g3.state;
+  }
+  
   if (packet->PeekHeader(hdr))
   {
     std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl;
     myPacket->RemoveHeader(hdr1);
     myPacket->RemoveTrailer(trl);
-    myPacket->CopyData(buff, packet->GetSize());
-    // for(unsigned int i=8; i < packet->GetSize(); i++){
-    //   std::cout << +buff[i];
-    // }
-    // std::cout << std::endl;
-
-    std::cout << "Received Cypher Text: ";
-
-    memcpy(buffa, buff+8, 2*size+1);
-    memcpy(buffb, buff+9+2*size, 2*size+1);
-
+    myPacket->CopyData(buffrc, packet->GetSize());
   }
   else {
     return;
   }
 
-  NS_G2_NAMESPACE::g2hcurve curve;
-  
-  
-  curve = enc.getcurve();
-  NS_G2_NAMESPACE::divisor m, a, b;
-  bytes_to_divisor(a, buffa, curve, ptest);
-  bytes_to_divisor(b, buffb, curve, ptest);
+  if(buffrc[8] == RECEIVE_CERT && state == RECEIVE_CERT && (packet->GetSize()) > 20) {
+    receive_Cert_Send_Join(buffrc, ec_algo);
+  }
 
-  m = b - x * a;
-  std::string str22;
-  int rt = divisor_to_text(str22, m, ptest, enc);
-  if(rt)
-    std::cout << "Could not decode divisor!" << std::endl;
-  else 
-    std::cout << "Decrypted message on node 1: " << str22 << std::endl;
+  else if(buffrc[8] == RECEIVE_ACCEPT_KEY && state == RECEIVE_ACCEPT_KEY && (packet->GetSize()) > 20) {
+    extract_Symmetric(buffrc+9, ec_algo);
+  }
+}
+
+void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz,  WifiTxVector txVector,MpduInfo aMpdu, SignalNoiseDbm signalNoise) {
+  std::cout << BOLD_CODE <<  context << END_CODE << std::endl;
+  Ptr <Packet> myPacket = packet->Copy();
+  //Print the info.
+  std::cout << "\tSize=" << packet->GetSize()
+        << " Freq="<<channelFreqMhz
+        << " Mode=" << txVector.GetMode()
+        << " Signal=" << signalNoise.signal
+        << " Noise=" << signalNoise.noise << std::endl;
+
+  //We can also examine the WifiMacHeader
+  WifiMacHeader hdr;
+  WifiMacHeader hdr1;
+  WifiMacTrailer trl;
+
+  uint8_t *buffrc = new uint8_t[packet->GetSize()];
+  int prot,vid;
+  
+  if (packet->PeekHeader(hdr))
+  {
+    std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl;
+    myPacket->RemoveHeader(hdr1);
+    myPacket->RemoveTrailer(trl);
+    myPacket->CopyData(buffrc, packet->GetSize());
+
+    prot = (int)buffrc[8];
+    vid = (int)buffrc[9];
+
+  }
+  else {
+    return;
+  }
+  if(prot == RECEIVE_CERT && (packet->GetSize()) > 20) {
+    if(ec_algo == 0 && rsu1g2.states[vid-1] == RECEIVE_CERT) {
+      extract_RSU_SendAccept_g2(buffrc+10, vid);
+    }
+    else if (ec_algo == 1 && rsu1ec.states[vid-1] == RECEIVE_CERT) {
+      extract_RSU_SendAccept_ec(buffrc+10, vid);
+    }
+    else if (ec_algo == 2 && rsu1g3.states[vid-1] == RECEIVE_CERT){
+      extract_RSU_SendAccept_g3(buffrc+10, vid);
+    }
+  }
 }
 
 
@@ -166,187 +210,166 @@ void DequeueTrace(std::string context, Ptr<const WifiMacQueueItem> item)
 
 int main (int argc, char *argv[])
 {
-    NTL::SetSeed(to_ZZ(19800729));
+  CommandLine cmd;
+  int fullsize=0;
+  uint8_t *cypher_buff;
+
+  if(ec_algo == 0) {
+    std::cout << "Using ElGamal with Genus 2 HEC for message encryption\nHECQV for certificates\nElGamal HEC genus 2 signatures" << std::endl;
+    ZZ ptest = to_ZZ(pt);
+    field_t::init(ptest);
+    std::cout << "Using p: " << ptest << " of size: " << NumBits(ptest) << std::endl;
+            
+    NS_G2_NAMESPACE::g2hcurve curve;
+
+    NS_G2_NAMESPACE::divisor g, h, rsupub, capub;
+    ZZ rsupriv;
+    UnifiedEncoding enc(ptest, 10, 4, 2);
+    rsu1g2.u = 10;
+    rsu1g2.w = 4;
+    std::string base = "BaseforGenerator";
+    int rt = text_to_divisor(g, base, ptest, curve, enc);
+    if(rt) {
+      exit(1);
+    }
+
+    ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
+    ZZ x;
+    capub = capriv*g;
+    /* private key x */
+    RandomBnd(x, ptest*ptest);
+    divisor_to_bytes(rsu1g2.capub, capub, curve, ptest);
+
+    h = x * g;
+
+    g2HECQV cert2(curve, ptest, g);
+    int size = NumBytes(ptest);
+    uint8_t *encoded2 = new uint8_t[31 + 2*size+1];
+    cert2.cert_generate(encoded2, "RSU0001", h, capriv);
+
+    cert2.cert_pk_extraction(encoded2, capub);
+    cert2.cert_reception(encoded2, x);
+    
+    rsupub = cert2.get_calculated_Qu();
+    rsupriv = cert2.get_extracted_du();
+
+    rsu1g2.priv = rsupriv;
+    rsu1g2.curve = curve;
+    divisor_to_bytes(rsu1g2.rsupub, rsupub, curve, ptest);
+    divisor_to_bytes(rsu1g2.g, g, curve, ptest);
+
+    fullsize = 1 + 31 + 2*size+1 + 2 + base.length() + 1;
+
+    cypher_buff = new uint8_t[fullsize];
+    cypher_buff[0] = 0;
+    memcpy(cypher_buff+1, encoded2, 31 + 2*size+1);
+    uint8_t w, u;
+    w = 10;
+    u = 4;
+    cypher_buff[31+2*size+2] = w;
+    cypher_buff[31+2*size+3] = u;
+    memcpy(cypher_buff+31+2*size+4, base.c_str(), base.length()+1);
+  }
+
+  else if (ec_algo == 1) {
+    std::cout << "Using ElGamal with ECC for message encryption\nECQV for certificates\nECDSA signatures" << std::endl;
+    std::cout << "Using curve secp256r1 parameters" << std::endl;
     
     CryptoPP::AutoSeededRandomPool prng;    
     GroupParameters group;
     group.Initialize(CryptoPP::ASN1::secp256r1());
-    
-    std::string messtr = "Accept";
-    Element messecc = text_to_ecpoint(messtr, messtr.length(), group, 32);
-    bool f = group.GetCurve().VerifyPoint(messecc);
 
-    if(!f)
-      std::cout << "Failed to encode message to point" << std::endl;
-    
-    // private key
-    CryptoPP::Integer priv2(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+    rsu1ec.group = group;
 
-    CryptoPP::Integer kecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
-
-    CryptoPP::Integer randecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
-    
     ECQV cert(group);
+
+    // private key
+    CryptoPP::Integer priv_ecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+
+    CryptoPP::Integer capriv("99904945320188894543539641655649253921899278606834393872940151579788317849983");
     
+    Element pub = group.ExponentiateBase(priv_ecc);
 
-    std::cout << "Private exponent:" << std::endl;
-    std::cout << "  " << std::hex << priv2 << std::endl;
-  
-    // public key
-    Element y1 = group.ExponentiateBase(priv2);
+    int size = group.GetCurve().FieldSize().ByteCount();
+    uint8_t *encoded = new uint8_t[31 + 2*size+1];
+    cert.cert_generate(encoded, "RSU0001", pub, capriv);
+    cert.cert_pk_extraction(encoded, group.ExponentiateBase(capriv));
+    cert.cert_reception(encoded, priv_ecc);
+
+    rsu1ec.capub = group.ExponentiateBase(capriv);
+
+    Element rsupub = cert.get_calculated_Qu();
+    CryptoPP::Integer rsupriv = cert.get_extracted_du();
+
+    rsu1ec.priv = rsupriv;
+    rsu1ec.rsupub = rsupub;
     
-    int size1 = group.GetCurve().FieldSize().ByteCount();
-    uint8_t *encoded = new uint8_t[31 + 2*size1+1];
-    cert.cert_generate(encoded, "VEH0001", y1, kecc);
+    fullsize = 1 + 31 + 2*size + 1;
 
-    cert.cert_pk_extraction(encoded);
-    cert.cert_reception(encoded, priv2);
-
-    uint8_t buffecc[65] = {0};
-    
-    group.GetCurve().EncodePoint(buffecc, y1, false);
-    vli_print(buffecc, 65);
-    printf("\n");
-
-    Element check;
-
-    group.GetCurve().DecodePoint(check, buffecc, 65);
-
-
-    Element aecc = group.ExponentiateBase(kecc);
-
-    //Element messecc = group.ExponentiateBase(randecc);
-    Element becctemp = group.GetCurve().ScalarMultiply(y1, kecc);
-
-    std::cout << "Public element:" << std::endl;
-    std::cout << "  " << std::hex << check.x << std::endl;
-    std::cout << "  " << std::hex << check.y << std::endl;
-    
-    // element addition
-    Element becc = group.GetCurve().Add(becctemp, messecc);
-    std::cout << "Add:" << std::endl;
-    std::cout << "  " << std::hex << becc.x << std::endl;
-    std::cout << "  " << std::hex << becc.y << std::endl;
-
-    Element dectemp = group.GetCurve().ScalarMultiply(aecc, priv2);
-    Element decmess = group.GetCurve().Subtract(becc, dectemp);
-
-    std::cout << "Mess:" << std::endl;
-    std::cout << "  " << std::hex << messecc.x << std::endl;
-    std::cout << "  " << std::hex << messecc.y << std::endl;
-
-    std::cout << "Decrypted Mess:" << std::endl;
-    std::cout << "  " << std::hex << decmess.x << std::endl;
-    std::cout << "  " << std::hex << decmess.y << std::endl;
-    std::string decrymes = ecpoint_to_text(decmess, 32);
-    std::cout << decrymes << std::endl;
-
-  CommandLine cmd;
-
-  /* HECC of genus 2 encrypted message using ElGamal Encryption: */
-
-
-  ZZ ptest = to_ZZ(pt);
-  field_t::init(ptest);
-
-  NS_G2_NAMESPACE::g2hcurve curve;
-
-  NS_G2_NAMESPACE::divisor m, g, h, a, b, achk, bchk;
-  UnifiedEncoding enc(ptest, 10, 4, 2);
-  std::string str11 = "Join 01234";
-  std::string base = "BaseforGenerat";
-  int rt = text_to_divisor(m, str11, ptest, curve, enc);
-  rt = text_to_divisor(g, base, ptest, curve, enc);
-  if(rt) {
-    exit(1);
+    cypher_buff = new uint8_t[fullsize];
+    cypher_buff[0] = 0;
+    memcpy(cypher_buff+1, encoded, 31 + 2*size+1);
   }
-  
-  std::cout << curve << std::endl;
-   /* private key x */
-  RandomBnd(x, ptest*ptest);
-   /* random number k */
-  RandomBnd(k, ptest*ptest);
 
+  else{
+    std::cout << "Using ElGamal with Genus 3 HEC for message encryption\nHECQV for certificates\nElGamal HEC genus 2 signatures" << std::endl;
+    ZZ ptest = to_ZZ(pg3);
+    field_t::init(ptest);
+    std::cout << "Using p: " << ptest << " of size: " << NumBits(ptest) << std::endl;
+    g3HEC::g3hcurve curve;
 
-   /* random message m as divisor */
-  
-  //g.random();
-   /* public key h */
-  h = x * g;
+    g3HEC::g3divisor g, h, rsupub, capub;
+    ZZ rsupriv;
+    UnifiedEncoding enc(ptest, 10, 4, 3);
+    rsu1g3.u = 10;
+    rsu1g3.w = 4;
 
-  g2HECQV cert2(curve, ptest, g);
-  int size2 = NumBytes(ptest);
-    uint8_t *encoded2 = new uint8_t[31 + 2*size2+1];
-    cert2.cert_generate(encoded2, "VEH0001", h, k);
+    std::string base = "BaseforGenerator";
+    int rt = text_to_divisorg3(g, base, ptest, curve, enc);
+    if(rt) {
+      exit(1);
+    }
 
-    cert2.cert_pk_extraction(encoded2);
+    ZZ capriv = to_ZZ("247253210584643408262663087671537517974691545498905118366998662050233012073014");
+    ZZ x;
+
+    capub = capriv*g;
+
+    divisorg3_to_bytes(rsu1g3.capub, capub, curve, ptest);
+    /* private key x */
+    RandomBnd(x, ptest*ptest*ptest);
+
+    h = x * g;
+
+    rsu1g3.curve = curve;
+    divisorg3_to_bytes(rsu1g3.g, g, curve, ptest);
+
+    g3HECQV cert2(curve, ptest, g);
+    int size = NumBytes(ptest);
+    uint8_t *encoded2 = new uint8_t[31 + 6*size];
+    cert2.cert_generate(encoded2, "RSU0001", h, capriv);
+
+    cert2.cert_pk_extraction(encoded2, capub);
     cert2.cert_reception(encoded2, x);
+    
+    rsupub = cert2.get_calculated_Qu();
+    rsupriv = cert2.get_extracted_du();
 
-   /* cipher text (a, b) */
-  a = k * g;
-  b = k * h + m;
+    rsu1g3.priv = rsupriv;
+    divisorg3_to_bytes(rsu1g3.rsupub, rsupub, curve, ptest);
 
-  int size = NumBytes(ptest);
-  uint8_t *buffa = new uint8_t[2*size+1];
+    fullsize = 1 + 31 + 6*size + 2 + base.length() + 1;
 
-  divisor_to_bytes(buffa, a, curve, ptest);
-  bytes_to_divisor(achk, buffa, curve, ptest);
-
-
-  uint8_t *buffb = new uint8_t[2*size+1];
-
-  divisor_to_bytes(buffb, b, curve, ptest);
-  bytes_to_divisor(bchk, buffb, curve, ptest);
-
-  std::cout << "Is it correct? " << (b == bchk) << std::endl;
-  
-  uint8_t *cypher_buff = new uint8_t[4*size+2];
-  memcpy(cypher_buff, buffa, 2*size+1);
-  memcpy(cypher_buff+2*size+1, buffb, 2*size+1);
-
-  std::cout << "Message to send for HECC genus 2: " << m << std::endl;
-
-
-
-  /* Genus 3 HECC ElGamal: */
-  UnifiedEncoding enc3(ptest, 10, 4, 3);
-
-
-  g3HEC::g3hcurve curveg3;
-  
-  ZZ x1, k1;
-  RandomBnd(x1, ptest*ptest*ptest);
-  RandomBnd(k1, ptest*ptest*ptest);
-  g3HEC::g3divisor m3t, m3, g1, h1, a1, b1;
-
-
-
-  std::string g3str = "Accept 01234";
-  int fl3 = text_to_divisorg3(m3, g3str, ptest, curveg3, enc3);
-  if(fl3) {
-    std::cout << "Conv from text to divisorG3 failed!" << std::endl;
+    cypher_buff = new uint8_t[fullsize];
+    cypher_buff[0] = 0;
+    memcpy(cypher_buff+1, encoded2, 31 + 6*size);
+    uint8_t w, u;
+    w = 10;
+    u = 4;
+    cypher_buff[31+6*size+1] = w;
+    cypher_buff[31+6*size+2] = u;
+    memcpy(cypher_buff+31+6*size+3, base.c_str(), base.length()+1);
   }
-
-  std::cout << m3 << std::endl;
-
-  std::string g3dec;
-  divisorg3_to_text(g3dec, m3, ptest, enc3);
-
-  std::cout << "Decoded from divisorG3: " << g3dec << std::endl;
-  uint8_t *buff3 = new uint8_t[6*size];
-  divisorg3_to_bytes(buff3, m3, curveg3, ptest); 
-  bytes_to_divisorg3(m3t, buff3, curveg3, ptest);
-
-  std::cout << "Is it okay? " << (m3t == m3) << std::endl;
-  g1.random();
-  h1 = x1 * g1;
-  a1 = k1*g1;
-  b1 = k1*h1 + m3;
-
-  if( b1 - x1 * a1 == m3)
-    std::cout << "ElGamal of g3 curve ok!" << std::endl;
-  else 
-    std::cout << "Not ok :/" << std::endl;
 
   //Number of nodes
   uint32_t nNodes = 2;
@@ -356,7 +379,7 @@ int main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   ns3::PacketMetadata::Enable ();
-  double simTime = 10;
+  double simTime = 100;
   NodeContainer nodes;
   nodes.Create(nNodes);
 
@@ -365,7 +388,7 @@ int main (int argc, char *argv[])
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
   positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (5.0, 10.0, 0.0));
+  //positionAlloc->Add (Vector (5.0, 10.0, 0.0));
 
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::CustomMobilityModel");
@@ -477,9 +500,12 @@ int main (int argc, char *argv[])
    uint16_t packetSize = msg.str().length() + 1;
    Ptr <Packet> packet_i = Create<Packet>((uint8_t*)msg.str().c_str(), packetSize);
    //Simulator::Schedule ( Seconds (2) , &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
-  
-   Ptr <Packet> packet_j = Create<Packet>((uint8_t*)cypher_buff, 4*size+2);
-   Simulator::Schedule ( Seconds (2) , &WaveNetDevice::SendX, wd0, packet_j, dest, protocol, tx);
+   Ptr <Packet> packet_j;
+
+   for (uint32_t t=2; t<simTime; t+=2) {
+      packet_j = Create<Packet>((uint8_t*)cypher_buff, fullsize);
+      Simulator::Schedule ( Seconds (t) , &WaveNetDevice::SendX, wd0, packet_j, dest, protocol, tx);
+   }
 
   //  Ptr <Packet> packet_ecc = Create<Packet>(public1, 64);
   //  Simulator::Schedule ( Seconds (4) , &WaveNetDevice::SendX, wd0, packet_ecc, dest, protocol, tx);
@@ -555,7 +581,8 @@ int main (int argc, char *argv[])
    * The MonitorSnifferRx trace is defined in WifiPhy.
    */
   
-  Config::Connect("/NodeList/*/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx", MakeCallback (&Rx) );
+  Config::Connect("/NodeList/1/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx", MakeCallback (&Rx) );
+  Config::Connect("/NodeList/0/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx", MakeCallback (&Rx1) );
   //Config::Connect("/NodeList/*/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/ReceiveCallback", MakeCallback (&PrintPayload) );
   //Set the number of power levels.
   Config::Set("/NodeList/*/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/TxPowerLevels", ns3::UintegerValue(7));

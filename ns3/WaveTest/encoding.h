@@ -9,11 +9,12 @@
 #include "cryptopp/osrng.h"
 #include "cryptopp/oids.h"
 
-#include "g3hec_ops.h"
+#include <iomanip>
+#include <ctime>
 
-#define ps "5000000000000000008503491"
-#define N "24999999999994130438600999402209463966197516075699"
+#include "g3hec_ops.h"
 #define pt "340282366920938463463374607431768211223"
+#define pg3 "77371252455336267181195223"
 
 #define str_to_ZZ_p(x) to_ZZ_p(to_ZZ(x))
 
@@ -23,6 +24,8 @@
 
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> GroupParameters;
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP>::Element Element;
+
+void vli_print(uint8_t *vli, unsigned int size);
 
 void swap_endian(uint8_t* buffer, size_t size);
 
@@ -77,3 +80,5 @@ int divisorg3_to_bytes(uint8_t *buff, g3HEC::g3divisor D, g3HEC::g3hcurve curve,
 
 int bytes_to_divisor(NS_G2_NAMESPACE::divisor &D, uint8_t *buff, NS_G2_NAMESPACE::g2hcurve curve, ZZ p);
 int bytes_to_divisorg3(g3HEC::g3divisor &D, uint8_t *buff, g3HEC::g3hcurve curve, ZZ p);
+
+int validate_timestamp(std::string tmstmp);

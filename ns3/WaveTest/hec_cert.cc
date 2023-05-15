@@ -45,11 +45,12 @@ int ECQV::cert_generate(uint8_t *encoded, std::string uname, Element ru, CryptoP
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
+
     
-    CryptoPP::Integer hashed, hashed_p, n = group.GetCurve().FieldSize();
+    CryptoPP::Integer hashed, hashed_p, n = group.GetGroupOrder();
     hashed.Decode((byte*)digest.c_str(), hash.DigestSize());
 
-    hashed_p = hashed;
+    hashed_p = hashed%n;
 
     Element chk = group.GetCurve().ScalarMultiply(this->pu, hashed_p);
     chk = group.GetCurve().Add(chk, this->capk);
@@ -59,7 +60,10 @@ int ECQV::cert_generate(uint8_t *encoded, std::string uname, Element ru, CryptoP
         return 1;
     }
 
-    this->r = (hashed_p*k1 + capriv);
+    CryptoPP::ModularArithmetic mod(n);
+
+    this->r = mod.Multiply(hashed_p, k1);
+    this->r = mod.Add(this->r, capriv);
     return 0;
 }
 
@@ -92,9 +96,9 @@ int ECQV::cert_pk_extraction(uint8_t *cert, Element capk1) {
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
 
-    CryptoPP::Integer hashed, hashed_p, n = this->group.GetCurve().FieldSize();
+    CryptoPP::Integer hashed, hashed_p, n = this->group.GetGroupOrder();
     hashed.Decode((byte*)digest.c_str(), hash.DigestSize());
-    hashed_p = hashed;
+    hashed_p = hashed%n;
     this->capk = capk1;
     this->qu = this->group.GetCurve().ScalarMultiply(this->pu, hashed_p);
     this->qu = this->group.GetCurve().Add(this->qu, this->capk);
@@ -115,14 +119,16 @@ int ECQV::cert_reception(uint8_t *cert, CryptoPP::Integer ku) {
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
 
-    CryptoPP::Integer hashed, hashed_p, n = this->group.GetCurve().FieldSize();
+    CryptoPP::Integer hashed, hashed_p, n = this->group.GetGroupOrder();
     hashed.Decode((byte*)digest.c_str(), size);
-    hashed_p = hashed;
+    hashed_p = hashed%n;
 
-    CryptoPP::Integer du1 = (this->r + hashed_p*ku);
+    CryptoPP::ModularArithmetic mod(n);
+    CryptoPP::Integer du1 = mod.Multiply(hashed_p, ku);
+    du1 = mod.Add(du1, this->r);
     Element qut = group.ExponentiateBase(du1);
     if(group.GetCurve().Equal(this->qu, qut)) {
-        std::cout << "Private key extraction successful!" << std::endl;
+        //std::cout << "Private key extraction successful!" << std::endl;
         this->du = du1;
         return 0;
     }
@@ -285,7 +291,7 @@ int g2HECQV::cert_reception(uint8_t *cert, ZZ ku) {
     ZZ du1 = (this->r + hashed*ku);
     NS_G2_NAMESPACE::divisor qut = du1*this->G;
     if(this->qu == qut) {
-        std::cout << "Private key extraction successful!" << std::endl;
+        //std::cout << "Private key extraction successful!" << std::endl;
         this->du = du1;
         return 0;
     }
@@ -451,7 +457,7 @@ int g3HECQV::cert_reception(uint8_t *cert, ZZ ku) {
     ZZ du1 = (this->r + hashed*ku);
     g3HEC::g3divisor qut = du1*this->G;
     if(this->qu == qut) {
-        std::cout << "Private key extraction successful!" << std::endl;
+        //std::cout << "Private key extraction successful!" << std::endl;
         this->du = du1;
         return 0;
     }

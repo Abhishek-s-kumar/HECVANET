@@ -72,7 +72,7 @@ int sign_genus2 (uint8_t *asig, ZZ& b, uint8_t *mess, int size, ZZ pch) {
     b = MulMod(m - x * f_a, InvMod(k, order), order);
 
     if ( f_a * h + b * a == m * g ) {
-        cout << "Created ElGamal signature!" << endl;
+        //cout << "Created ElGamal signature!" << endl;
         divisor_to_bytes(asig, a, curve, p);
         context.restore();
         return 0;
@@ -134,7 +134,7 @@ int verify_sig2(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk) {
     bytes_to_divisor(h, pk, curve, p);
 
     if ( f_a * h + sigb * a == m * g ) {
-        cout << "ElGamal signature verification succeeded!" << endl;
+        //cout << "ElGamal signature verification succeeded!" << endl;
         context.restore();
         return 0;
     }
@@ -153,10 +153,8 @@ int sign_ec(std::string &sig, CryptoPP::Integer kecc, uint8_t *message, int size
     GroupParameters group;
     group.Initialize(CryptoPP::ASN1::secp256r1());
 
-    Integer n = group.GetCurve().FieldSize();
-
     ECDSA<ECP, SHA256>::PrivateKey k1;
-    k1.Initialize(ASN1::secp256r1(), kecc%n );
+    k1.Initialize(ASN1::secp256r1(), kecc );
     ECDSA<ECP, SHA256>::Signer signer(k1);
 
     size_t siglen = signer.MaxSignatureLength();
@@ -188,7 +186,7 @@ int verify_ec(std::string sig, Element Pk, uint8_t *message, int size) {
         std::cout << "Failed to verify signature on message" << std::endl;
         return 1;
     } else {
-        std::cout << "Verified signature!" << std::endl;
+        //std::cout << "Verified signature!" << std::endl;
         return 0;
     }
 }

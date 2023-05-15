@@ -73,7 +73,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
 
 Element text_to_ecpoint(std::string txt, int len, GroupParameters group, int size);
 
-std::string ecpoint_to_text(Element pointl, int size);
+std::string ecpoint_to_text(Element pointl);
 
 int divisor_to_bytes(uint8_t *buff, NS_G2_NAMESPACE::divisor D, NS_G2_NAMESPACE::g2hcurve curve, ZZ p);
 int divisorg3_to_bytes(uint8_t *buff, g3HEC::g3divisor D, g3HEC::g3hcurve curve, ZZ p);

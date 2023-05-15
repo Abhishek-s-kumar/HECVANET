@@ -566,7 +566,8 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
     return 0;
 }
 
-Element text_to_ecpoint(std::string txt, int len, GroupParameters group, int size){
+Element text_to_ecpoint(std::string txt, int len, GroupParameters group, int size) {
+    
     uint8_t *mess = (uint8_t *)txt.c_str();
     CryptoPP::Integer hgf1 = group.GetCurve().GetA();
     uint8_t *crv_a = new uint8_t[size];
@@ -597,6 +598,11 @@ Element text_to_ecpoint(std::string txt, int len, GroupParameters group, int siz
     NTL::SetCoeff(eccrvF, 0, to_ZZ_p(crvbzz));
 
     ZZ to_enc = NTL::ZZFromBytes(mess, len);
+    if(to_enc >= crvpzz) {
+        std::cout << "Needs segmentation" << std::endl;
+        Element point1(0,0);
+        return point1;
+    }
     ZZ_p xa1, ya1;
     try_koblitz(eccrvF, to_enc, xa1, ya1, to_ZZ(1000), crvpzz);
     
@@ -618,11 +624,12 @@ Element text_to_ecpoint(std::string txt, int len, GroupParameters group, int siz
     return point;
 }
 
-std::string ecpoint_to_text(Element point, int size){
+std::string ecpoint_to_text(Element point){
     CryptoPP::Integer encmess = point.x/1000;
-    uint8_t *mess = new uint8_t[size];
-    encmess.Encode(mess, size);
-    swap_endian(mess, size);
+    uint8_t *mess = new uint8_t[encmess.ByteCount()+1];
+    encmess.Encode(mess, encmess.ByteCount());
+    swap_endian(mess, encmess.ByteCount());
+    mess[encmess.ByteCount()] = '\0';
     std::string message = (char*)mess;
     return message;
 }

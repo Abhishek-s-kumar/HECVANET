@@ -24,6 +24,7 @@
 #include "cryptopp/osrng.h"
 #include "cryptopp/hex.h"
 #include "cryptopp/modarith.h"
+#include "cryptopp/pkcspad.h"
 
 #include <thread>
 #include <random>
@@ -51,39 +52,51 @@
 enum ProtocolVEH {
     RECEIVE_CERT,
     RECEIVE_ACCEPT_KEY,
-    ON_SYMMETRIC_ENC
+    ON_SYMMETRIC_ENC,
+    GROUP_LEADER_INFORM,
+    IS_GROUP_LEADER,
+    RECEIVE_ACCEPT_GL,
+    ON_SYMM_GL
 };
 
 struct RSU_data_ec{
     ProtocolVEH states[100];
     CryptoPP::Integer priv;
     Element rsupub, capub, vehpk[100];
-    int numveh;
+    int numveh, glid;
     std::string symm_perveh[100], iv_perveh[100];
     GroupParameters group;
+    uint8_t certs[100][96];
 };
 
 struct Vehicle_data_ec{
     GroupParameters group;
-    Element capub, rsupub, pub;
+    Element capub, rsupub, pub, glpub;
     CryptoPP::Integer priv;
     uint8_t cert[96];
     ProtocolVEH state;
     std::string symm, iv;
 };
 
+struct GroupLeader_data_ec {
+    Vehicle_data_ec *mydata;
+    ProtocolVEH states[100];
+    std::string symm_perveh[100], iv_perveh[100];
+    int numveh;
+};
+
 struct RSU_data_g2{
     ProtocolVEH states[100];
     ZZ priv;
-    uint8_t rsupub[33], g[33], capub[33], vehpk[100][33];
-    int numveh, u, w;
+    uint8_t rsupub[33], g[33], capub[33], vehpk[100][33], certs[100][64];
+    int numveh, u, w, glid;
     std::string symm_perveh[100], iv_perveh[100];
     NS_G2_NAMESPACE::g2hcurve curve;
 };
 
 struct Vehicle_data_g2{
     NS_G2_NAMESPACE::g2hcurve curve;
-    uint8_t capub[33], rsupub[33], g[33], pub[33];
+    uint8_t capub[33], rsupub[33], g[33], pub[33], glpub[33];
     ZZ priv;
     uint8_t cert[64];
     ProtocolVEH state;
@@ -91,18 +104,25 @@ struct Vehicle_data_g2{
     int u, w;
 };
 
+struct GroupLeader_data_g2 {
+    Vehicle_data_g2 *mydata;
+    ProtocolVEH states[100];
+    std::string symm_perveh[100], iv_perveh[100];
+    int numveh;
+};
+
 struct RSU_data_g3{
     ProtocolVEH states[100];
     ZZ priv;
-    uint8_t rsupub[66], g[66], capub[66], vehpk[100][66];
-    int numveh, u, w;
+    uint8_t rsupub[66], g[66], capub[66], vehpk[100][66], certs[100][97];
+    int numveh, u, w, glid;
     std::string symm_perveh[100], iv_perveh[100];
     g3HEC::g3hcurve curve;
 };
 
 struct Vehicle_data_g3{
     g3HEC::g3hcurve curve;
-    uint8_t capub[66], rsupub[66], g[66], pub[66];
+    uint8_t capub[66], rsupub[66], g[66], pub[66], glpub[66];
     ZZ priv;
     uint8_t cert[97];
     ProtocolVEH state;
@@ -110,16 +130,27 @@ struct Vehicle_data_g3{
     int u, w;
 };
 
+struct GroupLeader_data_g3 {
+    Vehicle_data_g3 *mydata;
+    ProtocolVEH states[100];
+    std::string symm_perveh[100], iv_perveh[100];
+    int numveh;
+};
+
 extern Vehicle_data_ec vehec[100];
 extern RSU_data_ec rsuec[5];
+extern GroupLeader_data_ec glec;
 
 extern Vehicle_data_g2 vehg2[100];
 extern RSU_data_g2 rsug2[5];
+extern GroupLeader_data_g2 gl2;
 
 extern Vehicle_data_g3 vehg3[100];
 extern RSU_data_g3 rsug3[5];
+extern GroupLeader_data_g3 gl3;
 
 extern int rsuid;
+extern uint8_t hpk[23];
 
 void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid);
 
@@ -128,3 +159,9 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid);
 void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid);
 
 void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid);
+
+
+void RSU_inform_GL(int ec_algo, int vid);
+void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid);
+
+void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid);

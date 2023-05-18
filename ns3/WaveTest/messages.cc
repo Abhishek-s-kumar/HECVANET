@@ -6,7 +6,7 @@ uint8_t hpk1[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
 0x17,0x4c,0x4f,0x01,0x4d,0x16,0x78,0xe8,0x56,0x6e,0x03,0x02};
 
 
-void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid){
+void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     ZZ ptest = to_ZZ(pt);
     UnifiedEncoding enc(ptest, u, w, 2, ZZ_p::zero());
 
@@ -66,8 +66,8 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid){
     ZZ sigb;
     uint8_t *siga = new uint8_t[2*signsize+1];
 
-    sign_genus2(siga, sigb, temp, sizenosign, ptest);
-    verify_sig2(siga, sigb, temp, sizenosign, hpk1);
+    sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
+    verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
 
     int fullsize = sizenosign + 2*signsize + 1 + 61;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
@@ -81,7 +81,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid){
     Ptr <NetDevice> d0 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
 
-    Ptr<Node> n0 = ns3::NodeList::GetNode(rsuid);
+    Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
 
     Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
@@ -104,9 +104,12 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid){
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     veh1g2->state = RECEIVE_ACCEPT_KEY;
+    free(certveh1g2);
+    free(temp);
+    free(cypherbuff);
 }
 
-void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid) {
+void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) {
     ZZ ptest = to_ZZ(pg3);
     UnifiedEncoding enc(ptest, u, w, 3, ZZ_p::zero());
 
@@ -167,8 +170,8 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid) {
     ZZ sigb;
     uint8_t *siga = new uint8_t[2*sizesign+1];
 
-    sign_genus2(siga, sigb, temp, sizenosign, ptest);
-    verify_sig2(siga, sigb, temp, sizenosign, hpk1);
+    sign_genus2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), ptest);
+    verify_sig2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk1);
 
     int fullsize = sizenosign + 2*sizesign + 1 + 61;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
@@ -182,7 +185,7 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid) {
     Ptr <NetDevice> d0 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
 
-    Ptr<Node> n0 = ns3::NodeList::GetNode(rsuid);
+    Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
 
     Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
@@ -205,10 +208,14 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid) {
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     
     veh1g3->state = RECEIVE_ACCEPT_KEY;
+    free(certveh1g3);
+    free(temp);
+    free(siga);
+    free(cypherbuff);
 }
 
 
-void send_Join_ec(Vehicle_data_ec *veh1ec, int vid) {
+void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
 
     CryptoPP::AutoSeededRandomPool prng;  
     int size = veh1ec->group.GetCurve().FieldSize().ByteCount();
@@ -263,8 +270,8 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid) {
     memcpy(temp+2*(2*size+1), certec, 31 + 2*size+1);
 
     std::string sigecc;
-    sign_ec(sigecc, veh1ec->priv, temp, sizenosign);
-    verify_ec(sigecc, veh1ec->pub, temp, sizenosign);
+    sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
+    verify_ec(sigecc, veh1ec->pub, (uint8_t*)finalstr.c_str(), finalstr.length());
 
     int fullsize = sizenosign + sigecc.length() + 1;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
@@ -278,7 +285,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid) {
     Ptr <NetDevice> d0 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
 
-    Ptr<Node> n0 = ns3::NodeList::GetNode(rsuid);
+    Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
 
     Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
@@ -301,6 +308,9 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid) {
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 
     veh1ec->state = RECEIVE_ACCEPT_KEY;
+    free(certec);
+    free(temp);
+    free(cypherbuff);
 }
 
 void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
@@ -371,7 +381,8 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     rsupub = cert2.get_calculated_Qu();
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     divisor_to_bytes(veh1g2->rsupub, rsupub, veh1g2->curve, ptest);
-    send_Join_g2(u, w, veh1g2, vid);
+    send_Join_g2(u, w, veh1g2, vid, rsuid);
+    free(buffcert);
   }
 
   else if(ec_algo == 1) {
@@ -406,7 +417,8 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     veh1ec->rsupub = rsupub;
-    send_Join_ec(veh1ec, vid);
+    send_Join_ec(veh1ec, vid, rsuid);
+    free(buffcert);
   }
 
   else {
@@ -481,8 +493,8 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     divisorg3_to_bytes(veh1g3->rsupub, rsupub, veh1g3->curve, ptest);
 
-    send_Join_g3((int)u, (int)w, veh1g3, vid);
-    
+    send_Join_g3((int)u, (int)w, veh1g3, vid, rsuid);
+    free(buffcert);
   }
 }
 
@@ -502,18 +514,10 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     memcpy(siga, buffrc+sizenosign, 2*signsize+1);
     sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
-    int nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk1);
-
-    if(nok) {
-      sigb = -sigb;
-      nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk1);
-      if(nok)
-        return;
-    }
 
     NS_G2_NAMESPACE::divisor a, b, m, x;
     
-    nok = bytes_to_divisor(a, buffrc, rsu1g2->curve, ptest);
+    int nok = bytes_to_divisor(a, buffrc, rsu1g2->curve, ptest);
     nok = bytes_to_divisor(b, buffrc+2*size+1, rsu1g2->curve, ptest);
     
     if(nok)
@@ -540,6 +544,16 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
+
+    nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+
+    if(nok) {
+      sigb = -sigb;
+      nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+      if(nok)
+        return;
+    }
+
     NS_G2_NAMESPACE::divisor g, capub, vehpk;
     bytes_to_divisor(g, rsu1g2->g, rsu1g2->curve, ptest);
     bytes_to_divisor(capub, rsu1g2->capub, rsu1g2->curve, ptest);
@@ -554,7 +568,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
       return;
     }
 
-
+    memcpy(rsu1g2->certs[vid], received_cert, 31 + 2*size+1);
     divisor_to_bytes(rsu1g2->vehpk[vid], vehpk, rsu1g2->curve, ptest);
 
     std::string issued_by, expires_on;
@@ -673,8 +687,9 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    sign_genus2(mysiga, mysigb, temp, size1no, ptest);
-    verify_sig2(mysiga, mysigb, temp, size1no, hpk1);
+    std::string signstr = str1+str2+str3+str4+str5;
+    sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
+    verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
@@ -702,6 +717,8 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     rsu1g2->symm_perveh[vid] = keystr;
     rsu1g2->iv_perveh[vid] = ivstr;
     rsu1g2->states[vid] = RECEIVE_ACCEPT_KEY;
+    free(siga);
+    free(received_cert);
 
 }
 
@@ -721,18 +738,11 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     memcpy(siga, buffrc+sizenosign, 2*signsize+1);
     sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
-    int nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk1);
-
-    if(nok) {
-      sigb = -sigb;
-      nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk1);
-      if(nok)
-        return;
-    }
+    
 
     g3HEC::g3divisor a, b, m, x;
     
-    nok = bytes_to_divisorg3(a, buffrc, rsu1g3->curve, ptest);
+    int nok = bytes_to_divisorg3(a, buffrc, rsu1g3->curve, ptest);
     nok = bytes_to_divisorg3(b, buffrc+6*size, rsu1g3->curve, ptest);
     
     if(nok)
@@ -759,6 +769,15 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
+    nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+
+    if(nok) {
+      sigb = -sigb;
+      nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+      if(nok)
+        return;
+    }
+
     g3HEC::g3divisor g, capub, vehpk;
     bytes_to_divisorg3(g, rsu1g3->g, rsu1g3->curve, ptest);
     bytes_to_divisorg3(capub, rsu1g3->capub, rsu1g3->curve, ptest);
@@ -777,6 +796,8 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     issued_by = recert.get_issued_by();
     expires_on = recert.get_expires_on();
 
+
+    memcpy(rsu1g3->certs[vid], received_cert, 31 + 6*size);
     divisorg3_to_bytes(rsu1g3->vehpk[vid], vehpk, rsu1g3->curve, ptest);
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
@@ -808,7 +829,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess1, a1, b1;
     
-    text_to_divisorg3(mess1, str1, ptest, rsu1g3->curve, enc);
+    int rt = text_to_divisorg3(mess1, str1, ptest, rsu1g3->curve, enc);
+    if(rt) {
+      exit(1);
+    }
     
     ZZ k;
     RandomBnd(k, ptest*ptest*ptest);
@@ -823,7 +847,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess2, a2, b2;
     
-    text_to_divisorg3(mess2, str2, ptest, rsu1g3->curve, enc);
+    rt = text_to_divisorg3(mess2, str2, ptest, rsu1g3->curve, enc);
+    if(rt) {
+      exit(1);
+    }
     
     a2 = k*g;
     b2 = k*vehpk + mess2;
@@ -836,7 +863,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess3, a3, b3;
     
-    text_to_divisorg3(mess3, str3, ptest, rsu1g3->curve, enc);
+    rt = text_to_divisorg3(mess3, str3, ptest, rsu1g3->curve, enc);
+    if(rt) {
+      exit(1);
+    }
     
     a3 = k*g;
     b3 = k*vehpk + mess3;
@@ -848,7 +878,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess4, a4, b4;
     
-    text_to_divisorg3(mess4, str4, ptest, rsu1g3->curve, enc);
+    rt = text_to_divisorg3(mess4, str4, ptest, rsu1g3->curve, enc);
+    if(rt) {
+      exit(1);
+    }
     
     a4 = k*g;
     b4 = k*vehpk + mess4;
@@ -864,7 +897,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess5, a5, b5;
     
-    text_to_divisorg3(mess5, str5, ptest, rsu1g3->curve, enc);
+    rt = text_to_divisorg3(mess5, str5, ptest, rsu1g3->curve, enc);
+    if(rt) {
+      exit(1);
+    }
     
     a5 = k*g;
     b5 = k*vehpk + mess5;
@@ -890,8 +926,9 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    sign_genus2(mysiga, mysigb, temp, size1no, ptest);
-    verify_sig2(mysiga, mysigb, temp, size1no, hpk1);
+    std::string signstr = str1 + str2 + str3 + str4 + str5;
+    sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
+    verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
@@ -919,6 +956,8 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     rsu1g3->symm_perveh[vid] = keystr;
     rsu1g3->iv_perveh[vid] = ivstr;
     rsu1g3->states[vid] = RECEIVE_ACCEPT_KEY;
+    free(siga);
+    free(received_cert);
 }
 
 void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
@@ -935,11 +974,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     char sig[2*size+1];
     memcpy(sig, buffrc+sizenosign, 2*size+1);
     std::string sigecc(sig, 2*size+1);
-    int nok = verify_ec(sigecc, vehpub, buffrc, sizenosign);
-
-    if(nok) {
-      return;
-    }
+    
 
     Element a, b, m, mtemp;
     group.GetCurve().DecodePoint(a, buffrc, 2*size+1);
@@ -958,13 +993,19 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     rsu1ec->numveh++;
 
     std::string tmstmp = rec.substr(5);
-    nok = validate_timestamp(tmstmp);
+    int nok = validate_timestamp(tmstmp);
     if(nok) {
       std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
       return;
     }
     else {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+    }
+
+    nok = verify_ec(sigecc, vehpub, (uint8_t*)rec.c_str(), rec.length());
+
+    if(nok) {
+      return;
     }
 
     std::string issued_by, expires_on;
@@ -974,6 +1015,8 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
       return;
     }
+
+    memcpy(rsu1ec->certs[vid], buffrc+4*size+2, 31 + 2*size+1);
 
     using namespace CryptoPP;
 
@@ -1046,14 +1089,17 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     group.GetCurve().EncodePoint(temp+7*onedivsize, b4, false);
 
     std::string mysig;
-    sign_ec(mysig, rsu1ec->priv, temp, size1no);
-    verify_ec(mysig, rsu1ec->rsupub, temp, size1no);
+    std::string signstr = finalstr1 + finalstr2 + finalstr3 + finalstr4;
+    sign_ec(mysig, rsu1ec->priv, (uint8_t*)signstr.c_str(), signstr.length());
+    nok = verify_ec(mysig, rsu1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
+    if(nok)
+      return;
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
     memcpy(cypherbuff+2, temp, size1no);
     memcpy(cypherbuff+2+size1no, mysig.c_str(), mysig.length());
-    cypherbuff[fullsize1] = '\0';
+    cypherbuff[fullsize1+1] = '\0';
 
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -1095,10 +1141,6 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     ZZ mysigb;
     memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
     mysigb = -ZZFromBytes(buffrc+10*divsize+2*signsize+1, 61);
-    int nok = verify_sig2(mysiga, mysigb, buffrc, 10*divsize, hpk1);
-    if(nok) {
-      return;
-    }
 
     bytes_to_divisor(a1, buffrc, veh1g2->curve, ptest);
     bytes_to_divisor(b1, buffrc+divsize, veh1g2->curve, ptest);
@@ -1154,6 +1196,12 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
+    std::string signstr = rec1+rec2+rec3+rec4+rec5;
+    int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+    if(nok) {
+      return;
+    }
+
     std::string key, iv;
     key = rec1.substr(7);
     key += rec2.substr(7);
@@ -1173,7 +1221,6 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     int divsize = 2*size+1;
     int signsize = 2*size+1;
     std::string sigecc((char*)buffrc+8*divsize, signsize);
-    verify_ec(sigecc, veh1ec->rsupub, buffrc, 8*divsize);
 
     Element a1,b1,a2,b2,a3,b3,a4,b4,m1,m2,m3,m4;
     group.GetCurve().DecodePoint(a1, buffrc, divsize);
@@ -1216,6 +1263,12 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
+    std::string signstr = rec1 + rec2 + rec3 + rec4;
+    int nok = verify_ec(sigecc, veh1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
+    
+    if(nok)
+      return;
+
     std::string key, iv;
     key = rec1.substr(7);
     key += rec2.substr(0,16);
@@ -1242,10 +1295,6 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     ZZ mysigb;
     memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
     mysigb = -ZZFromBytes(buffrc+10*divsize+2*signsize+1, 61);
-    int nok = verify_sig2(mysiga, mysigb, buffrc, 10*divsize, hpk1);
-    if(nok) {
-      return;
-    }
 
     bytes_to_divisorg3(a1, buffrc, veh1g3->curve, ptest);
     bytes_to_divisorg3(b1, buffrc+divsize, veh1g3->curve, ptest);
@@ -1298,6 +1347,12 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     }
     else {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+    }
+
+    std::string signstr = rec1+rec2+rec3+rec4+rec5;
+    int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+    if(nok) {
+      return;
     }
 
     std::string key, iv;

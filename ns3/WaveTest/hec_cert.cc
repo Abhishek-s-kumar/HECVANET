@@ -16,6 +16,7 @@ int ECQV::encode_to_bytes(uint8_t *buff) {
     uint8_t *buffp = new uint8_t[2*size+1];
     group.GetCurve().EncodePoint(buffp, this->pu, false);
     memcpy(buff+31, buffp, 2*size+1);
+    free(buffp);
     return 0;
 }
 
@@ -348,6 +349,7 @@ int g3HECQV::encode_to_bytes(uint8_t *buff) {
     uint8_t *buffp = new uint8_t[6*size];
     divisorg3_to_bytes(buffp, this->pu, this->curve, this->p);
     memcpy(buff+31, buffp, 6*size);
+    free(buffp);
     return 0;
 }
 

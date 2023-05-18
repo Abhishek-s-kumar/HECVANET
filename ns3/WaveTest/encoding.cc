@@ -303,7 +303,7 @@ int text_to_divisor (NS_G2_NAMESPACE::divisor &D, std::string txt, ZZ p, NS_G2_N
     if(len > maxlen) {
         return 1;
     }
-    uint8_t *chk = new uint8_t[maxlen];
+    uint8_t chk[maxlen];
     memcpy(chk, txt.c_str(), len);
     for(int i = 0; i < maxlen - len; i++) {
         chk[maxlen-1-i] = '\0';
@@ -343,6 +343,8 @@ int text_to_divisor (NS_G2_NAMESPACE::divisor &D, std::string txt, ZZ p, NS_G2_N
     }
 
     D = points_to_divisor(x1, y1, x2, y2, curve);
+    free(str1);
+    free(str2);
 
     return 0;
 }
@@ -353,7 +355,7 @@ int text_to_divisorg3 (g3HEC::g3divisor &D, std::string txt, ZZ p, g3HEC::g3hcur
     if(len > maxlen) {
         return 1;
     }
-    uint8_t *chk = new uint8_t[maxlen];
+    uint8_t chk[maxlen];
     memcpy(chk, txt.c_str(), len);
     for(int i =0; i < maxlen - len; i++) {
         chk[maxlen-1-i] = '\0';
@@ -405,6 +407,9 @@ int text_to_divisorg3 (g3HEC::g3divisor &D, std::string txt, ZZ p, g3HEC::g3hcur
     }
 
     D = points_to_divisorg3(x1, y1, x2, y2, x3, y3, curve);
+    free(str1);
+    free(str2);
+    free(str3);
 
     return 0;
 }
@@ -495,6 +500,9 @@ int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedE
         memcpy(ret+maxlen/2, str2, maxlen/2);
         ret[maxlen] = '\0';
         txt = (char*)ret;
+        free(zer);
+        free(str1);
+        free(str2);
         return 0;
     }
     else{
@@ -502,6 +510,9 @@ int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedE
         memcpy(ret+maxlen/2, str1, maxlen/2);
         ret[maxlen] = '\0';
         txt = (char*)ret;
+        free(zer);
+        free(str1);
+        free(str2);
         return 0;
     }
 }
@@ -525,7 +536,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
         return 1;
     }
     
-    uint8_t *str1 = new uint8_t[maxlen/3+1];
+    uint8_t *str1;
 
     str1 = find_string(val1, val2, maxlen/3+1);
 
@@ -534,7 +545,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
         return 1;
     }
 
-    uint8_t *str2 = new uint8_t[maxlen/3+1];
+    uint8_t *str2;
 
     str2 = find_string(val3, val4, maxlen/3+1);
 
@@ -543,7 +554,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
         return 1;
     }
 
-    uint8_t *str3 = new uint8_t[maxlen/3+1];
+    uint8_t *str3;
 
     str3 = find_string(val5, val6, maxlen/3+1);
 
@@ -562,6 +573,11 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
     memcpy(ret+p3*maxlen/3, str3+1, maxlen/3);
     ret[maxlen] = '\0';
     txt = (char*)ret;
+
+    free(zer);
+    free(str1);
+    free(str2);
+    free(str3);
     
     return 0;
 }

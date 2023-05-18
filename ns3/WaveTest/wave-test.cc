@@ -8,6 +8,7 @@
 #include "hec_cert.h"
 #include "sign.h"
 #include "messages.h"
+#include "ns2-node-utility.h"
 
 #include <set>
 
@@ -15,20 +16,25 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
-int ec_algo = 0;
+const int ec_algo = 0;
 int rsuid = 63;
 
 Vehicle_data_g2 vehg2[100];
 RSU_data_g2 rsug2[5];
+GroupLeader_data_g2 gl2;
 
 Vehicle_data_g3 vehg3[100];
 RSU_data_g3 rsug3[5];
+GroupLeader_data_g3 gl3;
 
 Vehicle_data_ec vehec[100];
 RSU_data_ec rsuec[5];
+GroupLeader_data_ec glec;
 
 uint8_t hpk[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
 0x17,0x4c,0x4f,0x01,0x4d,0x16,0x78,0xe8,0x56,0x6e,0x03,0x02};
+
+double exit_time[63];
 
 
 //Note: this is a promiscuous trace for all packet reception. This is also on physical layer, so packets still have WifiMacHeader
@@ -54,6 +60,10 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
   else
     vid = (context[10] - 48)*10 + (context[11] - 48);
 
+  if(Now() >= Seconds(exit_time[vid])) {
+    return;
+  }
+
   int state;
   if(ec_algo == 0) {
     state = vehg2[vid].state;
@@ -76,14 +86,14 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     if(hdr1.GetAddr1() != nd0->GetAddress() && hdr1.GetAddr1() != "ff:ff:ff:ff:ff:ff") {
       return;
     }
-    std::cout << std::endl << BOLD_CODE <<  context << END_CODE << std::endl;
+    // std::cout << std::endl << BOLD_CODE <<  context << END_CODE << std::endl;
 
-    std::cout << "\tSize=" << packet->GetSize()
-        << " Freq="<<channelFreqMhz
-        << " Mode=" << txVector.GetMode()
-        << " Signal=" << signalNoise.signal
-        << " Noise=" << signalNoise.noise << std::endl;
-    std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl << std::endl;
+    // std::cout << "\tSize=" << packet->GetSize()
+    //     << " Freq="<<channelFreqMhz
+    //     << " Mode=" << txVector.GetMode()
+    //     << " Signal=" << signalNoise.signal
+    //     << " Noise=" << signalNoise.noise << std::endl;
+    // std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl << std::endl;
   }
   else {
     return;
@@ -96,6 +106,19 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
   else if(buffrc[8] == RECEIVE_ACCEPT_KEY && state == RECEIVE_ACCEPT_KEY && (packet->GetSize()) > 20) {
     int rid = buffrc[9];
     extract_Symmetric(buffrc+10, ec_algo, vid, rid);
+  }
+
+  else if(buffrc[8] == GROUP_LEADER_INFORM && state == ON_SYMMETRIC_ENC && (packet->GetSize()) > 20) {
+    extract_GLProof_Broadcast(buffrc+10, ec_algo, vid);
+  }
+
+  else if(buffrc[8] == IS_GROUP_LEADER && state == ON_SYMMETRIC_ENC && vid%2 == 0 && (packet->GetSize()) > 20) {
+    int glid = buffrc[9];
+    receive_GLCert_Send_Join(buffrc+10, ec_algo, vid, glid);
+  }
+
+  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == IS_GROUP_LEADER && (packet->GetSize()) > 20) {
+    std::cout << "Group leader received join req from node: " << +buffrc[9] << std::endl;
   }
 }
 
@@ -123,14 +146,7 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     if(hdr1.GetAddr1() != nd0->GetAddress() && hdr1.GetAddr1() != "ff:ff:ff:ff:ff:ff") {
       return;
     }
-    std::cout << std::endl << BOLD_CODE <<  context << END_CODE << std::endl;
-    std::cout << "\tSize=" << packet->GetSize()
-        << " Freq="<<channelFreqMhz
-        << " Mode=" << txVector.GetMode()
-        << " Signal=" << signalNoise.signal
-        << " Noise=" << signalNoise.noise << std::endl;
-    std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl << std::endl;
-
+    
     prot = (int)buffrc[8];
     vid = (int)buffrc[9];
 
@@ -139,6 +155,14 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     return;
   }
   if(prot == RECEIVE_CERT && (packet->GetSize()) > 20) {
+    // std::cout << std::endl << BOLD_CODE <<  context << END_CODE << std::endl;
+    // std::cout << "\tSize=" << packet->GetSize()
+    //     << " Freq="<<channelFreqMhz
+    //     << " Mode=" << txVector.GetMode()
+    //     << " Signal=" << signalNoise.signal
+    //     << " Noise=" << signalNoise.noise << std::endl;
+    // std::cout << "\tDestination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << std::endl << std::endl;
+
     if(ec_algo == 0 && rsug2[rid].states[vid] == RECEIVE_CERT) {
       extract_RSU_SendAccept_g2(buffrc+10, vid, rid);
     }
@@ -210,23 +234,23 @@ void PrintInfo ()
       num = rsug3[0].numveh;
     }
 
-    for(int i=0; i < rsuid-1; i++) {
+    for(int i=0; i < rsuid; i++) {
       switch (ec_algo)
       {
       case 0:
-        if(vehg2[i].state == 2) {
+        if(vehg2[i].state >= 2) {
           numacc++;
           vehreg.insert(i);
         }
         break;
       case 1:
-        if(vehec[i].state == 2) {
+        if(vehec[i].state >= 2) {
           numacc++;
           vehreg.insert(i);
         }
         break;
       case 2:
-        if(vehg3[i].state == 2) {
+        if(vehg3[i].state >= 2) {
           numacc++;
           vehreg.insert(i);
         }
@@ -236,22 +260,28 @@ void PrintInfo ()
       }
     }
 
-    std::cout << BOLD_CODE << " Registered vehicles in RSU: " << num << " Received Symmetric: ";
+    std::cout << BOLD_CODE << "Registered vehicles in RSU: " << num << " Received Symmetric: ";
     for(auto& id : vehreg) {
       std::cout << id << ' ';
     }
     std::cout << END_CODE << std::endl;
 
-    if(Now() > Seconds(150)) {
-      std::cout << vehg2[13].symm << " " << vehg2[44].symm << std::endl;
-    }
-    
-    // for(int i=0; i<10; i++){
-    //   std::cout << "Vehicle " << i+1 << " is in state: " << vehg2[i].state << " "; 
-    // }
-    // std::cout << std::endl;
-
     Simulator::Schedule (Seconds (4), &PrintInfo);
+}
+
+void SelectGL(std::set<double> endsim_cars) {
+    int rand_id;
+    do {
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_int_distribution<> dis(0, 58);
+      
+      rand_id = dis(gen);
+    } while((endsim_cars.find(rand_id) == endsim_cars.end()));
+
+    std::cout << std::endl << BOLD_CODE << YELLOW_CODE << "Selected GL: " << rand_id << END_CODE << std::endl;
+    
+    RSU_inform_GL(ec_algo, rand_id);
 
 }
 
@@ -434,6 +464,8 @@ int main (int argc, char *argv[])
   NodeContainer nodes;
   nodes.Create(nNodes);
 
+  Ns2NodeUtility ns2_util(sumo_file);
+
   //Nodes MUST have some sort of mobility because that's needed to compute the received signal strength
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
@@ -463,6 +495,7 @@ int main (int argc, char *argv[])
     pos.x *= 0.5;
     pos.y *= 0.5;
     mob->SetPosition(pos);
+    //std::cout << "Node " << i << " Entry time: " << ns2_util.GetEntryTimeForNode(i) << " exit time: " << ns2_util.GetExitTimeForNode(i) << std::endl;
   }
   //I prefer using WaveHelper to create WaveNetDevice
   YansWifiChannelHelper waveChannel = YansWifiChannelHelper::Default ();
@@ -558,8 +591,11 @@ int main (int argc, char *argv[])
   
    //Simulator::Schedule ( Seconds (2) , &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
    Ptr <Packet> packet_j;
+   std::set<double> endsim_cars;
 
-   for (uint32_t t=2; t<simTime; t+=5) {
+   uint32_t gl_phase = 150;
+
+   for (uint32_t t=2; t < simTime-1; t+=2) {
       packet_j = Create<Packet>((uint8_t*)cypher_buff, fullsize);
       Simulator::Schedule ( Seconds (t) , &WaveNetDevice::SendX, wd0, packet_j, dest, protocol, tx);
    }
@@ -573,14 +609,32 @@ int main (int argc, char *argv[])
    */
 
   for(uint32_t i=0; i < nNodes-1; i++) {
+    double entryt = ns2_util.GetEntryTimeForNode(i);
+    if( entryt > 300){
+      entryt -= 200;
+    }
     std::string conn = "/NodeList/";
     conn = conn + to_string(i);
     conn = conn + "/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx";
-    Config::Connect(conn, MakeCallback(&Rx));
+    //Config::Connect(conn, MakeCallback(&Rx));
+    Simulator::Schedule(Seconds(entryt), &Config::Connect, conn, MakeCallback(&Rx));
+
+    double exit=0;
+    if(ns2_util.GetExitTimeForNode(i) > 200) {
+      exit = ns2_util.GetSimulationTime();
+      endsim_cars.insert(i);
+    }
+    else {
+      exit = ns2_util.GetExitTimeForNode(i);
+    }
+    exit_time[i] = exit;
   }
+
   
   std::string rsuconn = "/NodeList/" + to_string(rsuid) + "/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx";
   Config::Connect(rsuconn, MakeCallback (&Rx1) );
+
+  Simulator::Schedule(Seconds(gl_phase), &SelectGL, endsim_cars);
   
   //Set the number of power levels.
   Config::Set("/NodeList/*/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/TxPowerLevels", ns3::UintegerValue(7));
@@ -590,7 +644,7 @@ int main (int argc, char *argv[])
    * What if some packets were dropped due to collision, or whatever? We use this trace to fire RxDrop function
    */
   
-  Config::Connect("/NodeList/18/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/PhyRxDrop", MakeCallback (&RxDrop) );
+  Config::Connect("/NodeList/63/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/PhyRxDrop", MakeCallback (&RxDrop) );
 
   /*
    * We can also trace some MAC layer details

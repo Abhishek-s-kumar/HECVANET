@@ -356,7 +356,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         tx.priority = 7;	//We set the AC to highest prior
         tx.txPowerLevel = 7; //When we define TxPowerStar
 
-        for(uint32_t i=0; i < 250; i+=2) {
+        for(uint32_t i=150; i < 400; i+=2) {
             packet_i = Create<Packet>(sendbuff, finalsendsize);
             Simulator::Schedule(Seconds(i), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
         }
@@ -535,3 +535,4 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         break;
     }
 }
+

@@ -16,7 +16,7 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
-const int ec_algo = 0;
+const int ec_algo = 2;
 int rsuid = 63;
 
 Vehicle_data_g2 vehg2[100];
@@ -64,7 +64,7 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     return;
   }
 
-  int state;
+  int state, onglstate=0;
   if(ec_algo == 0) {
     state = vehg2[vid].state;
   } 
@@ -86,6 +86,7 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     if(hdr1.GetAddr1() != nd0->GetAddress() && hdr1.GetAddr1() != "ff:ff:ff:ff:ff:ff") {
       return;
     }
+
     // std::cout << std::endl << BOLD_CODE <<  context << END_CODE << std::endl;
 
     // std::cout << "\tSize=" << packet->GetSize()
@@ -97,6 +98,24 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
   }
   else {
     return;
+  }
+
+  switch (ec_algo)
+  {
+  case 0: {
+    onglstate = gl2.states[buffrc[9]];
+    break;
+  }
+  case 1: {
+    onglstate = glec.states[buffrc[9]];
+    break;
+  }
+  case 2: {
+    onglstate = gl3.states[buffrc[9]];
+    break;
+  }
+  default:
+    break;
   }
 
   if(buffrc[8] == RECEIVE_CERT && state == RECEIVE_CERT && (packet->GetSize()) > 20) {
@@ -117,8 +136,12 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     receive_GLCert_Send_Join(buffrc+10, ec_algo, vid, glid);
   }
 
-  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == IS_GROUP_LEADER && (packet->GetSize()) > 20) {
-    std::cout << "Group leader received join req from node: " << +buffrc[9] << std::endl;
+  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == IS_GROUP_LEADER && onglstate != RECEIVE_ACCEPT_GL  && (packet->GetSize()) > 20) {
+    extract_GLJoin_SendAccept(buffrc+10, ec_algo, buffrc[9], vid);
+  }
+
+  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == RECEIVE_ACCEPT_GL && (packet->GetSize()) > 20) {
+    extract_Symmetric(buffrc+10, ec_algo, vid, buffrc[9], 1);
   }
 }
 
@@ -222,16 +245,19 @@ void DequeueTrace(std::string context, Ptr<const WifiMacQueueItem> item)
 
 void PrintInfo ()
 {
-    std::set<int> vehreg;
-    int num, numacc=0;
+    std::set<int> vehreg, vehgl;
+    int numrsu, numgl=0, numacc=0, numsymgl;
     if(ec_algo == 0) {
-      num = rsug2[0].numveh;
+      numrsu = rsug2[0].numveh;
+      numgl = gl2.numveh;
     }
     else if(ec_algo == 1) {
-      num = rsuec[0].numveh;
+      numrsu = rsuec[0].numveh;
+      numgl = glec.numveh;
     }
     else{
-      num = rsug3[0].numveh;
+      numrsu = rsug3[0].numveh;
+      numgl = gl3.numveh;
     }
 
     for(int i=0; i < rsuid; i++) {
@@ -242,11 +268,19 @@ void PrintInfo ()
           numacc++;
           vehreg.insert(i);
         }
+        if(vehg2[i].state == ON_SYMM_GL) {
+          numsymgl++;
+          vehgl.insert(i);
+        }
         break;
       case 1:
         if(vehec[i].state >= 2) {
           numacc++;
           vehreg.insert(i);
+        }
+        if(vehec[i].state == ON_SYMM_GL) {
+          numsymgl++;
+          vehgl.insert(i);
         }
         break;
       case 2:
@@ -254,17 +288,29 @@ void PrintInfo ()
           numacc++;
           vehreg.insert(i);
         }
+        if(vehg3[i].state == ON_SYMM_GL) {
+          numsymgl++;
+          vehgl.insert(i);
+        }
         break;
       default:
         break;
       }
     }
 
-    std::cout << BOLD_CODE << "Registered vehicles in RSU: " << num << " Received Symmetric: ";
+    std::cout << BOLD_CODE << "Registered vehicles in RSU: " << numrsu << " Received Symmetric: ";
     for(auto& id : vehreg) {
       std::cout << id << ' ';
     }
     std::cout << END_CODE << std::endl;
+
+    if(Now() > Seconds(150)) {
+      std::cout << BOLD_CODE << "Registered vehicles in GL: " << numgl << " Received Symmetric: ";
+      for(auto& id : vehgl) {
+        std::cout << id << ' ';
+      }
+      std::cout << END_CODE << std::endl;
+    }
 
     Simulator::Schedule (Seconds (4), &PrintInfo);
 }
@@ -457,7 +503,7 @@ int main (int argc, char *argv[])
 
   cmd.Parse (argc, argv);
 
-  std::string sumo_file = "/home/el18018/sumo/tools/temp1/ns2mobility.tcl";
+  std::string sumo_file = "/home/el18018/ns-allinone-3.30/ns-3.30/scratch/WaveTest/ns2mobility.tcl";
 
   ns3::PacketMetadata::Enable ();
   double simTime = 426;

@@ -424,7 +424,7 @@ bool isAscii(const char* bytes, int len) {
 }
 
 uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size) {
-    uint8_t *str = new uint8_t[size];
+    uint8_t *str = new uint8_t[size+15];
     ZZ sol1, sol2, sol3, sol4;
 
     sol1 = rep(val1);

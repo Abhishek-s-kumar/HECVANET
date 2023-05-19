@@ -126,7 +126,7 @@ void send_GLJoin_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, sigecc.c_str(), sigecc.length());
-    cypherbuff[fullsize+1] = 0;
+    cypherbuff[fullsize+1] = '\0';
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -415,3 +415,629 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         break;
     }
 }
+
+
+void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) {
+    switch (ec_algo)
+    {
+    case 0: {
+        ZZ ptest = to_ZZ(pt);
+        int size = NumBytes(ptest);
+        UnifiedEncoding enc(ptest, gl2.mydata->u, gl2.mydata->w, 2, ZZ_p::zero());
+        int signsize = NumBytes(to_ZZ(pg2));
+        int sizenosign = 2*(2*size + 1) + 31 + 2*size+1;
+
+        uint8_t *siga = new uint8_t[2*signsize+1];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizenosign, 2*signsize+1);
+        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+
+        NS_G2_NAMESPACE::divisor a, b, m, x;
+        
+        int nok = bytes_to_divisor(a, buffrc, gl2.mydata->curve, ptest);        
+        nok = bytes_to_divisor(b, buffrc+2*size+1, gl2.mydata->curve, ptest);
+        
+        if(nok)
+            return;
+
+        m = b - gl2.mydata->priv*a;
+        std::string rec;
+        divisor_to_text(rec, m, ptest, enc);
+        std::string tocmp = "Join";
+
+        if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
+        return;
+        }
+        std::cout << BOLD_CODE << GREEN_CODE << "Received Join on GL from vehicle: " << vid << END_CODE << std::endl;
+        gl2.numveh++;
+
+        std::string tmstmp = rec.substr(5);
+        nok = validate_timestamp(tmstmp);
+        if(nok) {
+            std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
+            return;
+        }
+        else {
+            std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+        }
+
+
+        nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+            if(nok)
+                return;
+        }
+
+        NS_G2_NAMESPACE::divisor g, capub, vehpk;
+        bytes_to_divisor(g, gl2.mydata->g, gl2.mydata->curve, ptest);
+        bytes_to_divisor(capub, gl2.mydata->capub, gl2.mydata->curve, ptest);
+
+        g2HECQV recert(gl2.mydata->curve, ptest, g);
+        uint8_t *received_cert = new uint8_t[31 + 2*size+1];
+        memcpy(received_cert, buffrc+4*size+2, 31 + 2*size+1);
+
+        recert.cert_pk_extraction(received_cert, capub);
+        vehpk = recert.get_calculated_Qu();
+        if(!vehpk.is_valid_divisor()) {
+            return;
+        }
+        divisor_to_bytes(gl2.vehpk[vid], vehpk, gl2.mydata->curve, ptest);
+
+        std::string issued_by, expires_on;
+        issued_by = recert.get_issued_by();
+        expires_on = recert.get_expires_on();
+
+        if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+        return;
+        }
+
+        using namespace CryptoPP;
+
+
+        AutoSeededRandomPool prng;
+
+        SecByteBlock key(AES::DEFAULT_KEYLENGTH);
+        SecByteBlock iv(AES::BLOCKSIZE);
+
+        prng.GenerateBlock(key, key.size());
+        prng.GenerateBlock(iv, iv.size());
+
+        std::string keystr, ivstr;
+        HexEncoder encoder(new StringSink(keystr));
+        encoder.Put(key, key.size());
+        encoder.MessageEnd();
+
+        HexEncoder encoder2(new StringSink(ivstr));
+        encoder2.Put(iv, iv.size());
+        encoder2.MessageEnd();
+    
+        std::string str1 = "Accept ";
+        str1 += keystr.substr(0, 16);
+
+        NS_G2_NAMESPACE::divisor mess1, a1, b1;
+        
+        text_to_divisor(mess1, str1, ptest, gl2.mydata->curve, enc);
+        
+        ZZ k;
+        RandomBnd(k, ptest*ptest);
+        a1 = k*g;
+        b1 = k*vehpk + mess1;
+
+
+        
+        std::string str2 = "Accept ";
+        str2 += keystr.substr(16);
+
+
+        NS_G2_NAMESPACE::divisor mess2, a2, b2;
+        
+        text_to_divisor(mess2, str2, ptest, gl2.mydata->curve, enc);
+        
+        a2 = k*g;
+        b2 = k*vehpk + mess2;
+
+
+
+        std::string str3 = "Accept ";
+        str3 += ivstr.substr(0, 16);
+
+
+        NS_G2_NAMESPACE::divisor mess3, a3, b3;
+        
+        text_to_divisor(mess3, str3, ptest, gl2.mydata->curve, enc);
+        
+        a3 = k*g;
+        b3 = k*vehpk + mess3;
+
+
+
+        std::string str4 = "Accept ";
+        str4 += ivstr.substr(16);
+
+        NS_G2_NAMESPACE::divisor mess4, a4, b4;
+        
+        text_to_divisor(mess4, str4, ptest, gl2.mydata->curve, enc);
+        
+        a4 = k*g;
+        b4 = k*vehpk + mess4;
+
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        auto str = oss.str();
+
+        std::string str5 = "Accept ";
+        str5 += str;
+
+        NS_G2_NAMESPACE::divisor mess5, a5, b5;
+        
+        text_to_divisor(mess5, str5, ptest, gl2.mydata->curve, enc);
+        
+        a5 = k*g;
+        b5 = k*vehpk + mess5;
+
+
+        int onedivsize = 2*size+1;
+        int size1no = 10*onedivsize;
+        int fullsize1 = size1no + 2*signsize + 62;
+
+        uint8_t cypherbuff[fullsize1+2];
+        uint8_t temp[size1no];
+
+        divisor_to_bytes(temp, a1, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+onedivsize, b1, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+2*onedivsize, a2, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+3*onedivsize, b2, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+4*onedivsize, a3, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+5*onedivsize, b3, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+6*onedivsize, a4, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+7*onedivsize, b4, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+8*onedivsize, a5, gl2.mydata->curve, ptest);
+        divisor_to_bytes(temp+9*onedivsize, b5, gl2.mydata->curve, ptest);
+
+        uint8_t mysiga[2*signsize+1];
+        ZZ mysigb;
+        std::string signstr = str1+str2+str3+str4+str5;
+        sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
+        verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk);
+
+        cypherbuff[0] = RECEIVE_ACCEPT_GL;
+        cypherbuff[1] = glid;
+        memcpy(cypherbuff+2, temp, size1no);
+        memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
+        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+
+        Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
+        Ptr <NetDevice> d0 = n0->GetDevice(0);
+        Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
+
+        Ptr<Node> n1 = ns3::NodeList::GetNode(vid);
+        Ptr <NetDevice> nd0 = n1->GetDevice(0);
+
+        Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize1+2);
+        Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
+        uint16_t protocol = 0x88dc;
+        TxInfo tx;
+        tx.preamble = WIFI_PREAMBLE_LONG;
+        tx.channelNumber = CCH;
+        tx.dataRate = WifiMode ("OfdmRate12MbpsBW10MHz");
+        tx.priority = 7;	//We set the AC to highest prior
+        tx.txPowerLevel = 7; //When we define TxPowerStar
+        wd0->SendX(packet_i, dest, protocol, tx);
+        gl2.symm_perveh[vid] = keystr;
+        gl2.iv_perveh[vid] = ivstr;
+        gl2.states[vid] = RECEIVE_ACCEPT_GL;
+        free(siga);
+        free(received_cert);
+
+        break;
+    }
+
+    case 1: {
+        GroupParameters group = glec.mydata->group;
+        int size = group.GetCurve().FieldSize().ByteCount();
+
+        ECQV cert(group);
+        cert.cert_pk_extraction(buffrc+4*size+2, glec.mydata->capub);
+        Element vehpub = cert.get_calculated_Qu();
+        glec.vehpk[vid] = vehpub;
+
+        int sizenosign = 2*(2*size+1) + 31 + 2*size + 1;
+        char sig[2*size];
+        memcpy(sig, buffrc+sizenosign, 2*size);
+        std::string sigecc(sig, 2*size);
+        
+
+        Element a, b, m, mtemp;
+        group.GetCurve().DecodePoint(a, buffrc, 2*size+1);
+        group.GetCurve().DecodePoint(b, buffrc+2*size+1, 2*size+1);
+        mtemp = group.GetCurve().ScalarMultiply(a, glec.mydata->priv);
+        m = group.GetCurve().Subtract(b, mtemp);
+        std::string rec;
+        rec = ecpoint_to_text(m);
+
+        std::string tocmp = "Join";
+
+        if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
+            return;
+        }
+        std::cout << BOLD_CODE << GREEN_CODE << "Received Join on GL from vehicle: " << vid << END_CODE << std::endl;
+        glec.numveh++;
+
+        std::string tmstmp = rec.substr(5);
+        int nok = validate_timestamp(tmstmp);
+        if(nok) {
+            std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
+            return;
+        }
+        else {
+            std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+        }
+
+        nok = verify_ec(sigecc, vehpub, (uint8_t*)rec.c_str(), rec.length());
+
+        if(nok) {
+            return;
+        }
+
+        std::string issued_by, expires_on;
+        issued_by = cert.get_issued_by();
+        expires_on = cert.get_expires_on();
+
+        if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            return;
+        }
+
+        using namespace CryptoPP;
+
+
+        AutoSeededRandomPool prng;
+
+        SecByteBlock key(AES::DEFAULT_KEYLENGTH);
+        SecByteBlock iv(AES::BLOCKSIZE);
+
+        prng.GenerateBlock(key, key.size());
+        prng.GenerateBlock(iv, iv.size());
+
+        std::string keystr, ivstr;
+        HexEncoder encoder(new StringSink(keystr));
+        encoder.Put(key, key.size());
+        encoder.MessageEnd();
+
+        HexEncoder encoder2(new StringSink(ivstr));
+        encoder2.Put(iv, iv.size());
+        encoder2.MessageEnd();
+
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        auto str = oss.str();
+
+        std::string finalstr1 = "Accept " + keystr.substr(0, 16);
+        std::string finalstr2 = keystr.substr(16) + ivstr.substr(0, 12);
+        std::string finalstr3 = ivstr.substr(12);
+        std::string finalstr4 = str;
+        Element m1, m2, m3, m4;
+        m1 = text_to_ecpoint(finalstr1, finalstr1.length(), group, size);
+        m2 = text_to_ecpoint(finalstr2, finalstr2.length(), group, size);
+        m3 = text_to_ecpoint(finalstr3, finalstr3.length(), group, size);
+        m4 = text_to_ecpoint(finalstr4, finalstr4.length(), group, size);
+
+        Element a1,b1,a2,b2,a3,b3,a4,b4;
+        CryptoPP::Integer k(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+        a1 = group.ExponentiateBase(k);
+        b1 = group.GetCurve().ScalarMultiply(vehpub, k);
+        b1 = group.GetCurve().Add(b1, m1);
+
+        a2 = group.ExponentiateBase(k);
+        b2 = group.GetCurve().ScalarMultiply(vehpub, k);
+        b2 = group.GetCurve().Add(b2, m2);
+
+        a3 = group.ExponentiateBase(k);
+        b3 = group.GetCurve().ScalarMultiply(vehpub, k);
+        b3 = group.GetCurve().Add(b3, m3);
+
+        a4 = group.ExponentiateBase(k);
+        b4 = group.GetCurve().ScalarMultiply(vehpub, k);
+        b4 = group.GetCurve().Add(b4, m4);
+
+        int onedivsize = 2*size+1;
+        int size1no = 8*onedivsize;
+        int fullsize1 = size1no + 2*size + 1;
+
+        uint8_t cypherbuff[fullsize1+2];
+        uint8_t temp[size1no];
+        group.GetCurve().EncodePoint(temp, a1, false);
+        group.GetCurve().EncodePoint(temp+onedivsize, b1, false);
+        group.GetCurve().EncodePoint(temp+2*onedivsize, a2, false);
+        group.GetCurve().EncodePoint(temp+3*onedivsize, b2, false);
+        group.GetCurve().EncodePoint(temp+4*onedivsize, a3, false);
+        group.GetCurve().EncodePoint(temp+5*onedivsize, b3, false);
+        group.GetCurve().EncodePoint(temp+6*onedivsize, a4, false);
+        group.GetCurve().EncodePoint(temp+7*onedivsize, b4, false);
+
+        std::string mysig;
+        std::string signstr = finalstr1 + finalstr2 + finalstr3 + finalstr4;
+        sign_ec(mysig, glec.mydata->priv, (uint8_t*)signstr.c_str(), signstr.length());
+        nok = verify_ec(mysig, glec.mydata->pub, (uint8_t*)signstr.c_str(), signstr.length());
+        
+        if(nok)
+            return;
+
+        cypherbuff[0] = RECEIVE_ACCEPT_GL;
+        cypherbuff[1] = glid;
+        memcpy(cypherbuff+2, temp, size1no);
+        memcpy(cypherbuff+2+size1no, mysig.c_str(), mysig.length());
+        cypherbuff[fullsize1+1] = '\0';
+
+        Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
+        Ptr <NetDevice> d0 = n0->GetDevice(0);
+        Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
+
+        Ptr<Node> n1 = ns3::NodeList::GetNode(vid);
+        Ptr <NetDevice> nd0 = n1->GetDevice(0);
+
+        Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize1+2);
+        Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
+        uint16_t protocol = 0x88dc;
+        TxInfo tx;
+        tx.preamble = WIFI_PREAMBLE_LONG;
+        tx.channelNumber = CCH;
+        tx.dataRate = WifiMode ("OfdmRate12MbpsBW10MHz");
+        tx.priority = 7;	//We set the AC to highest prior
+        tx.txPowerLevel = 7; //When we define TxPowerStar
+        wd0->SendX(packet_i, dest, protocol, tx);
+        glec.symm_perveh[vid] = keystr;
+        glec.iv_perveh[vid] = ivstr;
+        glec.states[vid] = RECEIVE_ACCEPT_GL;
+        break;
+    }
+
+    case 2: {
+        ZZ ptest = to_ZZ(pg3);
+        int size = NumBytes(ptest);
+        UnifiedEncoding enc(ptest, 10, 4, 3, ZZ_p::zero());
+
+        int signsize = NumBytes(to_ZZ(pg2));
+        int sizenosign = 12*size + 31 + 6*size;
+
+        // int fullsize = sizenosign + 2*signsize + 1 + signsize;
+
+        uint8_t *siga = new uint8_t[2*signsize+1];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizenosign, 2*signsize+1);
+        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+        
+
+        g3HEC::g3divisor a, b, m, x;
+        
+        int nok = bytes_to_divisorg3(a, buffrc, gl3.mydata->curve, ptest);
+        nok = bytes_to_divisorg3(b, buffrc+6*size, gl3.mydata->curve, ptest);
+        
+        if(nok)
+            return;
+
+        m = b - gl3.mydata->priv*a;
+        std::string rec;
+        divisorg3_to_text(rec, m, ptest, enc);
+        std::string tocmp = "Join";
+
+        if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
+            return;
+        }
+        std::cout << BOLD_CODE << GREEN_CODE << "Received Join GL from vehicle: " << vid << END_CODE << std::endl;
+        gl3.numveh++;
+
+        std::string tmstmp = rec.substr(5);
+        nok = validate_timestamp(tmstmp);
+        if(nok) {
+            std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
+            return;
+        }
+        else {
+            std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+        }
+
+        nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+            if(nok)
+                return;
+        }
+
+        g3HEC::g3divisor g, capub, vehpk;
+        bytes_to_divisorg3(g, gl3.mydata->g, gl3.mydata->curve, ptest);
+        bytes_to_divisorg3(capub, gl3.mydata->capub, gl3.mydata->curve, ptest);
+
+        g3HECQV recert(gl3.mydata->curve, ptest, g);
+        uint8_t *received_cert = new uint8_t[31 + 6*size];
+        memcpy(received_cert, buffrc+12*size, 31 + 6*size);
+
+        recert.cert_pk_extraction(received_cert, capub);
+        vehpk = recert.get_calculated_Qu();
+        if(!vehpk.is_valid_divisor()) {
+            return;
+        }
+
+        std::string issued_by, expires_on;
+        issued_by = recert.get_issued_by();
+        expires_on = recert.get_expires_on();
+
+        divisorg3_to_bytes(gl3.vehpk[vid], vehpk, gl3.mydata->curve, ptest);
+
+        if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            return;
+        }
+
+        using namespace CryptoPP;
+
+
+        AutoSeededRandomPool prng;
+
+        SecByteBlock key(AES::DEFAULT_KEYLENGTH);
+        SecByteBlock iv(AES::BLOCKSIZE);
+
+        prng.GenerateBlock(key, key.size());
+        prng.GenerateBlock(iv, iv.size());
+
+        std::string keystr, ivstr;
+        HexEncoder encoder(new StringSink(keystr));
+        encoder.Put(key, key.size());
+        encoder.MessageEnd();
+
+        HexEncoder encoder2(new StringSink(ivstr));
+        encoder2.Put(iv, iv.size());
+        encoder2.MessageEnd();
+    
+        std::string str1 = "Accept ";
+        str1 += keystr.substr(0, 16);
+
+        g3HEC::g3divisor mess1, a1, b1;
+        
+        int rt = text_to_divisorg3(mess1, str1, ptest, gl3.mydata->curve, enc);
+        if(rt) {
+            exit(1);
+        }
+        
+        ZZ k;
+        RandomBnd(k, ptest*ptest*ptest);
+        a1 = k*g;
+        b1 = k*vehpk + mess1;
+
+
+        
+        std::string str2 = "Accept ";
+        str2 += keystr.substr(16);
+
+
+        g3HEC::g3divisor mess2, a2, b2;
+        
+        rt = text_to_divisorg3(mess2, str2, ptest, gl3.mydata->curve, enc);
+        if(rt) {
+            exit(1);
+        }
+        
+        a2 = k*g;
+        b2 = k*vehpk + mess2;
+
+
+
+        std::string str3 = "Accept ";
+        str3 += ivstr.substr(0, 16);
+
+
+        g3HEC::g3divisor mess3, a3, b3;
+        
+        rt = text_to_divisorg3(mess3, str3, ptest, gl3.mydata->curve, enc);
+        if(rt) {
+            exit(1);
+        }
+        
+        a3 = k*g;
+        b3 = k*vehpk + mess3;
+
+
+
+        std::string str4 = "Accept ";
+        str4 += ivstr.substr(16);
+
+        g3HEC::g3divisor mess4, a4, b4;
+        
+        rt = text_to_divisorg3(mess4, str4, ptest, gl3.mydata->curve, enc);
+        if(rt) {
+            exit(1);
+        }
+        
+        a4 = k*g;
+        b4 = k*vehpk + mess4;
+
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        auto str = oss.str();
+        std::string str5 = "Accept ";
+        str5 += str;
+
+        g3HEC::g3divisor mess5, a5, b5;
+        
+        rt = text_to_divisorg3(mess5, str5, ptest, gl3.mydata->curve, enc);
+        if(rt) {
+            exit(1);
+        }
+        
+        a5 = k*g;
+        b5 = k*vehpk + mess5;
+
+
+        int onedivsize = 6*size;
+        int size1no = 10*onedivsize;
+        int fullsize1 = size1no + 2*signsize + 62;
+
+        uint8_t cypherbuff[fullsize1+2];
+        uint8_t temp[size1no];
+
+        divisorg3_to_bytes(temp, a1, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+onedivsize, b1, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+2*onedivsize, a2, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+3*onedivsize, b2, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+4*onedivsize, a3, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+5*onedivsize, b3, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+6*onedivsize, a4, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+7*onedivsize, b4, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+8*onedivsize, a5, gl3.mydata->curve, ptest);
+        divisorg3_to_bytes(temp+9*onedivsize, b5, gl3.mydata->curve, ptest);
+
+        uint8_t mysiga[2*signsize+1];
+        ZZ mysigb;
+        std::string signstr = str1 + str2 + str3 + str4 + str5;
+        sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
+        verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk);
+
+        cypherbuff[0] = RECEIVE_ACCEPT_GL;
+        cypherbuff[1] = glid;
+        memcpy(cypherbuff+2, temp, size1no);
+        memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
+        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+
+        Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
+        Ptr <NetDevice> d0 = n0->GetDevice(0);
+        Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
+
+        Ptr<Node> n1 = ns3::NodeList::GetNode(vid);
+        Ptr <NetDevice> nd0 = n1->GetDevice(0);
+
+        Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize1+2);
+        Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
+        uint16_t protocol = 0x88dc;
+        TxInfo tx;
+        tx.preamble = WIFI_PREAMBLE_LONG;
+        tx.channelNumber = CCH;
+        tx.dataRate = WifiMode ("OfdmRate12MbpsBW10MHz");
+        tx.priority = 7;	//We set the AC to highest prior
+        tx.txPowerLevel = 7; //When we define TxPowerStar
+        wd0->SendX(packet_i, dest, protocol, tx);
+        gl3.symm_perveh[vid] = keystr;
+        gl3.iv_perveh[vid] = ivstr;
+        gl3.states[vid] = RECEIVE_ACCEPT_GL;
+        free(siga);
+        free(received_cert);
+        break;
+    }
+    default:
+        break;
+    }
+}
+

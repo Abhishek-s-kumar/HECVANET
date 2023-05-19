@@ -83,6 +83,7 @@ struct GroupLeader_data_ec {
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
     int numveh;
+    Element vehpk[100];
 };
 
 struct RSU_data_g2{
@@ -109,6 +110,7 @@ struct GroupLeader_data_g2 {
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
     int numveh;
+    uint8_t vehpk[100][33];
 };
 
 struct RSU_data_g3{
@@ -135,6 +137,7 @@ struct GroupLeader_data_g3 {
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
     int numveh;
+    uint8_t vehpk[100][66];
 };
 
 extern Vehicle_data_ec vehec[100];
@@ -158,10 +161,12 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid);
 void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid);
 void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid);
 
-void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid);
+void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode=0);
 
 
 void RSU_inform_GL(int ec_algo, int vid);
 void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid);
 
 void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid);
+
+void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid);

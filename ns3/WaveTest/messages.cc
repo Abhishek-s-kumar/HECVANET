@@ -67,7 +67,10 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     uint8_t *siga = new uint8_t[2*signsize+1];
 
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
-    verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
+    int nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
+
+    if(nok)
+      return;
 
     int fullsize = sizenosign + 2*signsize + 1 + 61;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
@@ -171,7 +174,10 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     uint8_t *siga = new uint8_t[2*sizesign+1];
 
     sign_genus2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), ptest);
-    verify_sig2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk1);
+    int nok = verify_sig2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk1);
+
+    if(nok) 
+      return;
 
     int fullsize = sizenosign + 2*sizesign + 1 + 61;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
@@ -689,7 +695,9 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     ZZ mysigb;
     std::string signstr = str1+str2+str3+str4+str5;
     sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
-    verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+    nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+    if(nok)
+      return;
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
@@ -928,7 +936,9 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     ZZ mysigb;
     std::string signstr = str1 + str2 + str3 + str4 + str5;
     sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
-    verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
+    nok = verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
+    if(nok)
+      return;
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
@@ -1126,7 +1136,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
 
 
 
-void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
+void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode) {
   if(ec_algo == 0) {
     Vehicle_data_g2 *veh1g2 = &vehg2[vid];
     ZZ ptest = to_ZZ(pt);
@@ -1181,8 +1191,11 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     std::string rec5;
     divisor_to_text(rec5, mess5, ptest, enc);
 
-    if(rec5.substr(0,6) == "Accept") {
+    if(rec5.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
+    }
+    else if (rec5.substr(0,6) == "Accept" && mode == 1) {
+      std::cout << BOLD_CODE << GREEN_CODE << "Received accept from GL on node: " << vid << END_CODE << std::endl;
     }
     else{
       return;
@@ -1208,10 +1221,16 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     iv = rec3.substr(7);
     iv += rec4.substr(7);
 
-    std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    if(mode == 0)
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    else 
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1g2->symm = key;
     veh1g2->iv = iv;
-    veh1g2->state = ON_SYMMETRIC_ENC;
+    if(mode == 0)
+      veh1g2->state = ON_SYMMETRIC_ENC;
+    else 
+      veh1g2->state = ON_SYMM_GL;
   }
   else if (ec_algo == 1) {
     Vehicle_data_ec *veh1ec = &vehec[vid];
@@ -1248,8 +1267,11 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     m4 = group.GetCurve().Subtract(b4, m4);
     std::string rec4 = ecpoint_to_text(m4);
 
-    if(rec1.substr(0,6) == "Accept") {
+    if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
+    }
+    else if (rec1.substr(0,6) == "Accept" && mode == 1) {
+      std::cout << BOLD_CODE << GREEN_CODE << "Received accept from GL on node: " << vid << END_CODE << std::endl;
     }
     else{
       return;
@@ -1264,8 +1286,12 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     }
 
     std::string signstr = rec1 + rec2 + rec3 + rec4;
-    int nok = verify_ec(sigecc, veh1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
-    
+    int nok;
+    if(mode == 0)
+      nok = verify_ec(sigecc, veh1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
+    else 
+      nok = verify_ec(sigecc, veh1ec->glpub, (uint8_t*)signstr.c_str(), signstr.length());
+
     if(nok)
       return;
 
@@ -1275,10 +1301,16 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     iv = rec2.substr(16);
     iv += rec3;
 
-    std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    if(mode == 0)
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    else
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1ec->symm = key;
     veh1ec->iv = iv;
-    veh1ec->state = ON_SYMMETRIC_ENC;
+    if(mode ==0 )
+      veh1ec->state = ON_SYMMETRIC_ENC;
+    else 
+      veh1ec->state = ON_SYMM_GL;
   }
   else {
     Vehicle_data_g3 *veh1g3 = &vehg3[vid];
@@ -1334,8 +1366,11 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     std::string rec5;
     divisorg3_to_text(rec5, mess5, ptest, enc);
 
-    if(rec5.substr(0,6) == "Accept") {
+    if(rec5.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
+    }
+    else if (rec5.substr(0,6) == "Accept" && mode == 1) {
+      std::cout << BOLD_CODE << GREEN_CODE << "Received accept from GL on node: " << vid << END_CODE << std::endl;
     }
     else{
       return;
@@ -1361,9 +1396,15 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid) {
     iv = rec3.substr(7);
     iv += rec4.substr(7);
 
-    std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    if (mode == 0)
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
+    else 
+      std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1g3->symm = key;
     veh1g3->iv = iv;
-    veh1g3->state = ON_SYMMETRIC_ENC;
+    if (mode == 0)
+      veh1g3->state = ON_SYMMETRIC_ENC;
+    else
+      veh1g3->state = ON_SYMM_GL;
   }
 }

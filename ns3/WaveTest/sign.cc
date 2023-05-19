@@ -179,7 +179,7 @@ int verify_ec(std::string sig, Element Pk, uint8_t *message, int size) {
     publicKey.Initialize(ASN1::secp256r1(), Pk);
     ECDSA<ECP, SHA256>::Verifier verifier(publicKey);
 
-    bool result = verifier.VerifyMessage( message, size, (const byte*)&sig[0], sig.size());
+    bool result = verifier.VerifyMessage( message, size, (const byte*)&sig[0], sig.length());
     
     // Verification failure?
     if( !result ) {

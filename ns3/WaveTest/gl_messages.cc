@@ -1,6 +1,7 @@
 #include "messages.h"
 
-
+bool dry[100];
+bool already_here = false;
 using namespace ns3;
 
 void encrypt_message_AES (uint8_t *out, uint8_t *in, int size, std::string keystr, std::string ivstr) {
@@ -78,7 +79,7 @@ void RSU_inform_GL(int ec_algo, int vid) {
             int sizenosign = finalstr.length()+1 + 31 + 2*size+1;
 
             int sizemod16 = sizenosign + 16 - sizenosign%16;
-            int fullsize = sizemod16 + 2*signsize + 62;
+            int fullsize = sizemod16 + 2*signsize + 22;
 
             uint8_t sendbuff[fullsize+2];
 
@@ -107,7 +108,7 @@ void RSU_inform_GL(int ec_algo, int vid) {
             sendbuff[1] = vid;
             memcpy(sendbuff+2, cypher, sizemod16);
             memcpy(sendbuff+sizemod16+2, siga, 2*signsize+1);
-            BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 61);
+            BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 21);
 
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -209,7 +210,7 @@ void RSU_inform_GL(int ec_algo, int vid) {
             int sizenosign = finalstr.length()+1 + 31 + 6*size;
 
             int sizemod16 = sizenosign + 16 - sizenosign%16;
-            int fullsize = sizemod16 + 2*signsize + 62;
+            int fullsize = sizemod16 + 2*signsize + 22;
 
             uint8_t sendbuff[fullsize+2];
 
@@ -238,7 +239,7 @@ void RSU_inform_GL(int ec_algo, int vid) {
             sendbuff[1] = vid;
             memcpy(sendbuff+2, cypher, sizemod16);
             memcpy(sendbuff+sizemod16+2, siga, 2*signsize+1);
-            BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 61);
+            BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 21);
 
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -295,8 +296,10 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
             std::cout << BOLD_CODE << GREEN_CODE << "Node " << vid << " is selected as GL!" << END_CODE << std::endl;
 
         int nok = validate_timestamp(lead.substr(7, 27));
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Invalid Timestamp." << END_CODE << std::endl;
             return;
+        }
         else 
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
 
@@ -316,7 +319,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         ZZ sigb;
 
         memcpy(siga, buffrc+sizemod16, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizemod16+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizemod16+2*signsize+1, 21);
 
         nok = verify_sig2(siga, sigb, decrypted, sizenosign, hpk);
 
@@ -327,11 +330,12 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
                 return;
         }
 
+        gl2.myid = vid;
         gl2.mydata = veh1g2;
         gl2.mydata->state = IS_GROUP_LEADER;
         std::cout << BOLD_CODE << YELLOW_CODE << "Group Leader " << vid << " broadcasting proof of leadership for new vehicles..." << END_CODE << std::endl << std::endl;
 
-        int sendsize1 = 2 + sizenosign + 2*signsize + 62;
+        int sendsize1 = 2 + sizenosign + 2*signsize + 22;
         int finalsendsize = sendsize1;
         uint8_t sendbuff[finalsendsize];
 
@@ -339,7 +343,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         sendbuff[1] = vid;
         memcpy(sendbuff+2, decrypted, sizenosign);
         memcpy(sendbuff+2+sizenosign, siga, 2*signsize+1);
-        memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 61);
+        memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 21);
         
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -356,7 +360,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         tx.priority = 7;	//We set the AC to highest prior
         tx.txPowerLevel = 7; //When we define TxPowerStar
 
-        for(uint32_t i=150; i < 400; i+=2) {
+        for(uint32_t i=0; i < 250; i+=2) {
             packet_i = Create<Packet>(sendbuff, finalsendsize);
             Simulator::Schedule(Seconds(i), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
         }
@@ -383,8 +387,10 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
             std::cout << BOLD_CODE << GREEN_CODE << "Node " << vid << " is selected as GL!" << END_CODE << std::endl;
 
         int nok = validate_timestamp(lead.substr(7, 27));
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Invalid Timestamp." << END_CODE << std::endl;
             return;
+        }
         else 
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
 
@@ -406,6 +412,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
             return;
         }
 
+        glec.myid = vid;
         glec.mydata = veh1ec;
         glec.mydata->state = IS_GROUP_LEADER;
         std::cout << BOLD_CODE << YELLOW_CODE << "Group Leader " << vid << " broadcasting proof of leadership for new vehicles..." << END_CODE << std::endl << std::endl;
@@ -483,7 +490,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         ZZ sigb;
 
         memcpy(siga, buffrc+sizemod16, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizemod16+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizemod16+2*signsize+1, 21);
 
         nok = verify_sig2(siga, sigb, decrypted, sizenosign, hpk);
 
@@ -494,11 +501,12 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
                 return;
         }
 
+        gl3.myid = vid;
         gl3.mydata = veh1g3;
         gl3.mydata->state = IS_GROUP_LEADER;
         std::cout << BOLD_CODE << YELLOW_CODE << "Group Leader " << vid << " broadcasting proof of leadership for new vehicles..." << END_CODE << std::endl << std::endl;
 
-        int sendsize1 = 2 + sizenosign + 2*signsize + 62;
+        int sendsize1 = 2 + sizenosign + 2*signsize + 22;
         int finalsendsize = sendsize1;
         uint8_t sendbuff[finalsendsize];
 
@@ -506,7 +514,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         sendbuff[1] = vid;
         memcpy(sendbuff+2, decrypted, sizenosign);
         memcpy(sendbuff+2+sizenosign, siga, 2*signsize+1);
-        memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 61);
+        memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 21);
         
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
@@ -536,3 +544,399 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
     }
 }
 
+void schedule_inform_message(int ec_algo, int vid, int glid) {
+    double posx, posy;
+    Ptr<Node> currn = ns3::NodeList::GetNode(vid);
+    Ptr<MobilityModel> mob = currn->GetObject<MobilityModel>();
+    posx = mob->GetPosition().x;
+    posy = mob->GetPosition().y;
+
+    std::string inform = "Node " + to_string(vid) + " is at position: "
+                            + to_string(posx) + " " + to_string(posy) + " ";
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+    auto str = oss.str();
+
+    inform += str;
+
+    int messagesize = inform.length() + 1;
+    int sizemod16 = messagesize + 16 - messagesize%16;
+    uint8_t cypherbuff[sizemod16];
+
+    std::string key,iv;
+
+    switch (ec_algo)
+    {
+    case 0: {
+        key = vehg2[vid].symm;
+        iv = vehg2[vid].iv;
+        break;
+    }
+    case 1: {
+        key = vehec[vid].symm;
+        iv = vehec[vid].iv;
+        break;
+    }
+    case 2: {
+        key = vehg3[vid].symm;
+        iv = vehg3[vid].iv;
+        break;
+    }
+    default:
+        break;
+    }
+
+    encrypt_message_AES(cypherbuff, (uint8_t*)inform.c_str(), inform.length()+1, key, iv);
+    
+    int fullsize=0;
+    uint8_t *sendbuff;
+
+    if(ec_algo == 1) {
+        int size = vehec[vid].group.GetCurve().FieldSize().ByteCount();
+        fullsize = sizemod16 + 2*size+1;
+        sendbuff = new uint8_t[fullsize+2];
+
+        std::string sigecc;
+        sign_ec(sigecc, vehec[vid].priv, (uint8_t*)inform.c_str(), inform.length());
+        int nok = verify_ec(sigecc, vehec[vid].pub, (uint8_t*)inform.c_str(), inform.length());
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = vid;
+        memcpy(sendbuff+2, cypherbuff, sizemod16);
+        memcpy(sendbuff+2+sizemod16, sigecc.c_str(), 2*size+1);
+    }
+    else {
+        int size = NumBytes(to_ZZ(pg2));
+        fullsize = sizemod16 + 2*size + 22;
+        sendbuff = new uint8_t[fullsize+2];
+        uint8_t siga[2*size+1];
+        ZZ sigb;
+
+        sign_genus2(siga, sigb, (uint8_t*)inform.c_str(), inform.length(), to_ZZ(pg2));
+        int nok = verify_sig2(siga, sigb, (uint8_t *)inform.c_str(), inform.length(), hpk);
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = vid;
+        memcpy(sendbuff+2, cypherbuff, sizemod16);
+        memcpy(sendbuff+2+sizemod16, siga, 2*size+1);
+        BytesFromZZ(sendbuff+sizemod16+2*size+3, sigb, 21);
+    }
+
+    Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
+    Ptr <NetDevice> nd1 = n1->GetDevice(0);
+    Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (nd1);
+
+    Ptr<Node> n0 = ns3::NodeList::GetNode(glid);
+    Ptr <NetDevice> nd0 = n0->GetDevice(0);
+
+    Ptr <Packet> packet_i = Create<Packet>(sendbuff, fullsize+2);
+    Mac48Address dest = Mac48Address::ConvertFrom (nd0->GetAddress());
+
+    uint16_t protocol = 0x88dc;
+    TxInfo tx;
+    tx.preamble = WIFI_PREAMBLE_LONG;
+    tx.channelNumber = CCH;
+    tx.dataRate = WifiMode ("OfdmRate12MbpsBW10MHz");
+    tx.priority = 7;	//We set the AC to highest prior
+    tx.txPowerLevel = 7; //When we define TxPowerStar
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, 3);
+    
+    float timerand = dis(gen);
+
+    //wd0->SendX(packet_i, dest, protocol, tx);
+    Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
+}
+
+void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+    auto str = oss.str();
+
+    aggstr += str;
+    
+    int messagesize = aggstr.length() + 1;
+    int sizemod16 = messagesize + 16 - messagesize%16;
+    uint8_t cypherbuff[sizemod16];
+
+    std::string key,iv;
+
+    switch (ec_algo)
+    {
+    case 0: {
+        key = vehg2[glid].symm;
+        iv = vehg2[glid].iv;
+        break;
+    }
+    case 1: {
+        key = vehec[glid].symm;
+        iv = vehec[glid].iv;
+        break;
+    }
+    case 2: {
+        key = vehg3[glid].symm;
+        iv = vehg3[glid].iv;
+        break;
+    }
+    default:
+        break;
+    }
+
+    int infnum = aggstr.length()/46;
+    encrypt_message_AES(cypherbuff, (uint8_t*)aggstr.c_str(), messagesize, key, iv);
+    
+    int fullsize=0;
+    uint8_t *sendbuff;
+
+    if(ec_algo == 1) {
+        int size = vehec[glid].group.GetCurve().FieldSize().ByteCount();
+        fullsize = sizemod16 + 2*size+1;
+        sendbuff = new uint8_t[fullsize+3];
+
+        std::string sigecc;
+        sign_ec(sigecc, vehec[glid].priv, (uint8_t*)aggstr.c_str(), aggstr.length());
+        int nok = verify_ec(sigecc, vehec[glid].pub, (uint8_t*)aggstr.c_str(), aggstr.length());
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = glid;
+        sendbuff[2] = infnum;
+        memcpy(sendbuff+3, cypherbuff, sizemod16);
+        memcpy(sendbuff+3+sizemod16, sigecc.c_str(), 2*size+1);
+    }
+    else {
+        int size = NumBytes(to_ZZ(pg2));
+        fullsize = sizemod16 + 2*size + 22;
+        sendbuff = new uint8_t[fullsize+3];
+        uint8_t siga[2*size+1];
+        ZZ sigb;
+
+        sign_genus2(siga, sigb, (uint8_t*)aggstr.c_str(), aggstr.length(), to_ZZ(pg2));
+        int nok = verify_sig2(siga, sigb, (uint8_t *)aggstr.c_str(), aggstr.length(), hpk);
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = glid;
+        sendbuff[2] = infnum;
+        memcpy(sendbuff+3, cypherbuff, sizemod16);
+        memcpy(sendbuff+3+sizemod16, siga, 2*size+1);
+        BytesFromZZ(sendbuff+sizemod16+2*size+4, sigb, 21);
+    }
+
+    Ptr<Node> n1 =  ns3::NodeList::GetNode(glid);
+    Ptr <NetDevice> nd1 = n1->GetDevice(0);
+    Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (nd1);
+
+    Ptr<Node> n0 = ns3::NodeList::GetNode(rsuid);
+    Ptr <NetDevice> nd0 = n0->GetDevice(0);
+
+    Ptr <Packet> packet_i = Create<Packet>(sendbuff, fullsize+3);
+    Mac48Address dest = Mac48Address::ConvertFrom (nd0->GetAddress());
+
+    uint16_t protocol = 0x88dc;
+    TxInfo tx;
+    tx.preamble = WIFI_PREAMBLE_LONG;
+    tx.channelNumber = CCH;
+    tx.dataRate = WifiMode ("OfdmRate12MbpsBW10MHz");
+    tx.priority = 7;	//We set the AC to highest prior
+    tx.txPowerLevel = 7; //When we define TxPowerStar
+
+    wd0->SendX(packet_i, dest, protocol, tx);
+    //Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
+
+}
+
+void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
+    if(dry[vid] == true)
+        return;
+
+    std::string key,iv;
+
+    switch (ec_algo)
+    {
+    case 0: {
+        key = gl2.symm_perveh[vid];
+        iv = gl2.iv_perveh[vid];
+        break;
+    }
+    case 1: {
+        key = glec.symm_perveh[vid];
+        iv = glec.iv_perveh[vid];
+        break;
+    }
+    case 2: {
+        key = gl3.symm_perveh[vid];
+        iv = gl3.iv_perveh[vid];
+        break;
+    }
+    default:
+        break;
+    }
+
+    int messagesize = 66;
+    int sizemod16 = messagesize + 16 - messagesize%16;
+    uint8_t decrypted[sizemod16];
+
+
+    decrypt_message_AES(decrypted, buffrc, sizemod16, key, iv);
+    std::cout << std::endl << BOLD_CODE << GREEN_CODE << "Received info message from node: " << vid << std::endl;
+
+    std::string tmstmp((char*)decrypted+46);
+    int nok = validate_timestamp(tmstmp);
+    if(nok) {
+      std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
+      return;
+    }
+    else {
+      std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+    }
+
+    if (ec_algo == 1) {
+        int size = glec.mydata->group.GetCurve().FieldSize().ByteCount();
+        std::string sigecc((char*)buffrc+sizemod16, 2*size+1);
+        nok = verify_ec(sigecc, glec.vehpk[vid], decrypted, messagesize-1);
+        if(nok)
+            return;
+
+        std::string informed((char*)decrypted, 46);
+        glec.agg_messages += informed;
+        //std::cout << glec.agg_messages << std::endl;
+        dry[vid] = true;
+    }
+    else {
+        int size = NumBytes(to_ZZ(pg2));
+        uint8_t siga[2*size+1];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizemod16, 2*size+1);
+        sigb = ZZFromBytes(buffrc+sizemod16+2*size+1, 21);
+
+        nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+            if(nok)
+                return;
+        }
+        std::string informed((char*)decrypted, 46);
+        if(ec_algo == 0) {
+            gl2.agg_messages += informed;
+            //std::cout << gl2.agg_messages << std::endl;
+        }
+        else {
+            gl3.agg_messages += informed;
+            //std::cout << gl3.agg_messages << std::endl;
+        }
+
+        dry[vid] = true;
+    }
+    if(vid >= 62) {
+        std::string aggstr;
+        if(ec_algo == 0) {
+            aggstr = gl2.agg_messages;
+        }
+        else if(ec_algo == 1) {
+            aggstr = glec.agg_messages;
+        }
+        else{
+            aggstr = gl3.agg_messages;
+        }
+        send_Aggregated_toRSU(ec_algo, glid, aggstr);
+    } 
+}
+
+
+void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
+    if(already_here)
+        return;
+    
+    std::string key,iv, received;
+
+    switch (ec_algo)
+    {
+    case 0: {
+        key = rsug2[0].symm_perveh[glid];
+        iv = rsug2[0].iv_perveh[glid];
+        break;
+    }
+    case 1: {
+        key = rsuec[0].symm_perveh[glid];
+        iv = rsuec[0].iv_perveh[glid];
+        break;
+    }
+    case 2: {
+        key = rsug3[0].symm_perveh[glid];
+        iv = rsug3[0].iv_perveh[glid];
+        break;
+    }
+    default:
+        break;
+    }
+
+    int messagesize = infnum*46 + 20;
+    int sizemod16 = messagesize + 16 - messagesize%16;
+    uint8_t decrypted[sizemod16];
+
+
+    decrypt_message_AES(decrypted, buffrc, sizemod16, key, iv);
+    std::cout << BOLD_CODE << GREEN_CODE << "Received info message from GL!" << std::endl;
+
+    std::string tmstmp((char*)decrypted+infnum*46);
+    int nok = validate_timestamp(tmstmp);
+    if(nok) {
+      std::cout << BOLD_CODE << RED_CODE << "Message not fresh" << END_CODE << std::endl;
+      return;
+    }
+    else {
+      std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
+    }
+
+    if (ec_algo == 1) {
+        int size = rsuec[0].group.GetCurve().FieldSize().ByteCount();
+        std::string sigecc((char*)buffrc+sizemod16, 2*size+1);
+        nok = verify_ec(sigecc, rsuec[0].vehpk[glid], decrypted, messagesize-1);
+        if(nok)
+            return;
+
+        std::string informed((char*)decrypted, infnum*46);
+        received = informed;
+    }
+    else {
+        int size = NumBytes(to_ZZ(pg2));
+        uint8_t siga[2*size+1];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizemod16, 2*size+1);
+        sigb = ZZFromBytes(buffrc+sizemod16+2*size+1, 21);
+
+        nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+            if(nok)
+                return;
+        }
+        std::string informed((char*)decrypted, infnum*46);
+        received = informed;
+    }
+    std::cout << std::endl << BOLD_CODE << YELLOW_CODE << received << END_CODE << std::endl << std::endl;
+
+    already_here = true;
+
+}

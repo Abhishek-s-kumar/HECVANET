@@ -45,13 +45,13 @@ void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
     verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk);
 
-    int fullsize = sizenosign + 2*signsize + 1 + 61;
+    int fullsize = sizenosign + 2*signsize + 1 + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = RECEIVE_ACCEPT_GL;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 61);
+    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -201,13 +201,13 @@ void send_GLJoing_g3(Vehicle_data_g3 *veh1g3, int vid, int destnode) {
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
     verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk);
 
-    int fullsize = sizenosign + 2*signsize + 1 + 61;
+    int fullsize = sizenosign + 2*signsize + 1 + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = RECEIVE_ACCEPT_GL;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 61);
+    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -271,7 +271,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         ZZ sigb;
 
         memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
 
         nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk);
 
@@ -300,6 +300,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         glpub = cert2.get_calculated_Qu();
         std::cout << BOLD_CODE << GREEN_CODE << "Received GL public key, node: " << vid << END_CODE << std::endl;
         divisor_to_bytes(veh1g2->glpub, glpub, veh1g2->curve, ptest);
+        veh1g2->glid = glid;
         send_GLJoin_g2(veh1g2, vid, glid);
 
         break;
@@ -320,8 +321,10 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
             std::cout << BOLD_CODE << GREEN_CODE << "Received Proof of Leadership on node: " << vid << END_CODE << std::endl;
 
         int nok = validate_timestamp(lead.substr(7, 27));
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Invalid Timestamp." << END_CODE << std::endl;
             return;
+        }
         else 
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
 
@@ -342,11 +345,13 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         expires_on = cert.get_expires_on();
 
         if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
             return;
         }
 
         veh1ec->glpub = cert.get_calculated_Qu();
         std::cout << BOLD_CODE << GREEN_CODE << "Received GL public key, node: " << vid << END_CODE << std::endl;
+        veh1ec->glid = glid;
         send_GLJoin_ec(veh1ec, vid, glid);
         break;
     }
@@ -367,8 +372,10 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
             std::cout << BOLD_CODE << GREEN_CODE << "Received Proof of Leadership on node: " << vid << END_CODE << std::endl;
 
         int nok = validate_timestamp(lead.substr(7, 27));
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Invalid Timestamp." << END_CODE << std::endl;
             return;
+        }
         else 
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
 
@@ -378,7 +385,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         ZZ sigb;
 
         memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
 
         nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk);
 
@@ -401,12 +408,14 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         expires_on = cert2.get_expires_on();
 
         if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
             return;
         }
 
         glpub = cert2.get_calculated_Qu();
         std::cout << BOLD_CODE << GREEN_CODE << "Received GL public key, node: " << vid << END_CODE << std::endl;
         divisorg3_to_bytes(veh1g3->glpub, glpub, veh1g3->curve, ptest);
+        veh1g3->glid = glid;
         send_GLJoing_g3(veh1g3, vid, glid);
 
         break;
@@ -431,23 +440,24 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         ZZ sigb;
 
         memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
 
         NS_G2_NAMESPACE::divisor a, b, m, x;
         
         int nok = bytes_to_divisor(a, buffrc, gl2.mydata->curve, ptest);        
         nok = bytes_to_divisor(b, buffrc+2*size+1, gl2.mydata->curve, ptest);
         
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Bytes to divisor did not succeed." << END_CODE << std::endl;
             return;
-
+        }
         m = b - gl2.mydata->priv*a;
         std::string rec;
         divisor_to_text(rec, m, ptest, enc);
         std::string tocmp = "Join";
 
         if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
-        return;
+            return;
         }
         std::cout << BOLD_CODE << GREEN_CODE << "Received Join on GL from vehicle: " << vid << END_CODE << std::endl;
         gl2.numveh++;
@@ -492,6 +502,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         expires_on = recert.get_expires_on();
 
         if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
         return;
         }
 
@@ -585,7 +596,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
         int onedivsize = 2*size+1;
         int size1no = 10*onedivsize;
-        int fullsize1 = size1no + 2*signsize + 62;
+        int fullsize1 = size1no + 2*signsize + 22;
 
         uint8_t cypherbuff[fullsize1+2];
         uint8_t temp[size1no];
@@ -611,7 +622,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         cypherbuff[1] = glid;
         memcpy(cypherbuff+2, temp, size1no);
         memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -691,6 +702,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         expires_on = cert.get_expires_on();
 
         if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
             return;
         }
 
@@ -815,7 +827,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         ZZ sigb;
 
         memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
         
 
         g3HEC::g3divisor a, b, m, x;
@@ -823,8 +835,10 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         int nok = bytes_to_divisorg3(a, buffrc, gl3.mydata->curve, ptest);
         nok = bytes_to_divisorg3(b, buffrc+6*size, gl3.mydata->curve, ptest);
         
-        if(nok)
+        if(nok) {
+            std::cout << RED_CODE << "Bytes to divisor did not succeed." << END_CODE << std::endl;
             return;
+        }
 
         m = b - gl3.mydata->priv*a;
         std::string rec;
@@ -877,6 +891,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         divisorg3_to_bytes(gl3.vehpk[vid], vehpk, gl3.mydata->curve, ptest);
 
         if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+            std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
             return;
         }
 
@@ -984,7 +999,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
         int onedivsize = 6*size;
         int size1no = 10*onedivsize;
-        int fullsize1 = size1no + 2*signsize + 62;
+        int fullsize1 = size1no + 2*signsize + 22;
 
         uint8_t cypherbuff[fullsize1+2];
         uint8_t temp[size1no];
@@ -1010,7 +1025,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         cypherbuff[1] = glid;
         memcpy(cypherbuff+2, temp, size1no);
         memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -1040,4 +1055,6 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         break;
     }
 }
+
+
 

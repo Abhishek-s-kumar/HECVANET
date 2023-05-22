@@ -16,8 +16,9 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
-const int ec_algo = 2;
+const int ec_algo = 1;
 int rsuid = 63;
+uint16_t seq, seq2;
 
 Vehicle_data_g2 vehg2[100];
 RSU_data_g2 rsug2[5];
@@ -42,7 +43,6 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
 {
 
   //context will include info about the source of this event. Use string manipulation if you want to extract info.
-  
   
   Ptr <Packet> myPacket = packet->Copy();
   //Print the info.
@@ -83,6 +83,7 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
 
     Ptr<Node> n1 = ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> nd0 = n1->GetDevice(0);
+
     if(hdr1.GetAddr1() != nd0->GetAddress() && hdr1.GetAddr1() != "ff:ff:ff:ff:ff:ff") {
       return;
     }
@@ -136,12 +137,16 @@ void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     receive_GLCert_Send_Join(buffrc+10, ec_algo, vid, glid);
   }
 
-  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == IS_GROUP_LEADER && onglstate != RECEIVE_ACCEPT_GL  && (packet->GetSize()) > 20) {
+  else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == IS_GROUP_LEADER && onglstate != RECEIVE_ACCEPT_GL  && (packet->GetSize()) > 20) { 
     extract_GLJoin_SendAccept(buffrc+10, ec_algo, buffrc[9], vid);
   }
 
   else if(buffrc[8] == RECEIVE_ACCEPT_GL && state == RECEIVE_ACCEPT_GL && (packet->GetSize()) > 20) {
     extract_Symmetric(buffrc+10, ec_algo, vid, buffrc[9], 1);
+  }
+
+  else if(buffrc[8] == INFORM_MSG && state == IS_GROUP_LEADER && (packet->GetSize()) > 20) {
+    extract_Inform_Aggregate(buffrc+10, ec_algo, buffrc[9], vid);
   }
 }
 
@@ -156,7 +161,7 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
   WifiMacTrailer trl;
 
   uint8_t *buffrc = new uint8_t[packet->GetSize()];
-  int prot,vid, rid=0;
+  int prot,vid, rid=0, glid=0;
   
   if (packet->PeekHeader(hdr))
   {
@@ -172,6 +177,24 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
     
     prot = (int)buffrc[8];
     vid = (int)buffrc[9];
+
+    switch (ec_algo)
+    {
+    case 0: {
+      glid = rsug2[rid].glid;
+      break;
+    }
+    case 1: {
+      glid = rsuec[rid].glid;
+      break;
+    }
+    case 2: {
+      glid = rsug3[rid].glid;
+      break;
+    }
+    default:
+      break;
+    }
 
   }
   else {
@@ -196,6 +219,9 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
       extract_RSU_SendAccept_g3(buffrc+10, vid, rid);
     }
   }
+  else if(prot == INFORM_MSG && glid == vid && (packet->GetSize()) > 20) {
+    extract_Info_RSU(buffrc+11, buffrc[10], ec_algo, glid);
+  }
 }
 
 
@@ -204,16 +230,20 @@ void Rx1(std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz
  */
 void RxDrop (std::string context, Ptr<const Packet> packet, ns3::WifiPhyRxfailureReason reason)
 {
-	std::cout << std::endl << BOLD_CODE << YELLOW_CODE << "Packet Rx Dropped!" << END_CODE << std::endl;
-	//From ns-3.30, the reasons are defined in an enum type in ns3::WifiPhy class.
-	std::cout << " Reason : " << reason << std::endl;
-	std::cout << context << std::endl;
-
-	WifiMacHeader hdr;
+  WifiMacHeader hdr;
 	if (packet->PeekHeader(hdr))
 	{
+    if(seq == hdr.GetSequenceNumber() || hdr.GetAddr2() == "00:00:00:00:00:00") {
+      return;
+    }
+    std::cout << std::endl << BOLD_CODE << YELLOW_CODE << "Packet Rx Dropped!" << END_CODE << std::endl;
+    //From ns-3.30, the reasons are defined in an enum type in ns3::WifiPhy class.
+    std::cout << " Reason : " << reason << std::endl;
+    std::cout << context << std::endl;
 
-		std::cout << " Destination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << "\tSeq No. " << hdr.GetSequenceNumber() << std::endl << std::endl;
+    seq = hdr.GetSequenceNumber();
+
+		std::cout << " Destination MAC : " << hdr.GetAddr1() << "\tSource MAC : " << hdr.GetAddr2() << "\tSeq No. " << seq << std::endl << std::endl;
 	}
 }
 
@@ -328,6 +358,9 @@ void SelectGL(std::set<double> endsim_cars) {
     std::cout << std::endl << BOLD_CODE << YELLOW_CODE << "Selected GL: " << rand_id << END_CODE << std::endl;
     
     RSU_inform_GL(ec_algo, rand_id);
+    std::string conn = "/NodeList/";
+    conn += to_string(rand_id) + "/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/PhyRxDrop";
+    Config::Connect(conn, MakeCallback (&RxDrop) );
 
 }
 
@@ -667,7 +700,7 @@ int main (int argc, char *argv[])
 
     double exit=0;
     if(ns2_util.GetExitTimeForNode(i) > 200) {
-      exit = ns2_util.GetSimulationTime();
+      exit = 426;
       endsim_cars.insert(i);
     }
     else {

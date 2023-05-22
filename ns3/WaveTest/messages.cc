@@ -72,13 +72,13 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     if(nok)
       return;
 
-    int fullsize = sizenosign + 2*signsize + 1 + 61;
+    int fullsize = sizenosign + 2*signsize + 1 + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = 0;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 61);
+    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -179,13 +179,13 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     if(nok) 
       return;
 
-    int fullsize = sizenosign + 2*sizesign + 1 + 61;
+    int fullsize = sizenosign + 2*sizesign + 1 + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = 0;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*sizesign+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*sizesign+1, sigb, 61);
+    BytesFromZZ(cypherbuff+sizenosign+2+2*sizesign+1, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -381,6 +381,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     expires_on = cert2.get_expires_on();
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -418,6 +419,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     expires_on = cert.get_expires_on();
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -493,6 +495,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     expires_on = cert2.get_expires_on();
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -519,15 +522,17 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     ZZ sigb;
 
     memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-    sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+    sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
 
     NS_G2_NAMESPACE::divisor a, b, m, x;
     
     int nok = bytes_to_divisor(a, buffrc, rsu1g2->curve, ptest);
     nok = bytes_to_divisor(b, buffrc+2*size+1, rsu1g2->curve, ptest);
     
-    if(nok)
+    if(nok) {
+      std::cout << RED_CODE << "Bytes to divisor did not succeed." << END_CODE << std::endl;
       return;
+    }
 
     m = b - rsu1g2->priv*a;
     std::string rec;
@@ -582,6 +587,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     expires_on = recert.get_expires_on();
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -675,7 +681,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     int onedivsize = 2*size+1;
     int size1no = 10*onedivsize;
-    int fullsize1 = size1no + 2*signsize + 62;
+    int fullsize1 = size1no + 2*signsize + 22;
 
     uint8_t cypherbuff[fullsize1+2];
     uint8_t temp[size1no];
@@ -703,7 +709,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     cypherbuff[1] = 0;
     memcpy(cypherbuff+2, temp, size1no);
     memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+    BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -745,7 +751,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     ZZ sigb;
 
     memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-    sigb = -ZZFromBytes(buffrc+sizenosign+2*signsize+1, 61);
+    sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
     
 
     g3HEC::g3divisor a, b, m, x;
@@ -753,8 +759,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     int nok = bytes_to_divisorg3(a, buffrc, rsu1g3->curve, ptest);
     nok = bytes_to_divisorg3(b, buffrc+6*size, rsu1g3->curve, ptest);
     
-    if(nok)
+    if(nok) {
+      std::cout << RED_CODE << "Bytes to divisorg3 did not succeed." << END_CODE << std::endl;
       return;
+    }
 
     m = b - rsu1g3->priv*a;
     std::string rec;
@@ -809,6 +817,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     divisorg3_to_bytes(rsu1g3->vehpk[vid], vehpk, rsu1g3->curve, ptest);
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -916,7 +925,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     int onedivsize = 6*size;
     int size1no = 10*onedivsize;
-    int fullsize1 = size1no + 2*signsize + 62;
+    int fullsize1 = size1no + 2*signsize + 22;
 
     uint8_t cypherbuff[fullsize1+2];
     uint8_t temp[size1no];
@@ -944,7 +953,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     cypherbuff[1] = 0;
     memcpy(cypherbuff+2, temp, size1no);
     memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 61);
+    BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -1023,6 +1032,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     expires_on = cert.get_expires_on();
 
     if(issued_by.substr(0,4) != "DMV1" || expires_on.substr(6) <= "2023") {
+      std::cout << RED_CODE << "Invalid Cert." << END_CODE << std::endl;
       return;
     }
 
@@ -1150,7 +1160,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
     memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
-    mysigb = -ZZFromBytes(buffrc+10*divsize+2*signsize+1, 61);
+    mysigb = ZZFromBytes(buffrc+10*divsize+2*signsize+1, 21);
 
     bytes_to_divisor(a1, buffrc, veh1g2->curve, ptest);
     bytes_to_divisor(b1, buffrc+divsize, veh1g2->curve, ptest);
@@ -1229,8 +1239,10 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     veh1g2->iv = iv;
     if(mode == 0)
       veh1g2->state = ON_SYMMETRIC_ENC;
-    else 
+    else {
       veh1g2->state = ON_SYMM_GL;
+      schedule_inform_message(ec_algo, vid, veh1g2->glid);
+    }
   }
   else if (ec_algo == 1) {
     Vehicle_data_ec *veh1ec = &vehec[vid];
@@ -1309,8 +1321,10 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     veh1ec->iv = iv;
     if(mode ==0 )
       veh1ec->state = ON_SYMMETRIC_ENC;
-    else 
+    else {
       veh1ec->state = ON_SYMM_GL;
+      schedule_inform_message(ec_algo, vid, veh1ec->glid);
+    }
   }
   else {
     Vehicle_data_g3 *veh1g3 = &vehg3[vid];
@@ -1326,7 +1340,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
     memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
-    mysigb = -ZZFromBytes(buffrc+10*divsize+2*signsize+1, 61);
+    mysigb = ZZFromBytes(buffrc+10*divsize+2*signsize+1, 21);
 
     bytes_to_divisorg3(a1, buffrc, veh1g3->curve, ptest);
     bytes_to_divisorg3(b1, buffrc+divsize, veh1g3->curve, ptest);
@@ -1404,7 +1418,9 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     veh1g3->iv = iv;
     if (mode == 0)
       veh1g3->state = ON_SYMMETRIC_ENC;
-    else
+    else {
       veh1g3->state = ON_SYMM_GL;
+      schedule_inform_message(ec_algo, vid, veh1g3->glid);
+    }
   }
 }

@@ -56,7 +56,8 @@ enum ProtocolVEH {
     GROUP_LEADER_INFORM,
     IS_GROUP_LEADER,
     RECEIVE_ACCEPT_GL,
-    ON_SYMM_GL
+    ON_SYMM_GL,
+    INFORM_MSG
 };
 
 struct RSU_data_ec{
@@ -76,14 +77,16 @@ struct Vehicle_data_ec{
     uint8_t cert[96];
     ProtocolVEH state;
     std::string symm, iv;
+    int glid;
 };
 
 struct GroupLeader_data_ec {
     Vehicle_data_ec *mydata;
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
-    int numveh;
+    int numveh, myid;
     Element vehpk[100];
+    std::string agg_messages;
 };
 
 struct RSU_data_g2{
@@ -102,15 +105,16 @@ struct Vehicle_data_g2{
     uint8_t cert[64];
     ProtocolVEH state;
     std::string symm, iv;
-    int u, w;
+    int u, w, glid;
 };
 
 struct GroupLeader_data_g2 {
     Vehicle_data_g2 *mydata;
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
-    int numveh;
+    int numveh, myid;
     uint8_t vehpk[100][33];
+    std::string agg_messages;
 };
 
 struct RSU_data_g3{
@@ -129,15 +133,16 @@ struct Vehicle_data_g3{
     uint8_t cert[97];
     ProtocolVEH state;
     std::string symm, iv;
-    int u, w;
+    int u, w, glid;
 };
 
 struct GroupLeader_data_g3 {
     Vehicle_data_g3 *mydata;
     ProtocolVEH states[100];
     std::string symm_perveh[100], iv_perveh[100];
-    int numveh;
+    int numveh, myid;
     uint8_t vehpk[100][66];
+    std::string agg_messages;
 };
 
 extern Vehicle_data_ec vehec[100];
@@ -170,3 +175,8 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid);
 void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid);
 
 void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid);
+
+void schedule_inform_message(int ec_algo, int vid, int glid);
+void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid);
+
+void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid);

@@ -10,14 +10,14 @@ static ZZ from_divisor_to_ZZ(const NS_G2_NAMESPACE::divisor& div, const ZZ& n)
 int sign_genus2 (uint8_t *asig, ZZ& b, uint8_t *mess, int size, ZZ pch) {
     NTL::ZZ_pContext context;
     context.save();
-    CryptoPP::SHA3_256 hash;
+    CryptoPP::SHA3_224 hash;
     hash.Update(mess, size);
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
     
     ZZ m;
-    m = ZZFromBytes((unsigned char*)digest.data(), 32);
+    m = ZZFromBytes((unsigned char*)digest.data(), 28);
     SetSeed(to_ZZ(1234567890));
 
     ZZ p = to_ZZ(pg2); 
@@ -69,7 +69,7 @@ int sign_genus2 (uint8_t *asig, ZZ& b, uint8_t *mess, int size, ZZ pch) {
     f_a = from_divisor_to_ZZ(a, order);
 
     /* b = (m - x*f(a))/k mod N */
-    b = MulMod(m - x * f_a, InvMod(k, order), order);
+    b = ((m - x*f_a)*InvMod(k, order))%order;
 
     if ( f_a * h + b * a == m * g ) {
         //cout << "Created ElGamal signature!" << endl;
@@ -89,14 +89,14 @@ int sign_genus2 (uint8_t *asig, ZZ& b, uint8_t *mess, int size, ZZ pch) {
 int verify_sig2(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk) {
     NTL::ZZ_pContext context;
     context.save();
-    CryptoPP::SHA3_256 hash;
+    CryptoPP::SHA3_224 hash;
     hash.Update(mess, size);
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
     
     ZZ m;
-    m = ZZFromBytes((unsigned char*)digest.data(), 32);
+    m = ZZFromBytes((unsigned char*)digest.data(), 28);
     SetSeed(to_ZZ(1234567890));
 
     ZZ p = to_ZZ(pg2); 

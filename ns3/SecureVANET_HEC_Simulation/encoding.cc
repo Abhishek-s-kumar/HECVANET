@@ -423,8 +423,8 @@ bool isAscii(const char* bytes, int len) {
     return true;
 }
 
-uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size) {
-    uint8_t *str = new uint8_t[size+15];
+uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size, int mode=0) {
+    uint8_t *str = new uint8_t[size];
     ZZ sol1, sol2, sol3, sol4;
 
     sol1 = rep(val1);
@@ -433,25 +433,33 @@ uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size) {
     sol4 = rep(-val2);
 
     NTL::BytesFromZZ(str, sol1, size);
-    bool flag = isAscii((char*)str, size);
+    bool flag = isAscii((char*)str, size); 
+    if(mode)
+        flag = flag && (str[0] == '1' || str[0] == '2' || str[0] == '3');
     if(flag) {
         return str;
     }
 
     NTL::BytesFromZZ(str, sol2, size);
     flag = isAscii((char*)str, size);
+    if(mode)
+        flag = flag && (str[0] == '1' || str[0] == '2' || str[0] == '3');
     if(flag) {
         return str;
     }
 
     NTL::BytesFromZZ(str, sol3, size);
     flag = isAscii((char*)str, size);
+    if(mode)
+        flag = flag && (str[0] == '1' || str[0] == '2' || str[0] == '3');
     if(flag) {
         return str;
     }
 
     NTL::BytesFromZZ(str, sol4, size);
     flag = isAscii((char*)str, size);
+    if(mode)
+        flag = flag && (str[0] == '1' || str[0] == '2' || str[0] == '3');
     if(flag) {
         return str;
     }
@@ -538,7 +546,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
     
     uint8_t *str1;
 
-    str1 = find_string(val1, val2, maxlen/3+1);
+    str1 = find_string(val1, val2, maxlen/3+1, 1);
 
     if(memcmp(str1, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
@@ -547,7 +555,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
 
     uint8_t *str2;
 
-    str2 = find_string(val3, val4, maxlen/3+1);
+    str2 = find_string(val3, val4, maxlen/3+1, 1);
 
     if(memcmp(str2, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
@@ -556,7 +564,7 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
 
     uint8_t *str3;
 
-    str3 = find_string(val5, val6, maxlen/3+1);
+    str3 = find_string(val5, val6, maxlen/3+1, 1);
 
     if(memcmp(str3, zer, maxlen/3+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
@@ -572,8 +580,9 @@ int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncodin
     memcpy(ret+p2*maxlen/3, str2+1, maxlen/3);
     memcpy(ret+p3*maxlen/3, str3+1, maxlen/3);
     ret[maxlen] = '\0';
+    //std::string toret((char*)ret, maxlen+1);
     txt = (char*)ret;
-
+    //txt = toret;
     free(zer);
     free(str1);
     free(str2);

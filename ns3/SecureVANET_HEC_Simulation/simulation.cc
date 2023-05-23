@@ -16,7 +16,7 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
-const int ec_algo = 1;
+uint32_t ec_algo = 0;
 int rsuid = 63;
 uint16_t seq, seq2;
 
@@ -368,6 +368,10 @@ void SelectGL(std::set<double> endsim_cars) {
 int main (int argc, char *argv[])
 {
   CommandLine cmd;
+  cmd.AddValue("algo", "Encryption Algorithm", ec_algo);
+
+  cmd.Parse (argc, argv);
+
   int fullsize=0;
   uint8_t *cypher_buff;
 
@@ -531,10 +535,6 @@ int main (int argc, char *argv[])
 
   //Number of nodes
   uint32_t nNodes = 64;
-
-  cmd.AddValue ("n","Number of nodes", nNodes);
-
-  cmd.Parse (argc, argv);
 
   std::string sumo_file = "/home/el18018/ns-allinone-3.30/ns-3.30/scratch/WaveTest/ns2mobility.tcl";
 

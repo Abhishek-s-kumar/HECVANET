@@ -551,8 +551,18 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
     posx = mob->GetPosition().x;
     posy = mob->GetPosition().y;
 
-    std::string inform = "Node " + to_string(vid) + " is at position: "
-                            + to_string(posx) + " " + to_string(posy) + " ";
+    std::string inform = "Node " + to_string(vid) + " is at position: ";
+
+    if(posx > 0 && posx < 100)
+        inform += " " + to_string(posx); 
+    else
+        inform += to_string(posx); 
+
+    if(posy > 0 && posy < 100)   
+        inform += "  " + to_string(posy) + " ";
+    else 
+        inform += " " + to_string(posy) + " ";
+        
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
     
@@ -604,6 +614,7 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         int nok = verify_ec(sigecc, vehec[vid].pub, (uint8_t*)inform.c_str(), inform.length());
         if(nok)
             return;
+        
 
         sendbuff[0] = INFORM_MSG;
         sendbuff[1] = vid;
@@ -809,9 +820,11 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         int size = glec.mydata->group.GetCurve().FieldSize().ByteCount();
         std::string sigecc((char*)buffrc+sizemod16, 2*size+1);
         nok = verify_ec(sigecc, glec.vehpk[vid], decrypted, messagesize-1);
+
         if(nok)
             return;
 
+        
         std::string informed((char*)decrypted, 46);
         glec.agg_messages += informed;
         //std::cout << glec.agg_messages << std::endl;

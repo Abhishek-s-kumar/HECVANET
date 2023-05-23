@@ -922,6 +922,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     a5 = k*g;
     b5 = k*vehpk + mess5;
 
+    
 
     int onedivsize = 6*size;
     int size1no = 10*onedivsize;
@@ -944,6 +945,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
     std::string signstr = str1 + str2 + str3 + str4 + str5;
+
     sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
     nok = verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
     if(nok)

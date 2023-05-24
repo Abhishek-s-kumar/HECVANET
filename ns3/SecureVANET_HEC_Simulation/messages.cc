@@ -41,7 +41,9 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     cert2.cert_generate(certveh1g2, "VEH0001", h, capriv);
 
     cert2.cert_pk_extraction(certveh1g2, capub);
-    cert2.cert_reception(certveh1g2, x);
+    int nok = cert2.cert_reception(certveh1g2, x);
+    if(nok)
+      exit(1);
 
     mypub = cert2.get_calculated_Qu();
     mypriv = cert2.get_extracted_du();
@@ -67,7 +69,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     uint8_t *siga = new uint8_t[2*signsize+1];
 
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
-    int nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
+    nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
 
     if(nok)
       return;
@@ -360,18 +362,8 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     divisor_to_bytes(veh1g2->g, g, veh1g2->curve, ptest);
 
-    poly_t uca, vca;
-    SetCoeff(uca, 2, 1);
-    SetCoeff(uca, 1, to_ZZ_p(to_ZZ("10449495449821289081705384679193221605")));
-    SetCoeff(uca, 0, to_ZZ_p(to_ZZ("18201279118423512585508597806469124467")));
-
-    SetCoeff(vca, 1, to_ZZ_p(to_ZZ("25428464405508011187614906973766682181")));
-    SetCoeff(vca, 0, to_ZZ_p(to_ZZ("332059286561908222198963453047829588368")));
-
-    capub.set_curve(curve);
-    capub.set_upoly(uca);
-    capub.set_vpoly(vca);
-    capub.update();
+    ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
+    capub = capriv*g;
 
     divisor_to_bytes(veh1g2->capub, capub, veh1g2->curve, ptest);
 
@@ -623,11 +615,9 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     RandomBnd(k, ptest*ptest);
     a1 = k*g;
     b1 = k*vehpk + mess1;
-
-
     
-    std::string str2 = "Accept ";
-    str2 += keystr.substr(16);
+    std::string str2 = keystr.substr(16);
+    str2 += ivstr.substr(0, 10);
 
 
     NS_G2_NAMESPACE::divisor mess2, a2, b2;
@@ -639,9 +629,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
 
 
-    std::string str3 = "Accept ";
-    str3 += ivstr.substr(0, 16);
-
+    std::string str3 = ivstr.substr(10);
 
     NS_G2_NAMESPACE::divisor mess3, a3, b3;
     
@@ -652,8 +640,14 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
 
 
-    std::string str4 = "Accept ";
-    str4 += ivstr.substr(16);
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+    auto str = oss.str();
+
+    std::string str4 = str;
 
     NS_G2_NAMESPACE::divisor mess4, a4, b4;
     
@@ -662,26 +656,9 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     a4 = k*g;
     b4 = k*vehpk + mess4;
 
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    
-    std::ostringstream oss;
-    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
-    auto str = oss.str();
-
-    std::string str5 = "Accept ";
-    str5 += str;
-
-    NS_G2_NAMESPACE::divisor mess5, a5, b5;
-    
-    text_to_divisor(mess5, str5, ptest, rsu1g2->curve, enc);
-    
-    a5 = k*g;
-    b5 = k*vehpk + mess5;
-
 
     int onedivsize = 2*size+1;
-    int size1no = 10*onedivsize;
+    int size1no = 8*onedivsize;
     int fullsize1 = size1no + 2*signsize + 22;
 
     uint8_t cypherbuff[fullsize1+2];
@@ -695,12 +672,10 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     divisor_to_bytes(temp+5*onedivsize, b3, rsu1g2->curve, ptest);
     divisor_to_bytes(temp+6*onedivsize, a4, rsu1g2->curve, ptest);
     divisor_to_bytes(temp+7*onedivsize, b4, rsu1g2->curve, ptest);
-    divisor_to_bytes(temp+8*onedivsize, a5, rsu1g2->curve, ptest);
-    divisor_to_bytes(temp+9*onedivsize, b5, rsu1g2->curve, ptest);
 
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    std::string signstr = str1+str2+str3+str4+str5;
+    std::string signstr = str1+str2+str3+str4;
     sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
     nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
     if(nok)
@@ -859,8 +834,8 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
 
     
-    std::string str2 = "Accept ";
-    str2 += keystr.substr(16);
+    std::string str2 = keystr.substr(16);
+    str2 += ivstr.substr(0, 10);
 
 
     g3HEC::g3divisor mess2, a2, b2;
@@ -875,8 +850,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
 
 
-    std::string str3 = "Accept ";
-    str3 += ivstr.substr(0, 16);
+    std::string str3 = ivstr.substr(10);
 
 
     g3HEC::g3divisor mess3, a3, b3;
@@ -890,9 +864,14 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     b3 = k*vehpk + mess3;
 
 
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+    auto str = oss.str();
 
-    std::string str4 = "Accept ";
-    str4 += ivstr.substr(16);
+    std::string str4 = str;
 
     g3HEC::g3divisor mess4, a4, b4;
     
@@ -904,29 +883,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     a4 = k*g;
     b4 = k*vehpk + mess4;
 
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    
-    std::ostringstream oss;
-    oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
-    auto str = oss.str();
-    std::string str5 = "Accept ";
-    str5 += str;
-
-    g3HEC::g3divisor mess5, a5, b5;
-    
-    rt = text_to_divisorg3(mess5, str5, ptest, rsu1g3->curve, enc);
-    if(rt) {
-      exit(1);
-    }
-    
-    a5 = k*g;
-    b5 = k*vehpk + mess5;
-
     
 
     int onedivsize = 6*size;
-    int size1no = 10*onedivsize;
+    int size1no = 8*onedivsize;
     int fullsize1 = size1no + 2*signsize + 22;
 
     uint8_t cypherbuff[fullsize1+2];
@@ -940,12 +900,10 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     divisorg3_to_bytes(temp+5*onedivsize, b3, rsu1g3->curve, ptest);
     divisorg3_to_bytes(temp+6*onedivsize, a4, rsu1g3->curve, ptest);
     divisorg3_to_bytes(temp+7*onedivsize, b4, rsu1g3->curve, ptest);
-    divisorg3_to_bytes(temp+8*onedivsize, a5, rsu1g3->curve, ptest);
-    divisorg3_to_bytes(temp+9*onedivsize, b5, rsu1g3->curve, ptest);
 
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    std::string signstr = str1 + str2 + str3 + str4 + str5;
+    std::string signstr = str1 + str2 + str3 + str4;
 
     sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
     nok = verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
@@ -1162,8 +1120,8 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     int signsize = NumBytes(to_ZZ(pg2));
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
-    mysigb = ZZFromBytes(buffrc+10*divsize+2*signsize+1, 21);
+    memcpy(mysiga, buffrc+8*divsize, 2*signsize+1);
+    mysigb = ZZFromBytes(buffrc+8*divsize+2*signsize+1, 21);
 
     bytes_to_divisor(a1, buffrc, veh1g2->curve, ptest);
     bytes_to_divisor(b1, buffrc+divsize, veh1g2->curve, ptest);
@@ -1196,25 +1154,17 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     std::string rec4;
     divisor_to_text(rec4, mess4, ptest, enc);
 
-
-    bytes_to_divisor(a5, buffrc+8*divsize, veh1g2->curve, ptest);
-    bytes_to_divisor(b5, buffrc+9*divsize, veh1g2->curve, ptest);
-    
-    mess5 = b5 - veh1g2->priv*a5;
-    std::string rec5;
-    divisor_to_text(rec5, mess5, ptest, enc);
-
-    if(rec5.substr(0,6) == "Accept" && mode == 0) {
+    if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
     }
-    else if (rec5.substr(0,6) == "Accept" && mode == 1) {
+    else if (rec1.substr(0,6) == "Accept" && mode == 1) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from GL on node: " << vid << END_CODE << std::endl;
     }
     else{
       return;
     }
 
-    if(validate_timestamp(rec5.substr(7))) {
+    if(validate_timestamp(rec4)) {
       std::cout << BOLD_CODE << RED_CODE << "Timestamp not ok" << END_CODE << std::endl;
       return;
     }
@@ -1222,7 +1172,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
-    std::string signstr = rec1+rec2+rec3+rec4+rec5;
+    std::string signstr = rec1+rec2+rec3+rec4;
     int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
     if(nok) {
       return;
@@ -1230,9 +1180,9 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
 
     std::string key, iv;
     key = rec1.substr(7);
-    key += rec2.substr(7);
-    iv = rec3.substr(7);
-    iv += rec4.substr(7);
+    key += rec2.substr(0,16);
+    iv = rec2.substr(16);
+    iv += rec3;
 
     if(mode == 0)
       std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;
@@ -1342,8 +1292,8 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     int signsize = NumBytes(to_ZZ(pg2));
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
-    memcpy(mysiga, buffrc+10*divsize, 2*signsize+1);
-    mysigb = ZZFromBytes(buffrc+10*divsize+2*signsize+1, 21);
+    memcpy(mysiga, buffrc+8*divsize, 2*signsize+1);
+    mysigb = ZZFromBytes(buffrc+8*divsize+2*signsize+1, 21);
 
     bytes_to_divisorg3(a1, buffrc, veh1g3->curve, ptest);
     bytes_to_divisorg3(b1, buffrc+divsize, veh1g3->curve, ptest);
@@ -1376,24 +1326,18 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     std::string rec4;
     divisorg3_to_text(rec4, mess4, ptest, enc);
 
-    bytes_to_divisorg3(a5, buffrc+8*divsize, veh1g3->curve, ptest);
-    bytes_to_divisorg3(b5, buffrc+9*divsize, veh1g3->curve, ptest);
-    
-    mess5 = b5 - veh1g3->priv*a5;
-    std::string rec5;
-    divisorg3_to_text(rec5, mess5, ptest, enc);
 
-    if(rec5.substr(0,6) == "Accept" && mode == 0) {
+    if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
     }
-    else if (rec5.substr(0,6) == "Accept" && mode == 1) {
+    else if (rec1.substr(0,6) == "Accept" && mode == 1) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from GL on node: " << vid << END_CODE << std::endl;
     }
     else{
       return;
     }
 
-    if(validate_timestamp(rec5.substr(7))) {
+    if(validate_timestamp(rec4)) {
       std::cout << BOLD_CODE << RED_CODE << "Timestamp not ok" << END_CODE << std::endl;
       return;
     }
@@ -1401,7 +1345,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
-    std::string signstr = rec1+rec2+rec3+rec4+rec5;
+    std::string signstr = rec1+rec2+rec3+rec4;
     int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
     if(nok) {
       return;
@@ -1409,9 +1353,9 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
 
     std::string key, iv;
     key = rec1.substr(7);
-    key += rec2.substr(7);
-    iv = rec3.substr(7);
-    iv += rec4.substr(7);
+    key += rec2.substr(0,16);
+    iv = rec2.substr(16);
+    iv += rec3;
 
     if (mode == 0)
       std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from RSU, node: " << vid << END_CODE << std::endl;

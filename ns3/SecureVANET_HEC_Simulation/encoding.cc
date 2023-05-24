@@ -311,15 +311,17 @@ int text_to_divisor (NS_G2_NAMESPACE::divisor &D, std::string txt, ZZ p, NS_G2_N
     ZZ chkzz = NTL::ZZFromBytes(chk, len);
 
     uint8_t *str1, *str2;
-    str1 = new uint8_t [maxlen/2];
-    str2 = new uint8_t [maxlen/2];
+    str1 = new uint8_t [maxlen/2+1];
+    str2 = new uint8_t [maxlen/2+1];
+    str1[0] = '1';
+    str2[0] = '2';
 
-    memcpy(str1, chk, maxlen/2);
-    memcpy(str2, chk + maxlen/2, maxlen/2);
+    memcpy(str1+1, chk, maxlen/2);
+    memcpy(str2+1, chk + maxlen/2, maxlen/2);
 
     ZZ msgzz1, msgzz2;
-    msgzz1 = NTL::ZZFromBytes(str1, maxlen/2);
-    msgzz2 = NTL::ZZFromBytes(str2, maxlen/2);
+    msgzz1 = NTL::ZZFromBytes(str1, maxlen/2+1);
+    msgzz2 = NTL::ZZFromBytes(str2, maxlen/2+1);
 
     if(msgzz1 >= p || msgzz2 >= p) {
         std::cout << "Needs segmentation." << std::endl; 
@@ -470,8 +472,8 @@ uint8_t* find_string(ZZ_p val1, ZZ_p val2, int size, int mode=0) {
 
 int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedEncoding enc) {
     int maxlen = 26;
-    uint8_t *zer = new uint8_t[maxlen/2];
-    memset(zer, '0', maxlen/2);
+    uint8_t *zer = new uint8_t[maxlen/2+1];
+    memset(zer, '0', maxlen/2+1);
     uint8_t *ret = new uint8_t[maxlen+1];
     ZZ_p x1, y1, x2, y2;
     divisor_to_points(D, x1, y1, x2, y2, p);
@@ -485,44 +487,34 @@ int divisor_to_text(std::string &txt, NS_G2_NAMESPACE::divisor D, ZZ p, UnifiedE
         return 1;
     }
 
-    uint8_t *str1 = new uint8_t[maxlen/2];
+    uint8_t *str1 = new uint8_t[maxlen/2+1];
 
-    str1 = find_string(val1, val2, maxlen/2);
+    str1 = find_string(val1, val2, maxlen/2+1, 1);
 
-    if(memcmp(str1, zer, maxlen/2) == 0) {
+    if(memcmp(str1, zer, maxlen/2+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
-    uint8_t *str2 = new uint8_t[maxlen/2];
+    uint8_t *str2 = new uint8_t[maxlen/2+1];
 
-    str2 = find_string(val3, val4, maxlen/2);
+    str2 = find_string(val3, val4, maxlen/2+1, 1);
 
-    if(memcmp(str2, zer, maxlen/2) == 0) {
+    if(memcmp(str2, zer, maxlen/2+1) == 0) {
         std::cout << "Could not decode!" << std::endl;
         return 1;
     }
 
-    if(memcmp(str1, "Accept", 6) == 0 ||  memcmp(str1, "Join", 4) == 0) {
-        memcpy(ret, str1, maxlen/2);
-        memcpy(ret+maxlen/2, str2, maxlen/2);
-        ret[maxlen] = '\0';
-        txt = (char*)ret;
-        free(zer);
-        free(str1);
-        free(str2);
-        return 0;
-    }
-    else{
-        memcpy(ret, str2, maxlen/2);
-        memcpy(ret+maxlen/2, str1, maxlen/2);
-        ret[maxlen] = '\0';
-        txt = (char*)ret;
-        free(zer);
-        free(str1);
-        free(str2);
-        return 0;
-    }
+    int p1, p2;
+    p1 = str1[0] - 49;
+    p2 = str2[0] - 49;
+    
+    memcpy(ret+p1*maxlen/2, str1+1, maxlen/2);
+    memcpy(ret+p2*maxlen/2, str2+1, maxlen/2);
+    ret[maxlen] = '\0';
+    //std::string toret((char*)ret, maxlen+1);
+    txt = (char*)ret;
+    return 0;
 }
 
 int divisorg3_to_text(std::string &txt, g3HEC::g3divisor D, ZZ p, UnifiedEncoding enc) {

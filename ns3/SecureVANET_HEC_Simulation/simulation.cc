@@ -394,7 +394,6 @@ int main (int argc, char *argv[])
       exit(1);
     }
 
-
     ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
     ZZ x;
     capub = capriv*g;

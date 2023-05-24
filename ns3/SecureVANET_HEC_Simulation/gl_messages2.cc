@@ -540,8 +540,8 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
 
         
-        std::string str2 = "Accept ";
-        str2 += keystr.substr(16);
+        std::string str2 = keystr.substr(16);
+        str2 += ivstr.substr(0, 10);
 
 
         NS_G2_NAMESPACE::divisor mess2, a2, b2;
@@ -553,8 +553,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
 
 
-        std::string str3 = "Accept ";
-        str3 += ivstr.substr(0, 16);
+        std::string str3 = ivstr.substr(10);
 
 
         NS_G2_NAMESPACE::divisor mess3, a3, b3;
@@ -565,9 +564,14 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         b3 = k*vehpk + mess3;
 
 
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        auto str = oss.str();
 
-        std::string str4 = "Accept ";
-        str4 += ivstr.substr(16);
+        std::string str4 = str;
 
         NS_G2_NAMESPACE::divisor mess4, a4, b4;
         
@@ -576,26 +580,9 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         a4 = k*g;
         b4 = k*vehpk + mess4;
 
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
-        auto str = oss.str();
-
-        std::string str5 = "Accept ";
-        str5 += str;
-
-        NS_G2_NAMESPACE::divisor mess5, a5, b5;
-        
-        text_to_divisor(mess5, str5, ptest, gl2.mydata->curve, enc);
-        
-        a5 = k*g;
-        b5 = k*vehpk + mess5;
-
 
         int onedivsize = 2*size+1;
-        int size1no = 10*onedivsize;
+        int size1no = 8*onedivsize;
         int fullsize1 = size1no + 2*signsize + 22;
 
         uint8_t cypherbuff[fullsize1+2];
@@ -609,12 +596,10 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         divisor_to_bytes(temp+5*onedivsize, b3, gl2.mydata->curve, ptest);
         divisor_to_bytes(temp+6*onedivsize, a4, gl2.mydata->curve, ptest);
         divisor_to_bytes(temp+7*onedivsize, b4, gl2.mydata->curve, ptest);
-        divisor_to_bytes(temp+8*onedivsize, a5, gl2.mydata->curve, ptest);
-        divisor_to_bytes(temp+9*onedivsize, b5, gl2.mydata->curve, ptest);
 
         uint8_t mysiga[2*signsize+1];
         ZZ mysigb;
-        std::string signstr = str1+str2+str3+str4+str5;
+        std::string signstr = str1+str2+str3+str4;
         sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
         verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk);
 
@@ -931,9 +916,8 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         b1 = k*vehpk + mess1;
 
 
-        
-        std::string str2 = "Accept ";
-        str2 += keystr.substr(16);
+        std::string str2 = keystr.substr(16);
+        str2 += ivstr.substr(0, 10);
 
 
         g3HEC::g3divisor mess2, a2, b2;
@@ -948,8 +932,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
 
 
-        std::string str3 = "Accept ";
-        str3 += ivstr.substr(0, 16);
+        std::string str3 = ivstr.substr(10);
 
 
         g3HEC::g3divisor mess3, a3, b3;
@@ -963,9 +946,13 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         b3 = k*vehpk + mess3;
 
 
-
-        std::string str4 = "Accept ";
-        str4 += ivstr.substr(16);
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        auto str = oss.str();
+        std::string str4 = str;
 
         g3HEC::g3divisor mess4, a4, b4;
         
@@ -977,28 +964,9 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         a4 = k*g;
         b4 = k*vehpk + mess4;
 
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
-        auto str = oss.str();
-        std::string str5 = "Accept ";
-        str5 += str;
-
-        g3HEC::g3divisor mess5, a5, b5;
-        
-        rt = text_to_divisorg3(mess5, str5, ptest, gl3.mydata->curve, enc);
-        if(rt) {
-            exit(1);
-        }
-        
-        a5 = k*g;
-        b5 = k*vehpk + mess5;
-
 
         int onedivsize = 6*size;
-        int size1no = 10*onedivsize;
+        int size1no = 8*onedivsize;
         int fullsize1 = size1no + 2*signsize + 22;
 
         uint8_t cypherbuff[fullsize1+2];
@@ -1012,12 +980,10 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         divisorg3_to_bytes(temp+5*onedivsize, b3, gl3.mydata->curve, ptest);
         divisorg3_to_bytes(temp+6*onedivsize, a4, gl3.mydata->curve, ptest);
         divisorg3_to_bytes(temp+7*onedivsize, b4, gl3.mydata->curve, ptest);
-        divisorg3_to_bytes(temp+8*onedivsize, a5, gl3.mydata->curve, ptest);
-        divisorg3_to_bytes(temp+9*onedivsize, b5, gl3.mydata->curve, ptest);
 
         uint8_t mysiga[2*signsize+1];
         ZZ mysigb;
-        std::string signstr = str1 + str2 + str3 + str4 + str5;
+        std::string signstr = str1 + str2 + str3 + str4;
         sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
         verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk);
 

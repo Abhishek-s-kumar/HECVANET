@@ -13,9 +13,9 @@ int ECQV::encode_to_bytes(uint8_t *buff) {
     memcpy(buff+7, this->issued_by.c_str(), 4);
     memcpy(buff+11, this->issued_on.c_str(), 10);
     memcpy(buff+21, this->expires_on.c_str(), 10);
-    uint8_t *buffp = new uint8_t[2*size+1];
-    group.GetCurve().EncodePoint(buffp, this->pu, false);
-    memcpy(buff+31, buffp, 2*size+1);
+    uint8_t *buffp = new uint8_t[size+1];
+    group.GetCurve().EncodePoint(buffp, this->pu, true);
+    memcpy(buff+31, buffp, size+1);
     free(buffp);
     return 0;
 }
@@ -42,7 +42,7 @@ int ECQV::cert_generate(uint8_t *encoded, std::string uname, Element ru, CryptoP
 
     encode_to_bytes(encoded);
 
-    hash.Update(encoded, 31 + 2*size + 1);
+    hash.Update(encoded, 31 + size + 1);
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
@@ -70,8 +70,8 @@ int ECQV::cert_generate(uint8_t *encoded, std::string uname, Element ru, CryptoP
 
 int ECQV::cert_pk_extraction(uint8_t *cert, Element capk1) {
     int size = this->group.GetCurve().FieldSize().ByteCount();
-    uint8_t *point = new uint8_t[2*size+1];
-    memcpy(point, cert+31, 2*size+1);
+    uint8_t *point = new uint8_t[size+1];
+    memcpy(point, cert+31, size+1);
 
     char *namec = new char[7];
     memcpy(namec, (char*)cert, 7);
@@ -89,10 +89,10 @@ int ECQV::cert_pk_extraction(uint8_t *cert, Element capk1) {
     memcpy(exp_onc, (char*)cert+21, 10);
     this->expires_on = exp_onc;
 
-    group.GetCurve().DecodePoint(this->pu, point, 2*size+1);
+    group.GetCurve().DecodePoint(this->pu, point, size+1);
     CryptoPP::SHA3_256 hash;
 
-    hash.Update(cert, 31 + 2*size + 1);
+    hash.Update(cert, 31 + size + 1);
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);
@@ -109,13 +109,13 @@ int ECQV::cert_pk_extraction(uint8_t *cert, Element capk1) {
 
 int ECQV::cert_reception(uint8_t *cert, CryptoPP::Integer ku) {
     int size = this->group.GetCurve().FieldSize().ByteCount();
-    uint8_t *point = new uint8_t[2*size+1];
-    memcpy(point, cert+31, 2*size+1);
+    uint8_t *point = new uint8_t[size+1];
+    memcpy(point, cert+31, size+1);
     Element pdec;
-    group.GetCurve().DecodePoint(pdec, point, 2*size+1);
+    group.GetCurve().DecodePoint(pdec, point, size+1);
     CryptoPP::SHA3_256 hash;
 
-    hash.Update(cert, 31 + 2*size + 1);
+    hash.Update(cert, 31 + size + 1);
     std::string digest;
     digest.resize(hash.DigestSize());
     hash.Final((byte*)&digest[0]);

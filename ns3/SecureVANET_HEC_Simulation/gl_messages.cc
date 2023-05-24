@@ -143,13 +143,13 @@ void RSU_inform_GL(int ec_algo, int vid) {
             std::string str11 = "Leader ";
             std::string finalstr = str11 + str;
 
-            int sizenosign = finalstr.length()+1 + 31 + 2*size+1;
+            int sizenosign = finalstr.length()+1 + 31 + size+1;
             int sizemod16 = sizenosign + 16 - sizenosign%16;
 
             uint8_t temp[sizenosign];
             memcpy(temp, finalstr.c_str(), finalstr.length());
             temp[finalstr.length()] = '\0';
-            memcpy(temp + finalstr.length()+1, rsuec[0].certs[vid], 31+2*size+1);
+            memcpy(temp + finalstr.length()+1, rsuec[0].certs[vid], 31+size+1);
 
             uint8_t cypher[sizemod16];
             encrypt_message_AES(cypher, temp, sizenosign, rsuec[0].symm_perveh[vid], rsuec[0].iv_perveh[vid]);
@@ -373,7 +373,7 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         CryptoPP::AutoSeededRandomPool prng;  
         int size = veh1ec->group.GetCurve().FieldSize().ByteCount();
 
-        int sizenosign = 27 + 31 + 2*size + 1;
+        int sizenosign = 27 + 31 + size + 1;
         int sizemod16 = sizenosign + 16 - sizenosign%16;
         uint8_t decrypted[sizemod16];
         

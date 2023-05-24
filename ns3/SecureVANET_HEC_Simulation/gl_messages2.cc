@@ -106,13 +106,13 @@ void send_GLJoin_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     btemp = veh1ec->group.GetCurve().ScalarMultiply(veh1ec->glpub, k);
     b = veh1ec->group.GetCurve().Add(btemp, m);
 
-    int sizenosign = 2*(2*size+1) + 31 + 2*size + 1;
+    int sizenosign = 2*(size+1) + 31 + size + 1;
     uint8_t *temp = new uint8_t[sizenosign];
 
-    veh1ec->group.GetCurve().EncodePoint(temp, a, false);
-    veh1ec->group.GetCurve().EncodePoint(temp+2*size+1, b, false);
+    veh1ec->group.GetCurve().EncodePoint(temp, a, true);
+    veh1ec->group.GetCurve().EncodePoint(temp+size+1, b, true);
 
-    memcpy(temp+2*(2*size+1), veh1ec->cert, 31 + 2*size+1);
+    memcpy(temp+2*(size+1), veh1ec->cert, 31 + size+1);
 
     std::string sigecc;
     sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
@@ -310,7 +310,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         CryptoPP::AutoSeededRandomPool prng; 
         int size = veh1ec->group.GetCurve().FieldSize().ByteCount();
 
-        int sizenosign = 27 + 31 + 2*size+1;
+        int sizenosign = 27 + 31 + size+1;
 
         std::string lead((char*)buffrc, 27);
         std::string tocmp = "Leader";
@@ -655,19 +655,19 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         int size = group.GetCurve().FieldSize().ByteCount();
 
         ECQV cert(group);
-        cert.cert_pk_extraction(buffrc+4*size+2, glec.mydata->capub);
+        cert.cert_pk_extraction(buffrc+2*size+2, glec.mydata->capub);
         Element vehpub = cert.get_calculated_Qu();
         glec.vehpk[vid] = vehpub;
 
-        int sizenosign = 2*(2*size+1) + 31 + 2*size + 1;
+        int sizenosign = 2*(size+1) + 31 + size + 1;
         char sig[2*size];
         memcpy(sig, buffrc+sizenosign, 2*size);
         std::string sigecc(sig, 2*size);
         
 
         Element a, b, m, mtemp;
-        group.GetCurve().DecodePoint(a, buffrc, 2*size+1);
-        group.GetCurve().DecodePoint(b, buffrc+2*size+1, 2*size+1);
+        group.GetCurve().DecodePoint(a, buffrc, size+1);
+        group.GetCurve().DecodePoint(b, buffrc+size+1, size+1);
         mtemp = group.GetCurve().ScalarMultiply(a, glec.mydata->priv);
         m = group.GetCurve().Subtract(b, mtemp);
         std::string rec;
@@ -761,20 +761,20 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         b4 = group.GetCurve().ScalarMultiply(vehpub, k);
         b4 = group.GetCurve().Add(b4, m4);
 
-        int onedivsize = 2*size+1;
+        int onedivsize = size+1;
         int size1no = 8*onedivsize;
         int fullsize1 = size1no + 2*size + 1;
 
         uint8_t cypherbuff[fullsize1+2];
         uint8_t temp[size1no];
-        group.GetCurve().EncodePoint(temp, a1, false);
-        group.GetCurve().EncodePoint(temp+onedivsize, b1, false);
-        group.GetCurve().EncodePoint(temp+2*onedivsize, a2, false);
-        group.GetCurve().EncodePoint(temp+3*onedivsize, b2, false);
-        group.GetCurve().EncodePoint(temp+4*onedivsize, a3, false);
-        group.GetCurve().EncodePoint(temp+5*onedivsize, b3, false);
-        group.GetCurve().EncodePoint(temp+6*onedivsize, a4, false);
-        group.GetCurve().EncodePoint(temp+7*onedivsize, b4, false);
+        group.GetCurve().EncodePoint(temp, a1, true);
+        group.GetCurve().EncodePoint(temp+onedivsize, b1, true);
+        group.GetCurve().EncodePoint(temp+2*onedivsize, a2, true);
+        group.GetCurve().EncodePoint(temp+3*onedivsize, b2, true);
+        group.GetCurve().EncodePoint(temp+4*onedivsize, a3, true);
+        group.GetCurve().EncodePoint(temp+5*onedivsize, b3, true);
+        group.GetCurve().EncodePoint(temp+6*onedivsize, a4, true);
+        group.GetCurve().EncodePoint(temp+7*onedivsize, b4, true);
 
         std::string mysig;
         std::string signstr = finalstr1 + finalstr2 + finalstr3 + finalstr4;

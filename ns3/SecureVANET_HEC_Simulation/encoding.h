@@ -18,10 +18,6 @@
 
 #define str_to_ZZ_p(x) to_ZZ_p(to_ZZ(x))
 
-#define msg1 "Accept"
-#define msg2 "Join"
-#define msg3 "Leader"
-
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> GroupParameters;
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP>::Element Element;
 

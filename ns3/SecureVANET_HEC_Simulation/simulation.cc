@@ -453,7 +453,7 @@ int main (int argc, char *argv[])
     Element pub = group.ExponentiateBase(priv_ecc);
 
     int size = group.GetCurve().FieldSize().ByteCount();
-    uint8_t *encoded = new uint8_t[31 + 2*size+1];
+    uint8_t *encoded = new uint8_t[31 + size+1];
     cert.cert_generate(encoded, "RSU0001", pub, capriv);
     cert.cert_pk_extraction(encoded, group.ExponentiateBase(capriv));
     cert.cert_reception(encoded, priv_ecc);
@@ -466,11 +466,11 @@ int main (int argc, char *argv[])
     rsuec[0].priv = rsupriv;
     rsuec[0].rsupub = rsupub;
     
-    fullsize = 1 + 31 + 2*size + 1;
+    fullsize = 1 + 31 + size + 1;
 
     cypher_buff = new uint8_t[fullsize];
     cypher_buff[0] = 0;
-    memcpy(cypher_buff+1, encoded, 31 + 2*size+1);
+    memcpy(cypher_buff+1, encoded, 31 + size+1);
   }
 
   else{

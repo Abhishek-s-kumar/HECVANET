@@ -67,14 +67,14 @@ struct RSU_data_ec{
     int numveh, glid;
     std::string symm_perveh[100], iv_perveh[100];
     GroupParameters group;
-    uint8_t certs[100][96];
+    uint8_t certs[100][64];
 };
 
 struct Vehicle_data_ec{
     GroupParameters group;
     Element capub, rsupub, pub, glpub;
     CryptoPP::Integer priv;
-    uint8_t cert[96];
+    uint8_t cert[64];
     ProtocolVEH state;
     std::string symm, iv;
     int glid;

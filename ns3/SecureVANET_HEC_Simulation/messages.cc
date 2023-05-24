@@ -245,7 +245,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     Element h = veh1ec->group.ExponentiateBase(x);
 
     ECQV cert(veh1ec->group);
-    uint8_t *certec = new uint8_t[31 + 2*size + 1];
+    uint8_t *certec = new uint8_t[31 + size + 1];
     cert.cert_generate(certec, "VEH0001", h, capriv);
     
     cert.cert_pk_extraction(certec, capub);
@@ -255,7 +255,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
       return;
     }
 
-    memcpy(veh1ec->cert, certec, 31 + 2*size+1);
+    memcpy(veh1ec->cert, certec, 31 + size+1);
 
     veh1ec->pub = cert.get_calculated_Qu();
     veh1ec->priv = cert.get_extracted_du();
@@ -267,13 +267,14 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     btemp = veh1ec->group.GetCurve().ScalarMultiply(veh1ec->rsupub, k);
     b = veh1ec->group.GetCurve().Add(btemp, m);
 
-    int sizenosign = 2*(2*size+1) + 31 + 2*size + 1;
+    int sizenosign = 2*(size+1) + 31 + size + 1;
     uint8_t *temp = new uint8_t[sizenosign];
 
-    veh1ec->group.GetCurve().EncodePoint(temp, a, false);
-    veh1ec->group.GetCurve().EncodePoint(temp+2*size+1, b, false);
 
-    memcpy(temp+2*(2*size+1), certec, 31 + 2*size+1);
+    veh1ec->group.GetCurve().EncodePoint(temp, a, true);
+    veh1ec->group.GetCurve().EncodePoint(temp+size+1, b, true);
+
+    memcpy(temp+2*(size+1), certec, 31 + size+1);
 
     std::string sigecc;
     sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
@@ -402,8 +403,8 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     int size = group.GetCurve().FieldSize().ByteCount();
     ECQV cert(group);
-    uint8_t *buffcert = new uint8_t[31 + 2*size+1];
-    memcpy(buffcert, buffrc+9, 31 + 2*size+1);
+    uint8_t *buffcert = new uint8_t[31 + size+1];
+    memcpy(buffcert, buffrc+9, 31 + size+1);
 
     CryptoPP::Integer cax("78988430312110551112312640562478615015063904707272294092537225346022844037941");
     CryptoPP::Integer cay("58350698637878652075905464639281560400171480414848423595036745311979378541663");
@@ -987,19 +988,19 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     int size = group.GetCurve().FieldSize().ByteCount();
 
     ECQV cert(group);
-    cert.cert_pk_extraction(buffrc+4*size+2, rsu1ec->capub);
+    cert.cert_pk_extraction(buffrc+2*size+2, rsu1ec->capub);
     Element vehpub = cert.get_calculated_Qu();
     rsu1ec->vehpk[vid] = vehpub;
 
-    int sizenosign = 2*(2*size+1) + 31 + 2*size + 1;
+    int sizenosign = 2*(size+1) + 31 + size + 1;
     char sig[2*size+1];
     memcpy(sig, buffrc+sizenosign, 2*size+1);
     std::string sigecc(sig, 2*size+1);
     
 
     Element a, b, m, mtemp;
-    group.GetCurve().DecodePoint(a, buffrc, 2*size+1);
-    group.GetCurve().DecodePoint(b, buffrc+2*size+1, 2*size+1);
+    group.GetCurve().DecodePoint(a, buffrc, size+1);
+    group.GetCurve().DecodePoint(b, buffrc+size+1, size+1);
     mtemp = group.GetCurve().ScalarMultiply(a, rsu1ec->priv);
     m = group.GetCurve().Subtract(b, mtemp);
     std::string rec;
@@ -1038,7 +1039,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
       return;
     }
 
-    memcpy(rsu1ec->certs[vid], buffrc+4*size+2, 31 + 2*size+1);
+    memcpy(rsu1ec->certs[vid], buffrc+2*size+2, 31 + size+1);
 
     using namespace CryptoPP;
 
@@ -1095,20 +1096,20 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     b4 = group.GetCurve().ScalarMultiply(vehpub, k);
     b4 = group.GetCurve().Add(b4, m4);
 
-    int onedivsize = 2*size+1;
+    int onedivsize = size+1;
     int size1no = 8*onedivsize;
     int fullsize1 = size1no + 2*size + 1;
 
     uint8_t cypherbuff[fullsize1+2];
     uint8_t temp[size1no];
-    group.GetCurve().EncodePoint(temp, a1, false);
-    group.GetCurve().EncodePoint(temp+onedivsize, b1, false);
-    group.GetCurve().EncodePoint(temp+2*onedivsize, a2, false);
-    group.GetCurve().EncodePoint(temp+3*onedivsize, b2, false);
-    group.GetCurve().EncodePoint(temp+4*onedivsize, a3, false);
-    group.GetCurve().EncodePoint(temp+5*onedivsize, b3, false);
-    group.GetCurve().EncodePoint(temp+6*onedivsize, a4, false);
-    group.GetCurve().EncodePoint(temp+7*onedivsize, b4, false);
+    group.GetCurve().EncodePoint(temp, a1, true);
+    group.GetCurve().EncodePoint(temp+onedivsize, b1, true);
+    group.GetCurve().EncodePoint(temp+2*onedivsize, a2, true);
+    group.GetCurve().EncodePoint(temp+3*onedivsize, b2, true);
+    group.GetCurve().EncodePoint(temp+4*onedivsize, a3, true);
+    group.GetCurve().EncodePoint(temp+5*onedivsize, b3, true);
+    group.GetCurve().EncodePoint(temp+6*onedivsize, a4, true);
+    group.GetCurve().EncodePoint(temp+7*onedivsize, b4, true);
 
     std::string mysig;
     std::string signstr = finalstr1 + finalstr2 + finalstr3 + finalstr4;
@@ -1251,7 +1252,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     GroupParameters group = veh1ec->group;
     int size = group.GetCurve().FieldSize().ByteCount();
 
-    int divsize = 2*size+1;
+    int divsize = size+1;
     int signsize = 2*size+1;
     std::string sigecc((char*)buffrc+8*divsize, signsize);
 

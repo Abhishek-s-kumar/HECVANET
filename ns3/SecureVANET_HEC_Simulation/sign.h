@@ -21,6 +21,13 @@
 
 #define xpk "8163892367034733443576960192244419582898514854451"
 
+#define f5g3 "1"
+#define f3g3 "6218231719898953"
+#define f1g3 "8683773159487505"
+
+#define psign3 "99037184507501969"
+#define Nsign3 "971392753190745941126493757635007515188486994011624"
+
 int sign_genus2 (uint8_t *asig, ZZ& b, uint8_t *mess, int size, ZZ pch);
 
 int verify_sig2(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk);
@@ -28,3 +35,7 @@ int verify_sig2(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk);
 int sign_ec(std::string &sig, CryptoPP::Integer kecc, uint8_t *message, int size);
 
 int verify_ec(std::string sig, Element Pk, uint8_t *message, int size);
+
+int sign_genus3(uint8_t *siga, ZZ& sigb, uint8_t *mess, int size, ZZ pch);
+
+int verify_sig3(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk);

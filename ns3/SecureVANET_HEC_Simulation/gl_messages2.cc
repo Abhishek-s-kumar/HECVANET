@@ -194,20 +194,23 @@ void send_GLJoing_g3(Vehicle_data_g3 *veh1g3, int vid, int destnode) {
     divisorg3_to_bytes(temp+6*size, b, veh1g3->curve, ptest);
     memcpy(temp+2*(6*size), veh1g3->cert, 31 + 6*size);
 
-    int signsize = NumBytes(to_ZZ(pg2));
+    int signsize = NumBytes(to_ZZ(psign3));
     ZZ sigb;
-    uint8_t *siga = new uint8_t[2*signsize+1];
+    uint8_t *siga = new uint8_t[6*signsize];
 
-    sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
-    verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk);
+    sign_genus3(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
+    int nok = verify_sig3(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk3);
 
-    int fullsize = sizenosign + 2*signsize + 1 + 21;
+    if(nok)
+        return;
+
+    int fullsize = sizenosign + 6*signsize + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = RECEIVE_ACCEPT_GL;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
-    memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
+    memcpy(cypherbuff+sizenosign+2, siga, 6*signsize);
+    BytesFromZZ(cypherbuff+sizenosign+2+6*signsize, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -380,18 +383,18 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
 
 
-        int signsize = NumBytes(to_ZZ(pg2));
-        uint8_t *siga = new uint8_t[2*signsize+1];
+        int signsize = NumBytes(to_ZZ(psign3));
+        uint8_t *siga = new uint8_t[6*signsize];
         ZZ sigb;
 
-        memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
+        memcpy(siga, buffrc+sizenosign, 6*signsize);
+        sigb = ZZFromBytes(buffrc+sizenosign+6*signsize, 21);
 
-        nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk);
+        nok = verify_sig3(siga, sigb, buffrc, sizenosign, hpk3);
 
         if(nok) {
             sigb = -sigb;
-            nok = verify_sig2(siga, sigb, buffrc, sizenosign, hpk);
+            nok = verify_sig3(siga, sigb, buffrc, sizenosign, hpk3);
             if(nok)
                 return;
         }
@@ -803,16 +806,16 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         int size = NumBytes(ptest);
         UnifiedEncoding enc(ptest, 10, 4, 3, ZZ_p::zero());
 
-        int signsize = NumBytes(to_ZZ(pg2));
+        int signsize = NumBytes(to_ZZ(psign3));
         int sizenosign = 12*size + 31 + 6*size;
 
         // int fullsize = sizenosign + 2*signsize + 1 + signsize;
 
-        uint8_t *siga = new uint8_t[2*signsize+1];
+        uint8_t *siga = new uint8_t[6*signsize];
         ZZ sigb;
 
-        memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-        sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
+        memcpy(siga, buffrc+sizenosign, 6*signsize);
+        sigb = ZZFromBytes(buffrc+sizenosign+6*signsize, 21);
         
 
         g3HEC::g3divisor a, b, m, x;
@@ -846,11 +849,11 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
             std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
         }
 
-        nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+        nok = verify_sig3(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk3);
 
         if(nok) {
             sigb = -sigb;
-            nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk);
+            nok = verify_sig3(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk3);
             if(nok)
                 return;
         }
@@ -967,7 +970,7 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
 
         int onedivsize = 6*size;
         int size1no = 8*onedivsize;
-        int fullsize1 = size1no + 2*signsize + 22;
+        int fullsize1 = size1no + 6*signsize + 21;
 
         uint8_t cypherbuff[fullsize1+2];
         uint8_t temp[size1no];
@@ -981,17 +984,20 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         divisorg3_to_bytes(temp+6*onedivsize, a4, gl3.mydata->curve, ptest);
         divisorg3_to_bytes(temp+7*onedivsize, b4, gl3.mydata->curve, ptest);
 
-        uint8_t mysiga[2*signsize+1];
+        uint8_t mysiga[6*signsize];
         ZZ mysigb;
         std::string signstr = str1 + str2 + str3 + str4;
-        sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
-        verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk);
+        sign_genus3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
+        
+        nok = verify_sig3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk3);
+        if(nok)
+            return;
 
         cypherbuff[0] = RECEIVE_ACCEPT_GL;
         cypherbuff[1] = glid;
         memcpy(cypherbuff+2, temp, size1no);
-        memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-        BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
+        memcpy(cypherbuff+size1no+2, mysiga, 6*signsize);
+        BytesFromZZ(cypherbuff+size1no+6*signsize+2, mysigb, 21);
 
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);

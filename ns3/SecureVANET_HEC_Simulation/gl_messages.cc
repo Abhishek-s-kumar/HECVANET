@@ -206,11 +206,11 @@ void RSU_inform_GL(int ec_algo, int vid) {
             std::string finalstr = str11 + str;
 
 
-            int signsize = NumBytes(to_ZZ(pg2));
+            int signsize = NumBytes(to_ZZ(psign3));
             int sizenosign = finalstr.length()+1 + 31 + 6*size;
 
             int sizemod16 = sizenosign + 16 - sizenosign%16;
-            int fullsize = sizemod16 + 2*signsize + 22;
+            int fullsize = sizemod16 + 6*signsize + 21;
 
             uint8_t sendbuff[fullsize+2];
 
@@ -227,10 +227,10 @@ void RSU_inform_GL(int ec_algo, int vid) {
             
 
             ZZ sigb;
-            uint8_t *siga = new uint8_t[2*signsize+1];
+            uint8_t *siga = new uint8_t[6*signsize];
 
-            sign_genus2(siga, sigb, temp, sizenosign, ptest);
-            int nok = verify_sig2(siga, sigb, temp, sizenosign, hpk);
+            sign_genus3(siga, sigb, temp, sizenosign, ptest);
+            int nok = verify_sig3(siga, sigb, temp, sizenosign, hpk3);
             
             if(nok)
                 return;
@@ -238,8 +238,8 @@ void RSU_inform_GL(int ec_algo, int vid) {
             sendbuff[0] = GROUP_LEADER_INFORM;
             sendbuff[1] = vid;
             memcpy(sendbuff+2, cypher, sizemod16);
-            memcpy(sendbuff+sizemod16+2, siga, 2*signsize+1);
-            BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 21);
+            memcpy(sendbuff+sizemod16+2, siga, 6*signsize);
+            BytesFromZZ(sendbuff+sizemod16+2+6*signsize, sigb, 21);
 
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -485,18 +485,18 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
             return;
         }
 
-        int signsize = NumBytes(to_ZZ(pg2));
-        uint8_t *siga = new uint8_t[2*signsize+1];
+        int signsize = NumBytes(to_ZZ(psign3));
+        uint8_t *siga = new uint8_t[6*signsize];
         ZZ sigb;
 
-        memcpy(siga, buffrc+sizemod16, 2*signsize+1);
-        sigb = ZZFromBytes(buffrc+sizemod16+2*signsize+1, 21);
+        memcpy(siga, buffrc+sizemod16, 6*signsize);
+        sigb = ZZFromBytes(buffrc+sizemod16+6*signsize, 21);
 
-        nok = verify_sig2(siga, sigb, decrypted, sizenosign, hpk);
+        nok = verify_sig3(siga, sigb, decrypted, sizenosign, hpk3);
 
         if(nok) {
             sigb = -sigb;
-            nok = verify_sig2(siga, sigb, decrypted, sizenosign, hpk);
+            nok = verify_sig3(siga, sigb, decrypted, sizenosign, hpk3);
             if(nok)
                 return;
         }
@@ -506,15 +506,15 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         gl3.mydata->state = IS_GROUP_LEADER;
         std::cout << BOLD_CODE << YELLOW_CODE << "Group Leader " << vid << " broadcasting proof of leadership for new vehicles..." << END_CODE << std::endl << std::endl;
 
-        int sendsize1 = 2 + sizenosign + 2*signsize + 22;
+        int sendsize1 = 2 + sizenosign + 6*signsize + 21;
         int finalsendsize = sendsize1;
         uint8_t sendbuff[finalsendsize];
 
         sendbuff[0] = IS_GROUP_LEADER;
         sendbuff[1] = vid;
         memcpy(sendbuff+2, decrypted, sizenosign);
-        memcpy(sendbuff+2+sizenosign, siga, 2*signsize+1);
-        memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 21);
+        memcpy(sendbuff+2+sizenosign, siga, 6*signsize);
+        memcpy(sendbuff+2+sizenosign+6*signsize, buffrc+sizemod16+6*signsize, 21);
         
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
@@ -621,7 +621,7 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         memcpy(sendbuff+2, cypherbuff, sizemod16);
         memcpy(sendbuff+2+sizemod16, sigecc.c_str(), 2*size+1);
     }
-    else {
+    else if(ec_algo == 0) {
         int size = NumBytes(to_ZZ(pg2));
         fullsize = sizemod16 + 2*size + 22;
         sendbuff = new uint8_t[fullsize+2];
@@ -638,6 +638,24 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         memcpy(sendbuff+2, cypherbuff, sizemod16);
         memcpy(sendbuff+2+sizemod16, siga, 2*size+1);
         BytesFromZZ(sendbuff+sizemod16+2*size+3, sigb, 21);
+    }
+    else {
+        int size = NumBytes(to_ZZ(psign3));
+        fullsize = sizemod16 + 6*size + 21;
+        sendbuff = new uint8_t[fullsize+2];
+        uint8_t siga[6*size];
+        ZZ sigb;
+
+        sign_genus3(siga, sigb, (uint8_t*)inform.c_str(), inform.length(), to_ZZ(psign3));
+        int nok = verify_sig3(siga, sigb, (uint8_t *)inform.c_str(), inform.length(), hpk3);
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = vid;
+        memcpy(sendbuff+2, cypherbuff, sizemod16);
+        memcpy(sendbuff+2+sizemod16, siga, 6*size);
+        BytesFromZZ(sendbuff+sizemod16+6*size+2, sigb, 21);
     }
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
@@ -728,7 +746,7 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         memcpy(sendbuff+3, cypherbuff, sizemod16);
         memcpy(sendbuff+3+sizemod16, sigecc.c_str(), 2*size+1);
     }
-    else {
+    else if(ec_algo==0) {
         int size = NumBytes(to_ZZ(pg2));
         fullsize = sizemod16 + 2*size + 22;
         sendbuff = new uint8_t[fullsize+3];
@@ -746,6 +764,25 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         memcpy(sendbuff+3, cypherbuff, sizemod16);
         memcpy(sendbuff+3+sizemod16, siga, 2*size+1);
         BytesFromZZ(sendbuff+sizemod16+2*size+4, sigb, 21);
+    }
+    else {
+        int size = NumBytes(to_ZZ(psign3));
+        fullsize = sizemod16 + 6*size + 21;
+        sendbuff = new uint8_t[fullsize+3];
+        uint8_t siga[6*size];
+        ZZ sigb;
+
+        sign_genus3(siga, sigb, (uint8_t*)aggstr.c_str(), aggstr.length(), to_ZZ(psign3));
+        int nok = verify_sig3(siga, sigb, (uint8_t *)aggstr.c_str(), aggstr.length(), hpk3);
+        if(nok)
+            return;
+
+        sendbuff[0] = INFORM_MSG;
+        sendbuff[1] = glid;
+        sendbuff[2] = infnum;
+        memcpy(sendbuff+3, cypherbuff, sizemod16);
+        memcpy(sendbuff+3+sizemod16, siga, 6*size);
+        BytesFromZZ(sendbuff+sizemod16+6*size+3, sigb, 21);
     }
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(glid);
@@ -830,7 +867,7 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         //std::cout << glec.agg_messages << std::endl;
         dry[vid] = true;
     }
-    else {
+    else if(ec_algo==0){
         int size = NumBytes(to_ZZ(pg2));
         uint8_t siga[2*size+1];
         ZZ sigb;
@@ -847,14 +884,34 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
                 return;
         }
         std::string informed((char*)decrypted, 46);
-        if(ec_algo == 0) {
-            gl2.agg_messages += informed;
-            //std::cout << gl2.agg_messages << std::endl;
+
+        gl2.agg_messages += informed;
+        //std::cout << gl2.agg_messages << std::endl;
+        
+
+        dry[vid] = true;
+    }
+    else {
+        int size = NumBytes(to_ZZ(psign3));
+        uint8_t siga[6*size];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizemod16, 6*size);
+        sigb = ZZFromBytes(buffrc+sizemod16+6*size, 21);
+
+        nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
+            if(nok)
+                return;
         }
-        else {
-            gl3.agg_messages += informed;
-            //std::cout << gl3.agg_messages << std::endl;
-        }
+        std::string informed((char*)decrypted, 46);
+        
+
+        gl3.agg_messages += informed;
+        //std::cout << gl3.agg_messages << std::endl;
 
         dry[vid] = true;
     }
@@ -929,7 +986,7 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
         std::string informed((char*)decrypted, infnum*46);
         received = informed;
     }
-    else {
+    else if(ec_algo==0){
         int size = NumBytes(to_ZZ(pg2));
         uint8_t siga[2*size+1];
         ZZ sigb;
@@ -942,6 +999,25 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
         if(nok) {
             sigb = -sigb;
             nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+            if(nok)
+                return;
+        }
+        std::string informed((char*)decrypted, infnum*46);
+        received = informed;
+    }
+    else {
+        int size = NumBytes(to_ZZ(psign3));
+        uint8_t siga[6*size];
+        ZZ sigb;
+
+        memcpy(siga, buffrc+sizemod16, 6*size);
+        sigb = ZZFromBytes(buffrc+sizemod16+6*size, 21);
+
+        nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
+
+        if(nok) {
+            sigb = -sigb;
+            nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
             if(nok)
                 return;
         }

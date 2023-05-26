@@ -159,6 +159,7 @@ extern GroupLeader_data_g3 gl3;
 
 extern int rsuid;
 extern uint8_t hpk[23];
+extern uint8_t hpk3[48];
 
 void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid);
 

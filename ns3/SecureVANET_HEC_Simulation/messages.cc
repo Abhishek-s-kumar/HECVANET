@@ -5,6 +5,10 @@ using namespace ns3;
 uint8_t hpk1[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
 0x17,0x4c,0x4f,0x01,0x4d,0x16,0x78,0xe8,0x56,0x6e,0x03,0x02};
 
+uint8_t hpk3[48] = {0x2a,0xdd,0x8a,0x2f,0x4a,0x6f,0x77,0x00,0x71,0x34,0x76,
+0x4f,0x6f,0xee,0xcc,0x00,0xbf,0x96,0x6d,0x7b,0xe5,0x47,0x7a,0x00,0xb1,0xa4,
+0xe6,0x78,0x96,0xaa,0x03,0x01,0xb7,0x1d,0x53,0xd5,0x58,0x1b,0x5a,0x01,0x88,
+0x7c,0xbf,0x3d,0x3d,0x91,0x6b,0x00};
 
 void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     ZZ ptest = to_ZZ(pt);
@@ -171,23 +175,23 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     divisorg3_to_bytes(temp+6*size, b, veh1g3->curve, ptest);
     memcpy(temp+2*(6*size), veh1g3->cert, 31 + 6*size);
 
-    int sizesign = NumBytes(to_ZZ(pg2));
+    int sizesign = NumBytes(to_ZZ(psign3));
     ZZ sigb;
-    uint8_t *siga = new uint8_t[2*sizesign+1];
+    uint8_t *siga = new uint8_t[6*sizesign];
 
-    sign_genus2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), ptest);
-    int nok = verify_sig2(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk1);
+    sign_genus3(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), ptest);
+    int nok = verify_sig3(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk3);
 
     if(nok) 
       return;
-
-    int fullsize = sizenosign + 2*sizesign + 1 + 21;
+    
+    int fullsize = sizenosign + 6*sizesign + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];
     cypherbuff[0] = 0;
     cypherbuff[1] = vid;
     memcpy(cypherbuff+2, temp, sizenosign);
-    memcpy(cypherbuff+sizenosign+2, siga, 2*sizesign+1);
-    BytesFromZZ(cypherbuff+sizenosign+2+2*sizesign+1, sigb, 21);
+    memcpy(cypherbuff+sizenosign+2, siga, 6*sizesign);
+    BytesFromZZ(cypherbuff+sizenosign+2+6*sizesign, sigb, 21);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -718,16 +722,16 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     int size = NumBytes(ptest);
     UnifiedEncoding enc(ptest, 10, 4, 3, ZZ_p::zero());
 
-    int signsize = NumBytes(to_ZZ(pg2));
+    int signsize = NumBytes(to_ZZ(psign3));
     int sizenosign = 12*size + 31 + 6*size;
 
     // int fullsize = sizenosign + 2*signsize + 1 + signsize;
 
-    uint8_t *siga = new uint8_t[2*signsize+1];
+    uint8_t *siga = new uint8_t[6*signsize];
     ZZ sigb;
 
-    memcpy(siga, buffrc+sizenosign, 2*signsize+1);
-    sigb = ZZFromBytes(buffrc+sizenosign+2*signsize+1, 21);
+    memcpy(siga, buffrc+sizenosign, 6*signsize);
+    sigb = ZZFromBytes(buffrc+sizenosign+6*signsize, 21);
     
 
     g3HEC::g3divisor a, b, m, x;
@@ -761,11 +765,11 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
-    nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+    nok = verify_sig3(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk3);
 
     if(nok) {
       sigb = -sigb;
-      nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+      nok = verify_sig3(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk3);
       if(nok)
         return;
     }
@@ -887,7 +891,7 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     int onedivsize = 6*size;
     int size1no = 8*onedivsize;
-    int fullsize1 = size1no + 2*signsize + 22;
+    int fullsize1 = size1no + 6*signsize + 21;
 
     uint8_t cypherbuff[fullsize1+2];
     uint8_t temp[size1no];
@@ -901,20 +905,20 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     divisorg3_to_bytes(temp+6*onedivsize, a4, rsu1g3->curve, ptest);
     divisorg3_to_bytes(temp+7*onedivsize, b4, rsu1g3->curve, ptest);
 
-    uint8_t mysiga[2*signsize+1];
+    uint8_t mysiga[6*signsize];
     ZZ mysigb;
     std::string signstr = str1 + str2 + str3 + str4;
 
-    sign_genus2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
-    nok = verify_sig2(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk1);
+    sign_genus3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
+    nok = verify_sig3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk3);
     if(nok)
       return;
 
     cypherbuff[0] = 1;
     cypherbuff[1] = 0;
     memcpy(cypherbuff+2, temp, size1no);
-    memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
-    BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
+    memcpy(cypherbuff+size1no+2, mysiga, 6*signsize);
+    BytesFromZZ(cypherbuff+size1no+6*signsize+2, mysigb, 21);
 
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -1289,11 +1293,11 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     int divsize = 6*size;
 
 
-    int signsize = NumBytes(to_ZZ(pg2));
-    uint8_t mysiga[2*signsize+1];
+    int signsize = NumBytes(to_ZZ(psign3));
+    uint8_t mysiga[6*signsize];
     ZZ mysigb;
-    memcpy(mysiga, buffrc+8*divsize, 2*signsize+1);
-    mysigb = ZZFromBytes(buffrc+8*divsize+2*signsize+1, 21);
+    memcpy(mysiga, buffrc+8*divsize, 6*signsize);
+    mysigb = ZZFromBytes(buffrc+8*divsize+6*signsize, 21);
 
     bytes_to_divisorg3(a1, buffrc, veh1g3->curve, ptest);
     bytes_to_divisorg3(b1, buffrc+divsize, veh1g3->curve, ptest);
@@ -1346,7 +1350,7 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     }
 
     std::string signstr = rec1+rec2+rec3+rec4;
-    int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+    int nok = verify_sig3(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk3);
     if(nok) {
       return;
     }

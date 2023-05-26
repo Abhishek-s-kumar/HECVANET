@@ -372,6 +372,11 @@ int main (int argc, char *argv[])
 
   cmd.Parse (argc, argv);
 
+  if(ec_algo < 0 || ec_algo > 2) {
+    std::cout << "Encryption algorithm ids are:\n\tHEC genus 2: 0\n\tECC: 1\n\tHEC genus 3: 2" << std::endl;
+    exit(1);
+  }
+
   int fullsize=0;
   uint8_t *cypher_buff;
 
@@ -473,7 +478,7 @@ int main (int argc, char *argv[])
   }
 
   else{
-    std::cout << "Using ElGamal with Genus 3 HEC for message encryption\nHECQV for certificates\nElGamal HEC genus 2 signatures" << std::endl;
+    std::cout << "Using ElGamal with Genus 3 HEC for message encryption\nHECQV for certificates\nElGamal HEC genus 3 signatures" << std::endl;
     ZZ ptest = to_ZZ(pg3);
     field_t::init(ptest);
     std::cout << "Using p: " << ptest << " of size: " << NumBits(ptest) << std::endl;

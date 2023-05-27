@@ -98,7 +98,17 @@ void RSU_inform_GL(int ec_algo, int vid) {
             ZZ sigb;
             uint8_t *siga = new uint8_t[2*signsize+1];
 
+            auto start = chrono::high_resolution_clock::now();
             sign_genus2(siga, sigb, temp, sizenosign, ptest);
+
+            if(get_metrics != 0) {
+                auto stop = chrono::high_resolution_clock::now();
+                auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+            
+                cout << "Signature generation: "
+                    << duration.count() << " microseconds" << endl;
+            }
+
             int nok = verify_sig2(siga, sigb, temp, sizenosign, hpk);
             
             if(nok)
@@ -155,7 +165,18 @@ void RSU_inform_GL(int ec_algo, int vid) {
             encrypt_message_AES(cypher, temp, sizenosign, rsuec[0].symm_perveh[vid], rsuec[0].iv_perveh[vid]);
             
             std::string sigecc;
+
+            auto start = chrono::high_resolution_clock::now();
             sign_ec(sigecc, rsuec[0].priv, temp, sizenosign);
+
+            if(get_metrics != 0) {
+                auto stop = chrono::high_resolution_clock::now();
+                auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+            
+                cout << "Signature generation: "
+                    << duration.count() << " microseconds" << endl;
+            }
+
             int nok = verify_ec(sigecc, rsuec[0].rsupub, temp, sizenosign);
 
             if (nok)
@@ -229,7 +250,17 @@ void RSU_inform_GL(int ec_algo, int vid) {
             ZZ sigb;
             uint8_t *siga = new uint8_t[6*signsize];
 
+            auto start = chrono::high_resolution_clock::now();
             sign_genus3(siga, sigb, temp, sizenosign, ptest);
+
+            if(get_metrics != 0) {
+                auto stop = chrono::high_resolution_clock::now();
+                auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+            
+                cout << "Signature generation: "
+                    << duration.count() << " microseconds" << endl;
+            }
+
             int nok = verify_sig3(siga, sigb, temp, sizenosign, hpk3);
             
             if(nok)
@@ -308,7 +339,18 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         bytes_to_divisor(capub, veh1g2->capub, veh1g2->curve, ptest);
         bytes_to_divisor(mypub, veh1g2->pub, veh1g2->curve, ptest);
         g2HECQV cert2(veh1g2->curve, ptest, g);
+
+        auto start = chrono::high_resolution_clock::now();
         cert2.cert_pk_extraction(decrypted+27, capub);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Certificate public key extraction: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         if(mypub != cert2.get_calculated_Qu()) {
             std::cout << BOLD_CODE << RED_CODE << "Certificate provided to GL is incorrect." << END_CODE << std::endl;
             return;
@@ -321,7 +363,16 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(siga, buffrc+sizemod16, 2*signsize+1);
         sigb = ZZFromBytes(buffrc+sizemod16+2*signsize+1, 21);
 
+        start = chrono::high_resolution_clock::now();
         nok = verify_sig2(siga, sigb, decrypted, sizenosign, hpk);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;
@@ -396,7 +447,18 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
 
 
         ECQV cert(veh1ec->group);
+
+        auto start = chrono::high_resolution_clock::now();
         cert.cert_pk_extraction(decrypted+27, veh1ec->capub);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Certificate public key extraction: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         if(veh1ec->pub.x != cert.get_calculated_Qu().x) {
             std::cout << BOLD_CODE << RED_CODE << "Certificate provided to GL is incorrect." << END_CODE << std::endl;
             return;
@@ -406,7 +468,16 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sig, buffrc+sizemod16, 2*size+1);
         std::string sigecc(sig, 2*size+1);
 
+        start = chrono::high_resolution_clock::now();
         nok = verify_ec(sigecc, veh1ec->rsupub, decrypted, sizenosign);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             return;
@@ -479,7 +550,18 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         bytes_to_divisorg3(capub, veh1g3->capub, veh1g3->curve, ptest);
         bytes_to_divisorg3(mypub, veh1g3->pub, veh1g3->curve, ptest);
         g3HECQV cert2(veh1g3->curve, ptest, g);
+
+        auto start = chrono::high_resolution_clock::now();
         cert2.cert_pk_extraction(decrypted+27, capub);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Certificate public key extraction: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         if(mypub != cert2.get_calculated_Qu()) {
             std::cout << BOLD_CODE << RED_CODE << "Certificate provided to GL is incorrect." << END_CODE << std::endl;
             return;
@@ -492,7 +574,16 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(siga, buffrc+sizemod16, 6*signsize);
         sigb = ZZFromBytes(buffrc+sizemod16+6*signsize, 21);
 
+        start = chrono::high_resolution_clock::now();
         nok = verify_sig3(siga, sigb, decrypted, sizenosign, hpk3);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;
@@ -610,7 +701,18 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         sendbuff = new uint8_t[fullsize+2];
 
         std::string sigecc;
+
+        auto start = chrono::high_resolution_clock::now();
         sign_ec(sigecc, vehec[vid].priv, (uint8_t*)inform.c_str(), inform.length());
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         int nok = verify_ec(sigecc, vehec[vid].pub, (uint8_t*)inform.c_str(), inform.length());
         if(nok)
             return;
@@ -628,7 +730,17 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         uint8_t siga[2*size+1];
         ZZ sigb;
 
+        auto start = chrono::high_resolution_clock::now();
         sign_genus2(siga, sigb, (uint8_t*)inform.c_str(), inform.length(), to_ZZ(pg2));
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+        
         int nok = verify_sig2(siga, sigb, (uint8_t *)inform.c_str(), inform.length(), hpk);
         if(nok)
             return;
@@ -646,7 +758,17 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         uint8_t siga[6*size];
         ZZ sigb;
 
+        auto start = chrono::high_resolution_clock::now();
         sign_genus3(siga, sigb, (uint8_t*)inform.c_str(), inform.length(), to_ZZ(psign3));
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         int nok = verify_sig3(siga, sigb, (uint8_t *)inform.c_str(), inform.length(), hpk3);
         if(nok)
             return;
@@ -735,7 +857,18 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         sendbuff = new uint8_t[fullsize+3];
 
         std::string sigecc;
+
+        auto start = chrono::high_resolution_clock::now();
         sign_ec(sigecc, vehec[glid].priv, (uint8_t*)aggstr.c_str(), aggstr.length());
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         int nok = verify_ec(sigecc, vehec[glid].pub, (uint8_t*)aggstr.c_str(), aggstr.length());
         if(nok)
             return;
@@ -753,7 +886,17 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         uint8_t siga[2*size+1];
         ZZ sigb;
 
+        auto start = chrono::high_resolution_clock::now();
         sign_genus2(siga, sigb, (uint8_t*)aggstr.c_str(), aggstr.length(), to_ZZ(pg2));
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         int nok = verify_sig2(siga, sigb, (uint8_t *)aggstr.c_str(), aggstr.length(), hpk);
         if(nok)
             return;
@@ -772,7 +915,17 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         uint8_t siga[6*size];
         ZZ sigb;
 
+        auto start = chrono::high_resolution_clock::now();
         sign_genus3(siga, sigb, (uint8_t*)aggstr.c_str(), aggstr.length(), to_ZZ(psign3));
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature generation: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         int nok = verify_sig3(siga, sigb, (uint8_t *)aggstr.c_str(), aggstr.length(), hpk3);
         if(nok)
             return;
@@ -856,7 +1009,17 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
     if (ec_algo == 1) {
         int size = glec.mydata->group.GetCurve().FieldSize().ByteCount();
         std::string sigecc((char*)buffrc+sizemod16, 2*size+1);
+
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_ec(sigecc, glec.vehpk[vid], decrypted, messagesize-1);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok)
             return;
@@ -874,8 +1037,17 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
 
         memcpy(siga, buffrc+sizemod16, 2*size+1);
         sigb = ZZFromBytes(buffrc+sizemod16+2*size+1, 21);
-
+        
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;
@@ -899,7 +1071,16 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         memcpy(siga, buffrc+sizemod16, 6*size);
         sigb = ZZFromBytes(buffrc+sizemod16+6*size, 21);
 
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;
@@ -979,7 +1160,18 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
     if (ec_algo == 1) {
         int size = rsuec[0].group.GetCurve().FieldSize().ByteCount();
         std::string sigecc((char*)buffrc+sizemod16, 2*size+1);
+
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_ec(sigecc, rsuec[0].vehpk[glid], decrypted, messagesize-1);
+        
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
+
         if(nok)
             return;
 
@@ -994,7 +1186,16 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
         memcpy(siga, buffrc+sizemod16, 2*size+1);
         sigb = ZZFromBytes(buffrc+sizemod16+2*size+1, 21);
 
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_sig2(siga, sigb, decrypted, messagesize-1, hpk);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;
@@ -1013,7 +1214,16 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
         memcpy(siga, buffrc+sizemod16, 6*size);
         sigb = ZZFromBytes(buffrc+sizemod16+6*size, 21);
 
+        auto start = chrono::high_resolution_clock::now();
         nok = verify_sig3(siga, sigb, decrypted, messagesize-1, hpk3);
+
+        if(get_metrics != 0) {
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        
+            cout << "Signature verification: "
+                << duration.count() << " microseconds" << endl;
+        }
 
         if(nok) {
             sigb = -sigb;

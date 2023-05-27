@@ -11,12 +11,14 @@
 #include "ns2-node-utility.h"
 
 #include <set>
+#include <chrono>
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("WaveExample1");
 
 uint32_t ec_algo = 0;
+uint32_t get_metrics = 0;
 int rsuid = 63;
 uint16_t seq, seq2;
 
@@ -369,6 +371,7 @@ int main (int argc, char *argv[])
 {
   CommandLine cmd;
   cmd.AddValue("algo", "Encryption Algorithm", ec_algo);
+  cmd.AddValue("metrics", "Get the metrics for a specific algo", get_metrics);
 
   cmd.Parse (argc, argv);
 
@@ -394,7 +397,19 @@ int main (int argc, char *argv[])
     rsug2[0].u = 10;
     rsug2[0].w = 4;
     std::string base = "BaseforGenerator";
+
+    auto start = chrono::high_resolution_clock::now();
+
     int rt = text_to_divisor(g, base, ptest, curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
@@ -403,18 +418,73 @@ int main (int argc, char *argv[])
     ZZ x;
     capub = capriv*g;
     /* private key x */
+
+    start = chrono::high_resolution_clock::now();
+
     RandomBnd(x, ptest*ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     divisor_to_bytes(rsug2[0].capub, capub, curve, ptest);
 
+    start = chrono::high_resolution_clock::now();
+    
     h = x * g;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     g2HECQV cert2(curve, ptest, g);
     int size = NumBytes(ptest);
     uint8_t *encoded2 = new uint8_t[31 + 2*size+1];
+
+    start = chrono::high_resolution_clock::now();
+
     cert2.cert_generate(encoded2, "RSU0001", h, capriv);
 
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
+    
     cert2.cert_pk_extraction(encoded2, capub);
+    
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
+
     cert2.cert_reception(encoded2, x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key reception: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     rsupub = cert2.get_calculated_Qu();
     rsupriv = cert2.get_extracted_du();
@@ -450,17 +520,71 @@ int main (int argc, char *argv[])
     ECQV cert(group);
 
     // private key
+    auto start = chrono::high_resolution_clock::now();
+
     CryptoPP::Integer priv_ecc(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     CryptoPP::Integer capriv("99904945320188894543539641655649253921899278606834393872940151579788317849983");
     
+    start = chrono::high_resolution_clock::now();
+
     Element pub = group.ExponentiateBase(priv_ecc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int size = group.GetCurve().FieldSize().ByteCount();
     uint8_t *encoded = new uint8_t[31 + size+1];
+    
+    start = chrono::high_resolution_clock::now();
+
     cert.cert_generate(encoded, "RSU0001", pub, capriv);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
+
     cert.cert_pk_extraction(encoded, group.ExponentiateBase(capriv));
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+    
+    start = chrono::high_resolution_clock::now();
+
     cert.cert_reception(encoded, priv_ecc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     rsuec[0].capub = group.ExponentiateBase(capriv);
 
@@ -491,7 +615,18 @@ int main (int argc, char *argv[])
     rsug3[0].w = 4;
 
     std::string base = "BaseforGenerator";
+
+    auto start = chrono::high_resolution_clock::now();
     int rt = text_to_divisorg3(g, base, ptest, curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
@@ -502,10 +637,31 @@ int main (int argc, char *argv[])
     capub = capriv*g;
 
     divisorg3_to_bytes(rsug3[0].capub, capub, curve, ptest);
+    
     /* private key x */
+    start = chrono::high_resolution_clock::now();
+
     RandomBnd(x, ptest*ptest*ptest);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
+
     h = x * g;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     rsug3[0].curve = curve;
     divisorg3_to_bytes(rsug3[0].g, g, curve, ptest);
@@ -513,10 +669,42 @@ int main (int argc, char *argv[])
     g3HECQV cert2(curve, ptest, g);
     int size = NumBytes(ptest);
     uint8_t *encoded2 = new uint8_t[31 + 6*size];
+
+    start = chrono::high_resolution_clock::now();
+
     cert2.cert_generate(encoded2, "RSU0001", h, capriv);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
+
     cert2.cert_pk_extraction(encoded2, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+    
+    start = chrono::high_resolution_clock::now();
+
     cert2.cert_reception(encoded2, x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key reception: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     rsupub = cert2.get_calculated_Qu();
     rsupriv = cert2.get_extracted_du();

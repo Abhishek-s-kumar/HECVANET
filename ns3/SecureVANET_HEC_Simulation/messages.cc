@@ -27,7 +27,18 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     ZZ x, k, mypriv;
     ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
 
+    auto start = chrono::high_resolution_clock::now();
+
     int rt = text_to_divisor(m, finalstr, ptest, veh1g2->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
@@ -35,17 +46,65 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     bytes_to_divisor(g, veh1g2->g, veh1g2->curve, ptest);
     bytes_to_divisor(capub, veh1g2->capub, veh1g2->curve, ptest);
 
+    start = chrono::high_resolution_clock::now();
     RandomBnd(x, ptest*ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     h = x * g;
     
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     g2HECQV cert2(veh1g2->curve, ptest, g);
     int size = NumBytes(ptest);
     uint8_t *certveh1g2 = new uint8_t[31 + 2*size+1];
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_generate(certveh1g2, "VEH0001", h, capriv);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_pk_extraction(certveh1g2, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     int nok = cert2.cert_reception(certveh1g2, x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key reception: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(nok)
       exit(1);
 
@@ -59,8 +118,19 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     bytes_to_divisor(rsupub, veh1g2->rsupub, veh1g2->curve, ptest);
 
     RandomBnd(k, ptest*ptest);
+
+    start = chrono::high_resolution_clock::now();
+
     a = k*g;
     b = k*rsupub + m;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message Encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int sizenosign = 2*(2*size + 1) + 31 + 2*size+1;
     uint8_t *temp = new uint8_t[sizenosign];
@@ -72,7 +142,17 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     ZZ sigb;
     uint8_t *siga = new uint8_t[2*signsize+1];
 
+    start = chrono::high_resolution_clock::now();
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
 
     if(nok)
@@ -135,7 +215,16 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     ZZ x, k, mypriv;
     ZZ capriv = to_ZZ("247253210584643408262663087671537517974691545498905118366998662050233012073014");
 
+    auto start = chrono::high_resolution_clock::now();
     int rt = text_to_divisorg3(m, finalstr, ptest, veh1g3->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     if(rt) {
       exit(1);
@@ -143,18 +232,65 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
 
     bytes_to_divisorg3(g, veh1g3->g, veh1g3->curve, ptest);
     bytes_to_divisorg3(capub, veh1g3->capub, veh1g3->curve, ptest);
-
+    
+    start = chrono::high_resolution_clock::now();
     RandomBnd(x, ptest*ptest*ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     h = x * g;
     
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     g3HECQV cert2(veh1g3->curve, ptest, g);
     int size = NumBytes(ptest);
     uint8_t *certveh1g3 = new uint8_t[31 + 6*size];
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_generate(certveh1g3, "VEH0001", h, capriv);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_pk_extraction(certveh1g3, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_reception(certveh1g3, x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key reception: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     mypub = cert2.get_calculated_Qu();
     mypriv = cert2.get_extracted_du();
@@ -166,8 +302,18 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     bytes_to_divisorg3(rsupub, veh1g3->rsupub, veh1g3->curve, ptest);
 
     RandomBnd(k, ptest*ptest*ptest);
+
+    start = chrono::high_resolution_clock::now();
     a = k*g;
     b = k*rsupub + m;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message Encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int sizenosign = 2*(6*size) + 31 + 6*size;
     uint8_t *temp = new uint8_t[sizenosign];
@@ -179,7 +325,17 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     ZZ sigb;
     uint8_t *siga = new uint8_t[6*sizesign];
 
+    start = chrono::high_resolution_clock::now();
     sign_genus3(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     int nok = verify_sig3(siga, sigb, (uint8_t *)finalstr.c_str(), finalstr.length(), hpk3);
 
     if(nok) 
@@ -241,21 +397,78 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     std::string str11 = "Join ";
     std::string finalstr = str11 + str;
 
+    auto start = chrono::high_resolution_clock::now();
     Element m = text_to_ecpoint(finalstr, finalstr.length(), veh1ec->group, size);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to EC Point: "
+         << duration.count() << " microseconds" << endl;
+    }
     
 
     CryptoPP::Integer capriv("99904945320188894543539641655649253921899278606834393872940151579788317849983");
     Element capub = veh1ec->capub;
 
+    start = chrono::high_resolution_clock::now();
     CryptoPP::Integer x(prng, CryptoPP::Integer::One(), veh1ec->group.GetMaxExponent());
+    
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Private key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     Element h = veh1ec->group.ExponentiateBase(x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Public key generation: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     ECQV cert(veh1ec->group);
     uint8_t *certec = new uint8_t[31 + size + 1];
+
+    start = chrono::high_resolution_clock::now();
     cert.cert_generate(certec, "VEH0001", h, capriv);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate generation: "
+         << duration.count() << " microseconds" << endl;
+    }
     
+    start = chrono::high_resolution_clock::now();
     cert.cert_pk_extraction(certec, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     int nok = cert.cert_reception(certec, x);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate private key reception: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(nok) {
       return;
@@ -269,9 +482,19 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     CryptoPP::Integer k(prng, CryptoPP::Integer::One(), veh1ec->group.GetMaxExponent());
 
     Element a,b,btemp;
+
+    start = chrono::high_resolution_clock::now();
     a = veh1ec->group.ExponentiateBase(k);
     btemp = veh1ec->group.GetCurve().ScalarMultiply(veh1ec->rsupub, k);
     b = veh1ec->group.GetCurve().Add(btemp, m);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message Encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int sizenosign = 2*(size+1) + 31 + size + 1;
     uint8_t *temp = new uint8_t[sizenosign];
@@ -283,7 +506,18 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     memcpy(temp+2*(size+1), certec, 31 + size+1);
 
     std::string sigecc;
+
+    start = chrono::high_resolution_clock::now();
     sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     verify_ec(sigecc, veh1ec->pub, (uint8_t*)finalstr.c_str(), finalstr.length());
 
     int fullsize = sizenosign + sigecc.length() + 1;
@@ -359,7 +593,17 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     veh1g2->curve = curve;
     NS_G2_NAMESPACE::divisor rsupub, g, capub;
 
+    auto start = chrono::high_resolution_clock::now();
     int rt = text_to_divisor(g, base1, ptest, curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
@@ -372,7 +616,18 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     divisor_to_bytes(veh1g2->capub, capub, veh1g2->curve, ptest);
 
     g2HECQV cert2(curve, ptest, g);
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_pk_extraction(buffcert, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string issued_by, expires_on;
     issued_by = cert2.get_issued_by();
     expires_on = cert2.get_expires_on();
@@ -408,7 +663,17 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     veh1ec->capub = capub;
 
+    auto start = chrono::high_resolution_clock::now();
     cert.cert_pk_extraction(buffcert, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     Element rsupub = cert.get_calculated_Qu();
 
     std::string issued_by, expires_on;
@@ -459,7 +724,17 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     veh1g3->curve = curve;
     g3HEC::g3divisor rsupub, g, capub;
 
+    auto start = chrono::high_resolution_clock::now();
     int rt = text_to_divisorg3(g, base1, ptest, curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
@@ -484,7 +759,18 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     divisorg3_to_bytes(veh1g3->capub, capub, veh1g3->curve, ptest);
 
     g3HECQV cert2(curve, ptest, g);
+
+    start = chrono::high_resolution_clock::now();
     cert2.cert_pk_extraction(buffcert, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     rsupub = cert2.get_calculated_Qu();
 
     std::string issued_by, expires_on;
@@ -531,9 +817,31 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
       return;
     }
 
+    auto start = chrono::high_resolution_clock::now();
+
     m = b - rsu1g2->priv*a;
+    
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+    
     std::string rec;
+
+    start = chrono::high_resolution_clock::now();
     divisor_to_text(rec, m, ptest, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string tocmp = "Join";
 
     if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
@@ -552,8 +860,16 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
-
+    start = chrono::high_resolution_clock::now();
     nok = verify_sig2(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk1);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature verification: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(nok) {
       sigb = -sigb;
@@ -570,7 +886,17 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     uint8_t *received_cert = new uint8_t[31 + 2*size+1];
     memcpy(received_cert, buffrc+4*size+2, 31 + 2*size+1);
 
+    start = chrono::high_resolution_clock::now();
     recert.cert_pk_extraction(received_cert, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     vehpk = recert.get_calculated_Qu();
     if(!vehpk.is_valid_divisor()) {
       return;
@@ -613,12 +939,31 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     NS_G2_NAMESPACE::divisor mess1, a1, b1;
     
+    start = chrono::high_resolution_clock::now();
     text_to_divisor(mess1, str1, ptest, rsu1g2->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     ZZ k;
     RandomBnd(k, ptest*ptest);
+
+    start = chrono::high_resolution_clock::now();
     a1 = k*g;
     b1 = k*vehpk + mess1;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     std::string str2 = keystr.substr(16);
     str2 += ivstr.substr(0, 10);
@@ -626,23 +971,56 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     NS_G2_NAMESPACE::divisor mess2, a2, b2;
     
+    start = chrono::high_resolution_clock::now();
     text_to_divisor(mess2, str2, ptest, rsu1g2->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
     
+    start = chrono::high_resolution_clock::now();
     a2 = k*g;
     b2 = k*vehpk + mess2;
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
 
     std::string str3 = ivstr.substr(10);
 
     NS_G2_NAMESPACE::divisor mess3, a3, b3;
     
+    start = chrono::high_resolution_clock::now();
     text_to_divisor(mess3, str3, ptest, rsu1g2->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
     
+    start = chrono::high_resolution_clock::now();
     a3 = k*g;
     b3 = k*vehpk + mess3;
 
-
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -655,10 +1033,28 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
 
     NS_G2_NAMESPACE::divisor mess4, a4, b4;
     
+    start = chrono::high_resolution_clock::now();
     text_to_divisor(mess4, str4, ptest, rsu1g2->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
     
+    start = chrono::high_resolution_clock::now();
     a4 = k*g;
     b4 = k*vehpk + mess4;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
 
     int onedivsize = 2*size+1;
@@ -680,7 +1076,18 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     uint8_t mysiga[2*signsize+1];
     ZZ mysigb;
     std::string signstr = str1+str2+str3+str4;
+
+    start = chrono::high_resolution_clock::now();
     sign_genus2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
     if(nok)
       return;
@@ -744,9 +1151,30 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
       return;
     }
 
+    auto start = chrono::high_resolution_clock::now();
     m = b - rsu1g3->priv*a;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec;
+
+    start = chrono::high_resolution_clock::now();
     divisorg3_to_text(rec, m, ptest, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string tocmp = "Join";
 
     if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
@@ -765,7 +1193,16 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
       std::cout << BOLD_CODE << GREEN_CODE << "Timestamp is valid." << END_CODE << std::endl;
     }
 
+    start = chrono::high_resolution_clock::now();
     nok = verify_sig3(siga, sigb, (uint8_t*)rec.c_str(), rec.length(), hpk3);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature verification: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(nok) {
       sigb = -sigb;
@@ -782,7 +1219,17 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     uint8_t *received_cert = new uint8_t[31 + 6*size];
     memcpy(received_cert, buffrc+12*size, 31 + 6*size);
 
+    start = chrono::high_resolution_clock::now();
     recert.cert_pk_extraction(received_cert, capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     vehpk = recert.get_calculated_Qu();
     if(!vehpk.is_valid_divisor()) {
       return;
@@ -826,17 +1273,35 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess1, a1, b1;
     
+    start = chrono::high_resolution_clock::now();
     int rt = text_to_divisorg3(mess1, str1, ptest, rsu1g3->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
     
     ZZ k;
     RandomBnd(k, ptest*ptest*ptest);
+
+    start = chrono::high_resolution_clock::now();
     a1 = k*g;
     b1 = k*vehpk + mess1;
 
-
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
     
     std::string str2 = keystr.substr(16);
     str2 += ivstr.substr(0, 10);
@@ -844,29 +1309,64 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess2, a2, b2;
     
+    start = chrono::high_resolution_clock::now();
     rt = text_to_divisorg3(mess2, str2, ptest, rsu1g3->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
     
+    start = chrono::high_resolution_clock::now();
     a2 = k*g;
     b2 = k*vehpk + mess2;
 
-
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     std::string str3 = ivstr.substr(10);
 
 
     g3HEC::g3divisor mess3, a3, b3;
     
+    start = chrono::high_resolution_clock::now();
     rt = text_to_divisorg3(mess3, str3, ptest, rsu1g3->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
     
+    start = chrono::high_resolution_clock::now();
     a3 = k*g;
     b3 = k*vehpk + mess3;
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -879,15 +1379,32 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
 
     g3HEC::g3divisor mess4, a4, b4;
     
+    start = chrono::high_resolution_clock::now();
     rt = text_to_divisorg3(mess4, str4, ptest, rsu1g3->curve, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to divisor: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(rt) {
       exit(1);
     }
     
+    start = chrono::high_resolution_clock::now();
     a4 = k*g;
     b4 = k*vehpk + mess4;
 
-    
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int onedivsize = 6*size;
     int size1no = 8*onedivsize;
@@ -909,7 +1426,17 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     ZZ mysigb;
     std::string signstr = str1 + str2 + str3 + str4;
 
+    start = chrono::high_resolution_clock::now();
     sign_genus3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), ptest);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     nok = verify_sig3(mysiga, mysigb, (uint8_t *)signstr.c_str(), signstr.length(), hpk3);
     if(nok)
       return;
@@ -950,7 +1477,18 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     int size = group.GetCurve().FieldSize().ByteCount();
 
     ECQV cert(group);
+    
+    auto start = chrono::high_resolution_clock::now();
     cert.cert_pk_extraction(buffrc+2*size+2, rsu1ec->capub);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Certificate public key extraction: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     Element vehpub = cert.get_calculated_Qu();
     rsu1ec->vehpk[vid] = vehpub;
 
@@ -963,10 +1501,32 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     Element a, b, m, mtemp;
     group.GetCurve().DecodePoint(a, buffrc, size+1);
     group.GetCurve().DecodePoint(b, buffrc+size+1, size+1);
+
+    start = chrono::high_resolution_clock::now();
     mtemp = group.GetCurve().ScalarMultiply(a, rsu1ec->priv);
     m = group.GetCurve().Subtract(b, mtemp);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+    
     std::string rec;
+
+    start = chrono::high_resolution_clock::now();
     rec = ecpoint_to_text(m);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "EC Point to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
 
     std::string tocmp = "Join";
 
@@ -1035,28 +1595,104 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     std::string finalstr3 = ivstr.substr(12);
     std::string finalstr4 = str;
     Element m1, m2, m3, m4;
+
+    start = chrono::high_resolution_clock::now();
     m1 = text_to_ecpoint(finalstr1, finalstr1.length(), group, size);
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to EC Point: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m2 = text_to_ecpoint(finalstr2, finalstr2.length(), group, size);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to EC Point: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m3 = text_to_ecpoint(finalstr3, finalstr3.length(), group, size);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to EC Point: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m4 = text_to_ecpoint(finalstr4, finalstr4.length(), group, size);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Text to EC Point: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     Element a1,b1,a2,b2,a3,b3,a4,b4;
     CryptoPP::Integer k(prng, CryptoPP::Integer::One(), group.GetMaxExponent());
+
+    start = chrono::high_resolution_clock::now();
     a1 = group.ExponentiateBase(k);
     b1 = group.GetCurve().ScalarMultiply(vehpub, k);
     b1 = group.GetCurve().Add(b1, m1);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     a2 = group.ExponentiateBase(k);
     b2 = group.GetCurve().ScalarMultiply(vehpub, k);
     b2 = group.GetCurve().Add(b2, m2);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     a3 = group.ExponentiateBase(k);
     b3 = group.GetCurve().ScalarMultiply(vehpub, k);
     b3 = group.GetCurve().Add(b3, m3);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     a4 = group.ExponentiateBase(k);
     b4 = group.GetCurve().ScalarMultiply(vehpub, k);
     b4 = group.GetCurve().Add(b4, m4);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message encryption: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     int onedivsize = size+1;
     int size1no = 8*onedivsize;
@@ -1075,7 +1711,18 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
 
     std::string mysig;
     std::string signstr = finalstr1 + finalstr2 + finalstr3 + finalstr4;
+
+    start = chrono::high_resolution_clock::now();
     sign_ec(mysig, rsu1ec->priv, (uint8_t*)signstr.c_str(), signstr.length());
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature generation: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     nok = verify_ec(mysig, rsu1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
     if(nok)
       return;
@@ -1130,33 +1777,110 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     bytes_to_divisor(a1, buffrc, veh1g2->curve, ptest);
     bytes_to_divisor(b1, buffrc+divsize, veh1g2->curve, ptest);
     
+    auto start = chrono::high_resolution_clock::now();
     mess1 = b1 - veh1g2->priv*a1;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec1;
+
+    start = chrono::high_resolution_clock::now();
     divisor_to_text(rec1, mess1, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisor(a2, buffrc+2*divsize, veh1g2->curve, ptest);
     bytes_to_divisor(b2, buffrc+3*divsize, veh1g2->curve, ptest);
     
+    start = chrono::high_resolution_clock::now();
     mess2 = b2 - veh1g2->priv*a2;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec2;
+
+    start = chrono::high_resolution_clock::now();
     divisor_to_text(rec2, mess2, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisor(a3, buffrc+4*divsize, veh1g2->curve, ptest);
     bytes_to_divisor(b3, buffrc+5*divsize, veh1g2->curve, ptest);
     
+    start = chrono::high_resolution_clock::now();
     mess3 = b3 - veh1g2->priv*a3;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec3;
+
+    start = chrono::high_resolution_clock::now();
     divisor_to_text(rec3, mess3, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisor(a4, buffrc+6*divsize, veh1g2->curve, ptest);
     bytes_to_divisor(b4, buffrc+7*divsize, veh1g2->curve, ptest);
     
+    start = chrono::high_resolution_clock::now();
     mess4 = b4 - veh1g2->priv*a4;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec4;
+
+    start = chrono::high_resolution_clock::now();
     divisor_to_text(rec4, mess4, ptest, enc);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
@@ -1177,7 +1901,18 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     }
 
     std::string signstr = rec1+rec2+rec3+rec4;
+
+    start = chrono::high_resolution_clock::now();
     int nok = verify_sig2(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk1);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature verification: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(nok) {
       return;
     }
@@ -1220,21 +1955,97 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     group.GetCurve().DecodePoint(a4, buffrc+6*divsize, divsize);
     group.GetCurve().DecodePoint(b4, buffrc+7*divsize, divsize);
 
+    auto start = chrono::high_resolution_clock::now();
     m1 = group.GetCurve().ScalarMultiply(a1, veh1ec->priv);
     m1 = group.GetCurve().Subtract(b1, m1);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     std::string rec1 = ecpoint_to_text(m1);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "EC Point to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m2 = group.GetCurve().ScalarMultiply(a2, veh1ec->priv);
     m2 = group.GetCurve().Subtract(b2, m2);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     std::string rec2 = ecpoint_to_text(m2);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "EC Point to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m3 = group.GetCurve().ScalarMultiply(a3, veh1ec->priv);
     m3 = group.GetCurve().Subtract(b3, m3);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     std::string rec3 = ecpoint_to_text(m3);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "EC Point to text: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     m4 = group.GetCurve().ScalarMultiply(a4, veh1ec->priv);
     m4 = group.GetCurve().Subtract(b4, m4);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     std::string rec4 = ecpoint_to_text(m4);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "EC Point to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
@@ -1256,10 +2067,20 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
 
     std::string signstr = rec1 + rec2 + rec3 + rec4;
     int nok;
+
+    start = chrono::high_resolution_clock::now();
     if(mode == 0)
       nok = verify_ec(sigecc, veh1ec->rsupub, (uint8_t*)signstr.c_str(), signstr.length());
     else 
       nok = verify_ec(sigecc, veh1ec->glpub, (uint8_t*)signstr.c_str(), signstr.length());
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature verification: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(nok)
       return;
@@ -1302,34 +2123,107 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     bytes_to_divisorg3(a1, buffrc, veh1g3->curve, ptest);
     bytes_to_divisorg3(b1, buffrc+divsize, veh1g3->curve, ptest);
     
+    auto start = chrono::high_resolution_clock::now();
     mess1 = b1 - veh1g3->priv*a1;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     std::string rec1;
+
+    start = chrono::high_resolution_clock::now();
     divisorg3_to_text(rec1, mess1, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisorg3(a2, buffrc+2*divsize, veh1g3->curve, ptest);
     bytes_to_divisorg3(b2, buffrc+3*divsize, veh1g3->curve, ptest);
     
+    start = chrono::high_resolution_clock::now();
     mess2 = b2 - veh1g3->priv*a2;
     std::string rec2;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     divisorg3_to_text(rec2, mess2, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisorg3(a3, buffrc+4*divsize, veh1g3->curve, ptest);
     bytes_to_divisorg3(b3, buffrc+5*divsize, veh1g3->curve, ptest);
-    
+
+    start = chrono::high_resolution_clock::now(); 
     mess3 = b3 - veh1g3->priv*a3;
     std::string rec3;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     divisorg3_to_text(rec3, mess3, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     bytes_to_divisorg3(a4, buffrc+6*divsize, veh1g3->curve, ptest);
     bytes_to_divisorg3(b4, buffrc+7*divsize, veh1g3->curve, ptest);
     
+    start = chrono::high_resolution_clock::now();
     mess4 = b4 - veh1g3->priv*a4;
     std::string rec4;
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Message decryption: "
+         << duration.count() << " microseconds" << endl;
+    }
+
+    start = chrono::high_resolution_clock::now();
     divisorg3_to_text(rec4, mess4, ptest, enc);
 
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Divisor to text: "
+         << duration.count() << " microseconds" << endl;
+    }
 
     if(rec1.substr(0,6) == "Accept" && mode == 0) {
       std::cout << BOLD_CODE << GREEN_CODE << "Received accept from RSU on node: " << vid << END_CODE << std::endl;
@@ -1350,7 +2244,18 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
     }
 
     std::string signstr = rec1+rec2+rec3+rec4;
+
+    start = chrono::high_resolution_clock::now();
     int nok = verify_sig3(mysiga, mysigb, (uint8_t*)signstr.c_str(), signstr.length(), hpk3);
+
+    if(get_metrics != 0) {
+      auto stop = chrono::high_resolution_clock::now();
+      auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+ 
+      cout << "Signature verification: "
+         << duration.count() << " microseconds" << endl;
+    }
+
     if(nok) {
       return;
     }

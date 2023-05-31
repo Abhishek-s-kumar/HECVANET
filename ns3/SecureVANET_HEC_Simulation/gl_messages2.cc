@@ -3,6 +3,12 @@
 
 using namespace ns3;
 
+void update_Vehicle_Energy(int vid, float value) {
+    vehicle_Energy_Consumption[vid] += prev_energy[vid] - value;
+    prev_energy[vid] = value;
+    std::cout << "Energy: " << prev_energy[vid] - value << std::endl;
+}
+
 void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {
     ZZ ptest = to_ZZ(pt);
     UnifiedEncoding enc(ptest, veh1g2->u, veh1g2->w, 2, ZZ_p::zero());
@@ -52,6 +58,9 @@ void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
     BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
+
+    if(get_metrics != 0)
+                std::cout << "VEHICLE_SEND_JOIN_GL message size: " << fullsize+2 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -127,6 +136,9 @@ void send_GLJoin_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, sigecc.c_str(), sigecc.length());
     cypherbuff[fullsize+1] = '\0';
+
+    if(get_metrics != 0)
+                std::cout << "VEHICLE_SEND_JOIN_GL message size: " << fullsize+2 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -211,6 +223,9 @@ void send_GLJoing_g3(Vehicle_data_g3 *veh1g3, int vid, int destnode) {
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 6*signsize);
     BytesFromZZ(cypherbuff+sizenosign+2+6*signsize, sigb, 21);
+
+    if(get_metrics != 0)
+                std::cout << "VEHICLE_SEND_JOIN_GL message size: " << fullsize+2 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -612,6 +627,9 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
         BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
+        if(get_metrics != 0)
+                std::cout << "GL_ACCEPT message size: " << fullsize1+2 << std::endl;
+
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);
         Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -777,6 +795,9 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         memcpy(cypherbuff+2, temp, size1no);
         memcpy(cypherbuff+2+size1no, mysig.c_str(), mysig.length());
         cypherbuff[fullsize1+1] = '\0';
+
+        if(get_metrics != 0)
+                std::cout << "GL_ACCEPT message size: " << fullsize1+2 << std::endl;
 
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);
@@ -998,6 +1019,9 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         memcpy(cypherbuff+2, temp, size1no);
         memcpy(cypherbuff+size1no+2, mysiga, 6*signsize);
         BytesFromZZ(cypherbuff+size1no+6*signsize+2, mysigb, 21);
+
+        if(get_metrics != 0)
+                std::cout << "GL_ACCEPT message size: " << fullsize1+2 << std::endl;
 
         Ptr<Node> n0 =  ns3::NodeList::GetNode(glid);
         Ptr <NetDevice> d0 = n0->GetDevice(0);

@@ -120,6 +120,9 @@ void RSU_inform_GL(int ec_algo, int vid) {
             memcpy(sendbuff+sizemod16+2, siga, 2*signsize+1);
             BytesFromZZ(sendbuff+sizemod16+2+2*signsize+1, sigb, 21);
 
+            if(get_metrics != 0)
+                std::cout << "RSU_INFORM_LEADER message size: " << fullsize+2 << std::endl;
+
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
             Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -189,6 +192,9 @@ void RSU_inform_GL(int ec_algo, int vid) {
             memcpy(sendbuff+2, cypher, sizemod16);
             memcpy(sendbuff+sizemod16+2, sigecc.c_str(), sigecc.length());
             sendbuff[fullsize+1] = 0;
+
+            if(get_metrics != 0)
+                std::cout << "RSU_INFORM_LEADER message size: " << fullsize+2 << std::endl;
 
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -271,6 +277,9 @@ void RSU_inform_GL(int ec_algo, int vid) {
             memcpy(sendbuff+2, cypher, sizemod16);
             memcpy(sendbuff+sizemod16+2, siga, 6*signsize);
             BytesFromZZ(sendbuff+sizemod16+2+6*signsize, sigb, 21);
+
+            if(get_metrics != 0)
+                std::cout << "RSU_INFORM_LEADER message size: " << fullsize+2 << std::endl;
 
             Ptr<Node> n1 =  ns3::NodeList::GetNode(rsuid);
             Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -396,6 +405,9 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sendbuff+2+sizenosign, siga, 2*signsize+1);
         memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 21);
         
+        if(get_metrics != 0)
+                std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
+
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
         Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -495,6 +507,9 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         sendbuff[1] = vid;
         memcpy(sendbuff+2, decrypted, sizenosign);
         memcpy(sendbuff+2+sizenosign, buffrc+sizemod16, 2*size+1);
+
+        if(get_metrics != 0)
+                std::cout << "GL_LEADERSHIP_PROOF message size: " << sendsize << std::endl;
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -607,6 +622,8 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sendbuff+2+sizenosign, siga, 6*signsize);
         memcpy(sendbuff+2+sizenosign+6*signsize, buffrc+sizemod16+6*signsize, 21);
         
+        if(get_metrics != 0)
+                std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -780,6 +797,9 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         BytesFromZZ(sendbuff+sizemod16+6*size+2, sigb, 21);
     }
 
+    if(get_metrics != 0)
+                std::cout << "VEHICLE_INFORM message size: " << fullsize+2 << std::endl;
+
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> nd1 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (nd1);
@@ -937,6 +957,9 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
         memcpy(sendbuff+3+sizemod16, siga, 6*size);
         BytesFromZZ(sendbuff+sizemod16+6*size+3, sigb, 21);
     }
+
+    if(get_metrics != 0)
+                std::cout << "GL_AGGREGATED_INFORM_RSU message size: " << fullsize+3 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(glid);
     Ptr <NetDevice> nd1 = n1->GetDevice(0);

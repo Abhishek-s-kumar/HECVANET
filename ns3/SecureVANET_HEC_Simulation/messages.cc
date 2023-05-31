@@ -128,7 +128,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
       auto stop = chrono::high_resolution_clock::now();
       auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
  
-      cout << "Message Encryption: "
+      cout << "Message encryption: "
          << duration.count() << " microseconds" << endl;
     }
 
@@ -165,6 +165,9 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
     BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
+
+    if(get_metrics != 0)
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -311,7 +314,7 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
       auto stop = chrono::high_resolution_clock::now();
       auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
  
-      cout << "Message Encryption: "
+      cout << "Message encryption: "
          << duration.count() << " microseconds" << endl;
     }
 
@@ -348,6 +351,9 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     memcpy(cypherbuff+2, temp, sizenosign);
     memcpy(cypherbuff+sizenosign+2, siga, 6*sizesign);
     BytesFromZZ(cypherbuff+sizenosign+2+6*sizesign, sigb, 21);
+
+    if(get_metrics != 0)
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -492,7 +498,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
       auto stop = chrono::high_resolution_clock::now();
       auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
  
-      cout << "Message Encryption: "
+      cout << "Message encryption: "
          << duration.count() << " microseconds" << endl;
     }
 
@@ -534,6 +540,12 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
 
     Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
+
+    if(get_metrics != 0) {
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
+      //update_Vehicle_Energy(vid, Vehicle_sources.Get(vid)->GetRemainingEnergy());
+    }
+
 
     Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
     Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
@@ -1098,6 +1110,9 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     memcpy(cypherbuff+size1no+2, mysiga, 2*signsize+1);
     BytesFromZZ(cypherbuff+size1no+2*signsize+3, mysigb, 21);
 
+    if(get_metrics != 0)
+      std::cout << "RSU_ACCEPT message size: " << fullsize1+2 << std::endl;
+
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -1447,6 +1462,9 @@ void extract_RSU_SendAccept_g3(uint8_t *buffrc, int vid, int rid) {
     memcpy(cypherbuff+size1no+2, mysiga, 6*signsize);
     BytesFromZZ(cypherbuff+size1no+6*signsize+2, mysigb, 21);
 
+    if(get_metrics != 0)
+      std::cout << "RSU_ACCEPT message size: " << fullsize1+2 << std::endl;
+
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -1732,6 +1750,9 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     memcpy(cypherbuff+2, temp, size1no);
     memcpy(cypherbuff+2+size1no, mysig.c_str(), mysig.length());
     cypherbuff[fullsize1+1] = '\0';
+
+    if(get_metrics != 0)
+      std::cout << "RSU_ACCEPT message size: " << fullsize1+2 << std::endl;
 
     Ptr<Node> n0 =  ns3::NodeList::GetNode(rsuid);
     Ptr <NetDevice> d0 = n0->GetDevice(0);

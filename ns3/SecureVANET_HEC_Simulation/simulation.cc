@@ -5,6 +5,7 @@
 #include "ns3/network-module.h"
 #include "custom-mobility-model.h"
 #include "ns3/node.h"
+#include "ns3/basic-energy-source-helper.h"
 #include "hec_cert.h"
 #include "sign.h"
 #include "messages.h"
@@ -38,7 +39,8 @@ uint8_t hpk[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
 0x17,0x4c,0x4f,0x01,0x4d,0x16,0x78,0xe8,0x56,0x6e,0x03,0x02};
 
 double exit_time[63];
-
+float vehicle_Energy_Consumption[64];
+float prev_energy[64];
 
 //Note: this is a promiscuous trace for all packet reception. This is also on physical layer, so packets still have WifiMacHeader
 void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz,  WifiTxVector txVector,MpduInfo aMpdu, SignalNoiseDbm signalNoise)
@@ -505,6 +507,8 @@ int main (int argc, char *argv[])
     cypher_buff[31+2*size+2] = w;
     cypher_buff[31+2*size+3] = u;
     memcpy(cypher_buff+31+2*size+4, base.c_str(), base.length()+1);
+    if(get_metrics != 0)
+      std::cout << "RSU_CERT_BROADCAST message size: " << fullsize << std::endl;
   }
 
   else if (ec_algo == 1) {
@@ -599,6 +603,8 @@ int main (int argc, char *argv[])
     cypher_buff = new uint8_t[fullsize];
     cypher_buff[0] = 0;
     memcpy(cypher_buff+1, encoded, 31 + size+1);
+    if(get_metrics != 0)
+      std::cout << "RSU_CERT_BROADCAST message size: " << fullsize << std::endl;
   }
 
   else{
@@ -723,6 +729,8 @@ int main (int argc, char *argv[])
     cypher_buff[31+6*size+1] = w;
     cypher_buff[31+6*size+2] = u;
     memcpy(cypher_buff+31+6*size+3, base.c_str(), base.length()+1);
+    if(get_metrics != 0)
+      std::cout << "RSU_CERT_BROADCAST message size: " << fullsize << std::endl;
   }
 
   //Number of nodes
@@ -741,20 +749,15 @@ int main (int argc, char *argv[])
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (100.0, 250.0, 0.0));
-  // positionAlloc->Add (Vector (0.0, 5.0, 0.0));
-  // positionAlloc->Add (Vector (0.0, -5.0, 0.0));
 
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::CustomMobilityModel");
   mobility.Install (nodes.Get(rsuid));
 
   Ptr<CustomMobilityModel> m0 = DynamicCast<CustomMobilityModel>(nodes.Get(rsuid)->GetObject<MobilityModel> ());
-  // Ptr<CustomMobilityModel> m1 = DynamicCast<CustomMobilityModel>(nodes.Get(1)->GetObject<MobilityModel> ());
-  // Ptr<CustomMobilityModel> m2 = DynamicCast<CustomMobilityModel>(nodes.Get(2)->GetObject<MobilityModel> ());
   
 
   m0->SetVelocityAndAcceleration (Vector (0,0,0), Vector (0,0,0));
-  // m1->SetVelocityAndAcceleration (Vector (0,0,0), Vector (3,0,0));
 
 
   Ns2MobilityHelper sumo_trace (sumo_file);
@@ -800,9 +803,6 @@ int main (int argc, char *argv[])
   NetDeviceContainer devices = waveHelper.Install (wavePhy, waveMac, nodes);
   wavePhy.EnablePcap ("WaveTest", devices);
 
-  //prepare a packet with a payload of 500 Bytes. Basically it has zeros in the payload
-  Ptr <Packet> packet 	= Create <Packet> (1000);
-
   //destination MAC
   Mac48Address dest	= Mac48Address::GetBroadcast();
 
@@ -845,15 +845,29 @@ int main (int argc, char *argv[])
    */
   tx.txPowerLevel = 7; //When we define TxPowerStart & TxPowerEnd for a WifiPhy, 7 is correspond to TxPowerEnd, and 1 TxPowerStart, and numbers in between are levels.
 
+
+  /**************** Energy model: ****************/
+
+  for(uint32_t i=0; i < nNodes; i++) {
+    prev_energy[i] = 1000.0; 
+  }
+
+  BasicEnergySourceHelper energyHelper;
+  energyHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue (1000.0));
+  EnergySourceContainer Vehicle_sources = energyHelper.Install(nodes);
+
+  // WifiRadioEnergyModelHelper wifiEnergyHelper;
+  // DeviceEnergyModelContainer deviceModels = wifiEnergyHelper.Install(devices, Vehicle_sources);
+  
+
   /*************** Sending a packet ***************/
 
   /*
    * In order to send a packet, we will call SendX function of WaveNetDevice.
    */
-
-  //Get the WaveNetDevice for the first devices, using node 0.
   Ptr <NetDevice> d0 = devices.Get (rsuid);
   Ptr <WaveNetDevice> wd0 = DynamicCast <WaveNetDevice> (d0);
+
   /*
    * We want to call
    *     wd0->SendX (packet, destination, protocol, tx);

@@ -1,0 +1,2861 @@
+Waf: Entering directory `/home/el18018/ns-allinone-3.30/ns-3.30/build'
+[2474/2535] Compiling scratch/SecureVANET_HEC_Simulation/messages.cc
+[2494/2535] Linking build/scratch/SecureVANET_HEC_Simulation/SecureVANET_HEC_Simulation
+Waf: Leaving directory `/home/el18018/ns-allinone-3.30/ns-3.30/build'
+Build commands will be stored in build/compile_commands.json
+'build' finished successfully (14.055s)
+Using ElGamal with Genus 2 HEC for message encryption
+HECQV for certificates
+ElGamal HEC genus 2 signatures
+Using p: 340282366920938463463374607431768211223 of size: 128
+Text to divisor: 187 microseconds
+Private key generation: 19 microseconds
+Public key generation: 8790 microseconds
+Certificate generation: 27330 microseconds
+Certificate public key extraction: 10619 microseconds
+Certificate private key reception: 18713 microseconds
+RSU_CERT_BROADCAST message size: 84
+Text to divisor: 77 microseconds
+Certificate public key extraction: 8971 microseconds
+[1m[32mReceived RSU public key, node: 0[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 10007 microseconds
+Certificate generation: 26113 microseconds
+Certificate public key extraction: 8785 microseconds
+Certificate private key reception: 17753 microseconds
+Message encryption: 17956 microseconds
+Signature generation: 23564 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17111 microseconds
+Divisor to text: 738 microseconds
+[1m[32mReceived Join from vehicle: 0[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14823 microseconds
+Certificate public key extraction: 9682 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17756 microseconds
+Text to divisor: 87 microseconds
+Message encryption: 17856 microseconds
+Text to divisor: 93 microseconds
+Message encryption: 17848 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 17363 microseconds
+Signature generation: 23908 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17171 microseconds
+Divisor to text: 461 microseconds
+Message decryption: 16857 microseconds
+Divisor to text: 617 microseconds
+Message decryption: 16548 microseconds
+Divisor to text: 855 microseconds
+Message decryption: 17443 microseconds
+Divisor to text: 456 microseconds
+[1m[32mReceived accept from RSU on node: 0[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14931 microseconds
+[1m[32mReceived symmetric key from RSU, node: 0[0m
+[1mRegistered vehicles in RSU: 1 Received Symmetric: 0 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9188 microseconds
+[1m[32mReceived RSU public key, node: 1[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8699 microseconds
+Certificate generation: 26740 microseconds
+Certificate public key extraction: 8890 microseconds
+Certificate private key reception: 17993 microseconds
+Message encryption: 20780 microseconds
+Signature generation: 22731 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16626 microseconds
+Divisor to text: 488 microseconds
+[1m[32mReceived Join from vehicle: 1[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14737 microseconds
+Certificate public key extraction: 8989 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17527 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17072 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16904 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17869 microseconds
+Signature generation: 22913 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17540 microseconds
+Divisor to text: 619 microseconds
+Message decryption: 17261 microseconds
+Divisor to text: 836 microseconds
+Message decryption: 18775 microseconds
+Divisor to text: 496 microseconds
+Message decryption: 17465 microseconds
+Divisor to text: 458 microseconds
+[1m[32mReceived accept from RSU on node: 1[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15279 microseconds
+[1m[32mReceived symmetric key from RSU, node: 1[0m
+[1mRegistered vehicles in RSU: 2 Received Symmetric: 0 1 [0m
+Text to divisor: 98 microseconds
+Certificate public key extraction: 9276 microseconds
+[1m[32mReceived RSU public key, node: 2[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8798 microseconds
+Certificate generation: 26903 microseconds
+Certificate public key extraction: 9325 microseconds
+Certificate private key reception: 18179 microseconds
+Message encryption: 17122 microseconds
+Signature generation: 23394 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 79 microseconds
+Certificate public key extraction: 9066 microseconds
+[1m[32mReceived RSU public key, node: 3[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8704 microseconds
+Certificate generation: 27984 microseconds
+Certificate public key extraction: 9257 microseconds
+Certificate private key reception: 18065 microseconds
+Message encryption: 17011 microseconds
+Signature generation: 23100 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17247 microseconds
+Divisor to text: 486 microseconds
+[1m[32mReceived Join from vehicle: 2[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15217 microseconds
+Certificate public key extraction: 9017 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 17522 microseconds
+Text to divisor: 95 microseconds
+Message encryption: 17213 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17467 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17420 microseconds
+Signature generation: 22737 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17201 microseconds
+Divisor to text: 358 microseconds
+Message decryption: 17296 microseconds
+Divisor to text: 1143 microseconds
+Message decryption: 17958 microseconds
+Divisor to text: 623 microseconds
+Message decryption: 17152 microseconds
+Divisor to text: 669 microseconds
+[1m[32mReceived accept from RSU on node: 2[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15232 microseconds
+[1m[32mReceived symmetric key from RSU, node: 2[0m
+Message decryption: 17873 microseconds
+Divisor to text: 464 microseconds
+[1m[32mReceived Join from vehicle: 3[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15202 microseconds
+Certificate public key extraction: 9163 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17516 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 18392 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 17198 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 18220 microseconds
+Signature generation: 23599 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17088 microseconds
+Divisor to text: 564 microseconds
+Message decryption: 17044 microseconds
+Divisor to text: 593 microseconds
+Message decryption: 17203 microseconds
+Divisor to text: 759 microseconds
+Message decryption: 17126 microseconds
+Divisor to text: 559 microseconds
+[1m[32mReceived accept from RSU on node: 3[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14945 microseconds
+[1m[32mReceived symmetric key from RSU, node: 3[0m
+[1mRegistered vehicles in RSU: 4 Received Symmetric: 0 1 2 3 [0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8935 microseconds
+[1m[32mReceived RSU public key, node: 6[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8697 microseconds
+Certificate generation: 26965 microseconds
+Certificate public key extraction: 8970 microseconds
+Certificate private key reception: 17933 microseconds
+Message encryption: 16980 microseconds
+Signature generation: 25948 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 74 microseconds
+Certificate public key extraction: 8790 microseconds
+[1m[32mReceived RSU public key, node: 4[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8820 microseconds
+Certificate generation: 25955 microseconds
+Certificate public key extraction: 9018 microseconds
+Certificate private key reception: 17912 microseconds
+Message encryption: 16898 microseconds
+Signature generation: 23139 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 75 microseconds
+Certificate public key extraction: 9218 microseconds
+[1m[32mReceived RSU public key, node: 5[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8874 microseconds
+Certificate generation: 26958 microseconds
+Certificate public key extraction: 9798 microseconds
+Certificate private key reception: 19203 microseconds
+Message encryption: 24046 microseconds
+Signature generation: 23524 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16658 microseconds
+Divisor to text: 482 microseconds
+[1m[32mReceived Join from vehicle: 4[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14289 microseconds
+Certificate public key extraction: 8609 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16468 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 19016 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17024 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 16478 microseconds
+Signature generation: 21973 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16689 microseconds
+Divisor to text: 972 microseconds
+Message decryption: 16690 microseconds
+Divisor to text: 649 microseconds
+Message decryption: 16653 microseconds
+Divisor to text: 354 microseconds
+Message decryption: 19015 microseconds
+Divisor to text: 496 microseconds
+[1m[32mReceived accept from RSU on node: 4[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14488 microseconds
+[1m[32mReceived symmetric key from RSU, node: 4[0m
+Message decryption: 16976 microseconds
+Divisor to text: 368 microseconds
+[1m[32mReceived Join from vehicle: 6[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 13864 microseconds
+Certificate public key extraction: 8611 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17658 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16400 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 27331 microseconds
+Text to divisor: 265 microseconds
+Message encryption: 17295 microseconds
+Signature generation: 24437 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17126 microseconds
+Divisor to text: 343 microseconds
+Message decryption: 17526 microseconds
+Divisor to text: 480 microseconds
+Message decryption: 17431 microseconds
+Divisor to text: 593 microseconds
+Message decryption: 16530 microseconds
+Divisor to text: 530 microseconds
+[1m[32mReceived accept from RSU on node: 6[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15089 microseconds
+[1m[32mReceived symmetric key from RSU, node: 6[0m
+Message decryption: 17348 microseconds
+Divisor to text: 349 microseconds
+[1m[32mReceived Join from vehicle: 5[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 13831 microseconds
+Certificate public key extraction: 10339 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16645 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17602 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16507 microseconds
+Text to divisor: 87 microseconds
+Message encryption: 19150 microseconds
+Signature generation: 23381 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16567 microseconds
+Divisor to text: 1048 microseconds
+Message decryption: 16532 microseconds
+Divisor to text: 552 microseconds
+Message decryption: 16570 microseconds
+Divisor to text: 703 microseconds
+Message decryption: 16552 microseconds
+Divisor to text: 645 microseconds
+[1m[32mReceived accept from RSU on node: 5[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14287 microseconds
+[1m[32mReceived symmetric key from RSU, node: 5[0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8796 microseconds
+[1m[32mReceived RSU public key, node: 8[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8580 microseconds
+Certificate generation: 25345 microseconds
+Certificate public key extraction: 9552 microseconds
+Certificate private key reception: 19096 microseconds
+Message encryption: 16623 microseconds
+Signature generation: 22678 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17586 microseconds
+Divisor to text: 633 microseconds
+[1m[32mReceived Join from vehicle: 8[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14822 microseconds
+Certificate public key extraction: 8537 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16478 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 17071 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 17289 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 17380 microseconds
+Signature generation: 22269 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 18598 microseconds
+Divisor to text: 381 microseconds
+Message decryption: 16662 microseconds
+Divisor to text: 1223 microseconds
+Message decryption: 17488 microseconds
+Divisor to text: 358 microseconds
+Message decryption: 16659 microseconds
+Divisor to text: 661 microseconds
+[1m[32mReceived accept from RSU on node: 8[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14247 microseconds
+[1m[32mReceived symmetric key from RSU, node: 8[0m
+[1mRegistered vehicles in RSU: 8 Received Symmetric: 0 1 2 3 4 5 6 8 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8660 microseconds
+[1m[32mReceived RSU public key, node: 9[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8464 microseconds
+Certificate generation: 27296 microseconds
+Certificate public key extraction: 9541 microseconds
+Certificate private key reception: 17852 microseconds
+Message encryption: 16730 microseconds
+Signature generation: 22845 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17224 microseconds
+Divisor to text: 1387 microseconds
+[1m[32mReceived Join from vehicle: 9[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14203 microseconds
+Certificate public key extraction: 8877 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16941 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16567 microseconds
+Text to divisor: 94 microseconds
+Message encryption: 17261 microseconds
+Text to divisor: 356 microseconds
+Message encryption: 16426 microseconds
+Signature generation: 23233 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16725 microseconds
+Divisor to text: 626 microseconds
+Message decryption: 16642 microseconds
+Divisor to text: 518 microseconds
+Message decryption: 17828 microseconds
+Divisor to text: 645 microseconds
+Message decryption: 17022 microseconds
+Divisor to text: 758 microseconds
+[1m[32mReceived accept from RSU on node: 9[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15136 microseconds
+[1m[32mReceived symmetric key from RSU, node: 9[0m
+[1mRegistered vehicles in RSU: 9 Received Symmetric: 0 1 2 3 4 5 6 8 9 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9214 microseconds
+[1m[32mReceived RSU public key, node: 10[0m
+Text to divisor: 87 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8424 microseconds
+Certificate generation: 31622 microseconds
+Certificate public key extraction: 9790 microseconds
+Certificate private key reception: 18773 microseconds
+Message encryption: 19009 microseconds
+Signature generation: 23871 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 74 microseconds
+Certificate public key extraction: 9334 microseconds
+[1m[32mReceived RSU public key, node: 11[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8396 microseconds
+Certificate generation: 27066 microseconds
+Certificate public key extraction: 10545 microseconds
+Certificate private key reception: 18247 microseconds
+Message encryption: 16788 microseconds
+Signature generation: 23438 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8941 microseconds
+[1m[32mReceived RSU public key, node: 12[0m
+Text to divisor: 71 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8778 microseconds
+Certificate generation: 26187 microseconds
+Certificate public key extraction: 9078 microseconds
+Certificate private key reception: 17101 microseconds
+Message encryption: 16615 microseconds
+Signature generation: 24509 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16367 microseconds
+Divisor to text: 1658 microseconds
+[1m[32mReceived Join from vehicle: 10[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14676 microseconds
+Certificate public key extraction: 8714 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17212 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 19025 microseconds
+Text to divisor: 97 microseconds
+Message encryption: 17832 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17925 microseconds
+Signature generation: 22299 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16702 microseconds
+Divisor to text: 505 microseconds
+Message decryption: 16657 microseconds
+Divisor to text: 690 microseconds
+Message decryption: 17308 microseconds
+Divisor to text: 359 microseconds
+Message decryption: 16722 microseconds
+Divisor to text: 1397 microseconds
+[1m[32mReceived accept from RSU on node: 10[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14426 microseconds
+[1m[32mReceived symmetric key from RSU, node: 10[0m
+Message decryption: 16606 microseconds
+Divisor to text: 502 microseconds
+[1m[32mReceived Join from vehicle: 12[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14669 microseconds
+Certificate public key extraction: 8579 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16687 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17427 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17733 microseconds
+Text to divisor: 252 microseconds
+Message encryption: 16479 microseconds
+Signature generation: 23189 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16847 microseconds
+Divisor to text: 1088 microseconds
+Message decryption: 17298 microseconds
+Divisor to text: 893 microseconds
+Message decryption: 19269 microseconds
+Divisor to text: 397 microseconds
+Message decryption: 17075 microseconds
+Divisor to text: 626 microseconds
+[1m[32mReceived accept from RSU on node: 12[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15089 microseconds
+[1m[32mReceived symmetric key from RSU, node: 12[0m
+Message decryption: 16652 microseconds
+Divisor to text: 519 microseconds
+[1m[32mReceived Join from vehicle: 11[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14802 microseconds
+Certificate public key extraction: 8607 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 26673 microseconds
+Text to divisor: 111 microseconds
+Message encryption: 24725 microseconds
+Text to divisor: 91 microseconds
+Message encryption: 20573 microseconds
+Text to divisor: 124 microseconds
+Message encryption: 21682 microseconds
+Signature generation: 24465 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 18100 microseconds
+Divisor to text: 388 microseconds
+Message decryption: 16904 microseconds
+Divisor to text: 1132 microseconds
+Message decryption: 17056 microseconds
+Divisor to text: 635 microseconds
+Message decryption: 17448 microseconds
+Divisor to text: 748 microseconds
+[1m[32mReceived accept from RSU on node: 11[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14344 microseconds
+[1m[32mReceived symmetric key from RSU, node: 11[0m
+Text to divisor: 113 microseconds
+Certificate public key extraction: 9213 microseconds
+[1m[32mReceived RSU public key, node: 13[0m
+Text to divisor: 199 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8685 microseconds
+Certificate generation: 26600 microseconds
+Certificate public key extraction: 8562 microseconds
+Certificate private key reception: 17361 microseconds
+Message encryption: 16460 microseconds
+Signature generation: 24162 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16835 microseconds
+Divisor to text: 533 microseconds
+[1m[32mReceived Join from vehicle: 13[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14693 microseconds
+Certificate public key extraction: 8692 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16955 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16586 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17430 microseconds
+Text to divisor: 94 microseconds
+Message encryption: 18139 microseconds
+Signature generation: 22629 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16523 microseconds
+Divisor to text: 513 microseconds
+Message decryption: 16636 microseconds
+Divisor to text: 537 microseconds
+Message decryption: 17058 microseconds
+Divisor to text: 528 microseconds
+Message decryption: 16923 microseconds
+Divisor to text: 656 microseconds
+[1m[32mReceived accept from RSU on node: 13[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14205 microseconds
+[1m[32mReceived symmetric key from RSU, node: 13[0m
+[1mRegistered vehicles in RSU: 13 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 [0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8665 microseconds
+[1m[32mReceived RSU public key, node: 14[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8707 microseconds
+Certificate generation: 25119 microseconds
+Certificate public key extraction: 8600 microseconds
+Certificate private key reception: 18601 microseconds
+Message encryption: 16487 microseconds
+Signature generation: 22182 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8641 microseconds
+[1m[32mReceived RSU public key, node: 15[0m
+Text to divisor: 76 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8409 microseconds
+Certificate generation: 27700 microseconds
+Certificate public key extraction: 9335 microseconds
+Certificate private key reception: 17230 microseconds
+Message encryption: 16720 microseconds
+Signature generation: 23437 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16358 microseconds
+Divisor to text: 508 microseconds
+[1m[32mReceived Join from vehicle: 15[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14365 microseconds
+Certificate public key extraction: 8951 microseconds
+Text to divisor: 95 microseconds
+Message encryption: 20152 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 17286 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 17351 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 18036 microseconds
+Signature generation: 22337 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17024 microseconds
+Divisor to text: 825 microseconds
+Message decryption: 16761 microseconds
+Divisor to text: 1218 microseconds
+Message decryption: 18471 microseconds
+Divisor to text: 529 microseconds
+Message decryption: 17061 microseconds
+Divisor to text: 1212 microseconds
+[1m[32mReceived accept from RSU on node: 15[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14393 microseconds
+[1m[32mReceived symmetric key from RSU, node: 15[0m
+Message decryption: 16833 microseconds
+Divisor to text: 985 microseconds
+[1m[32mReceived Join from vehicle: 14[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 16334 microseconds
+Certificate public key extraction: 8738 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17405 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17058 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16474 microseconds
+Text to divisor: 294 microseconds
+Message encryption: 17168 microseconds
+Signature generation: 22629 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16637 microseconds
+Divisor to text: 932 microseconds
+Message decryption: 16601 microseconds
+Divisor to text: 1130 microseconds
+Message decryption: 16682 microseconds
+Divisor to text: 903 microseconds
+Message decryption: 17630 microseconds
+Divisor to text: 1160 microseconds
+[1m[32mReceived accept from RSU on node: 14[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14849 microseconds
+[1m[32mReceived symmetric key from RSU, node: 14[0m
+[1mRegistered vehicles in RSU: 15 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 [0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8885 microseconds
+[1m[32mReceived RSU public key, node: 16[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8389 microseconds
+Certificate generation: 25650 microseconds
+Certificate public key extraction: 9327 microseconds
+Certificate private key reception: 17642 microseconds
+Message encryption: 16312 microseconds
+Signature generation: 23016 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16675 microseconds
+Divisor to text: 944 microseconds
+[1m[32mReceived Join from vehicle: 16[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14984 microseconds
+Certificate public key extraction: 8714 microseconds
+Text to divisor: 70 microseconds
+Message encryption: 17606 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16881 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16947 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 18063 microseconds
+Signature generation: 22016 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 18712 microseconds
+Divisor to text: 570 microseconds
+Message decryption: 18929 microseconds
+Divisor to text: 395 microseconds
+Message decryption: 20764 microseconds
+Divisor to text: 388 microseconds
+Message decryption: 17855 microseconds
+Divisor to text: 416 microseconds
+[1m[32mReceived accept from RSU on node: 16[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15044 microseconds
+[1m[32mReceived symmetric key from RSU, node: 16[0m
+[1mRegistered vehicles in RSU: 16 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 [0m
+Text to divisor: 74 microseconds
+Certificate public key extraction: 10066 microseconds
+[1m[32mReceived RSU public key, node: 17[0m
+Text to divisor: 77 microseconds
+Private key generation: 0 microseconds
+Public key generation: 9652 microseconds
+Certificate generation: 31350 microseconds
+Certificate public key extraction: 8689 microseconds
+Certificate private key reception: 18474 microseconds
+Message encryption: 18012 microseconds
+Signature generation: 22105 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17780 microseconds
+Divisor to text: 878 microseconds
+[1m[32mReceived Join from vehicle: 17[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15522 microseconds
+Certificate public key extraction: 9095 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 18442 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 18466 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17266 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 18915 microseconds
+Signature generation: 23992 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17215 microseconds
+Divisor to text: 649 microseconds
+Message decryption: 17275 microseconds
+Divisor to text: 1796 microseconds
+Message decryption: 18542 microseconds
+Divisor to text: 390 microseconds
+Message decryption: 16414 microseconds
+Divisor to text: 1497 microseconds
+[1m[32mReceived accept from RSU on node: 17[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15469 microseconds
+[1m[32mReceived symmetric key from RSU, node: 17[0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8586 microseconds
+[1m[32mReceived RSU public key, node: 18[0m
+Text to divisor: 919 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8517 microseconds
+Certificate generation: 27144 microseconds
+Certificate public key extraction: 9979 microseconds
+Certificate private key reception: 17529 microseconds
+Message encryption: 16347 microseconds
+Signature generation: 22282 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 287 microseconds
+Certificate public key extraction: 8621 microseconds
+[1m[32mReceived RSU public key, node: 19[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8870 microseconds
+Certificate generation: 25154 microseconds
+Certificate public key extraction: 9274 microseconds
+Certificate private key reception: 18599 microseconds
+Message encryption: 16449 microseconds
+Signature generation: 23626 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16715 microseconds
+Divisor to text: 889 microseconds
+[1m[32mReceived Join from vehicle: 18[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14568 microseconds
+Certificate public key extraction: 8628 microseconds
+Text to divisor: 87 microseconds
+Message encryption: 16675 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16921 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17380 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17216 microseconds
+Signature generation: 22593 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17622 microseconds
+Divisor to text: 909 microseconds
+Message decryption: 16776 microseconds
+Divisor to text: 1252 microseconds
+Message decryption: 16640 microseconds
+Divisor to text: 802 microseconds
+Message decryption: 16746 microseconds
+Divisor to text: 1440 microseconds
+[1m[32mReceived accept from RSU on node: 18[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14789 microseconds
+[1m[32mReceived symmetric key from RSU, node: 18[0m
+Message decryption: 16749 microseconds
+Divisor to text: 916 microseconds
+[1m[32mReceived Join from vehicle: 19[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15844 microseconds
+Certificate public key extraction: 8880 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16845 microseconds
+Text to divisor: 1001 microseconds
+Message encryption: 17263 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 16567 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 16572 microseconds
+Signature generation: 23929 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16934 microseconds
+Divisor to text: 967 microseconds
+Message decryption: 17124 microseconds
+Divisor to text: 759 microseconds
+Message decryption: 17405 microseconds
+Divisor to text: 359 microseconds
+Message decryption: 17522 microseconds
+Divisor to text: 1099 microseconds
+[1m[32mReceived accept from RSU on node: 19[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14181 microseconds
+[1m[32mReceived symmetric key from RSU, node: 19[0m
+[1mRegistered vehicles in RSU: 19 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 [0m
+Text to divisor: 86 microseconds
+Certificate public key extraction: 8602 microseconds
+[1m[32mReceived RSU public key, node: 20[0m
+Text to divisor: 76 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8354 microseconds
+Certificate generation: 25490 microseconds
+Certificate public key extraction: 9946 microseconds
+Certificate private key reception: 17301 microseconds
+Message encryption: 17957 microseconds
+Signature generation: 22367 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17039 microseconds
+Divisor to text: 890 microseconds
+[1m[32mReceived Join from vehicle: 20[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14361 microseconds
+Certificate public key extraction: 8578 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16460 microseconds
+Text to divisor: 365 microseconds
+Message encryption: 17076 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17111 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 17162 microseconds
+Signature generation: 23062 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 19219 microseconds
+Divisor to text: 360 microseconds
+Message decryption: 17940 microseconds
+Divisor to text: 521 microseconds
+Message decryption: 17738 microseconds
+Divisor to text: 379 microseconds
+Message decryption: 17429 microseconds
+Divisor to text: 616 microseconds
+[1m[32mReceived accept from RSU on node: 20[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14012 microseconds
+[1m[32mReceived symmetric key from RSU, node: 20[0m
+[1mRegistered vehicles in RSU: 20 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 [0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8606 microseconds
+[1m[32mReceived RSU public key, node: 21[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8609 microseconds
+Certificate generation: 25003 microseconds
+Certificate public key extraction: 9258 microseconds
+Certificate private key reception: 17243 microseconds
+Message encryption: 16633 microseconds
+Signature generation: 23845 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17068 microseconds
+Divisor to text: 1194 microseconds
+[1m[32mReceived Join from vehicle: 21[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14191 microseconds
+Certificate public key extraction: 8458 microseconds
+Text to divisor: 71 microseconds
+Message encryption: 16637 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 19276 microseconds
+Text to divisor: 86 microseconds
+Message encryption: 19327 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17368 microseconds
+Signature generation: 22436 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17663 microseconds
+Divisor to text: 949 microseconds
+Message decryption: 18864 microseconds
+Divisor to text: 649 microseconds
+Message decryption: 20290 microseconds
+Divisor to text: 671 microseconds
+Message decryption: 16730 microseconds
+Divisor to text: 493 microseconds
+[1m[32mReceived accept from RSU on node: 21[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14929 microseconds
+[1m[32mReceived symmetric key from RSU, node: 21[0m
+[1mRegistered vehicles in RSU: 21 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 [0m
+Text to divisor: 119 microseconds
+Certificate public key extraction: 8660 microseconds
+[1m[32mReceived RSU public key, node: 22[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8350 microseconds
+Certificate generation: 26085 microseconds
+Certificate public key extraction: 8546 microseconds
+Certificate private key reception: 17341 microseconds
+Message encryption: 17992 microseconds
+Signature generation: 22550 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 112 microseconds
+Certificate public key extraction: 9313 microseconds
+[1m[32mReceived RSU public key, node: 24[0m
+Text to divisor: 233 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8367 microseconds
+Certificate generation: 25066 microseconds
+Certificate public key extraction: 8698 microseconds
+Certificate private key reception: 17193 microseconds
+Message encryption: 16900 microseconds
+Signature generation: 22868 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16477 microseconds
+Divisor to text: 625 microseconds
+[1m[32mReceived Join from vehicle: 22[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14130 microseconds
+Certificate public key extraction: 8541 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16431 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17969 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16542 microseconds
+Text to divisor: 248 microseconds
+Message encryption: 17185 microseconds
+Signature generation: 24325 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17485 microseconds
+Divisor to text: 479 microseconds
+Message decryption: 17249 microseconds
+Divisor to text: 1333 microseconds
+Message decryption: 16583 microseconds
+Divisor to text: 1026 microseconds
+Message decryption: 17224 microseconds
+Divisor to text: 580 microseconds
+[1m[32mReceived accept from RSU on node: 22[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14658 microseconds
+[1m[32mReceived symmetric key from RSU, node: 22[0m
+Message decryption: 16631 microseconds
+Divisor to text: 632 microseconds
+[1m[32mReceived Join from vehicle: 24[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14470 microseconds
+Certificate public key extraction: 8913 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16868 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16438 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 16424 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 18858 microseconds
+Signature generation: 21990 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16634 microseconds
+Divisor to text: 369 microseconds
+Message decryption: 17906 microseconds
+Divisor to text: 1545 microseconds
+Message decryption: 16662 microseconds
+Divisor to text: 361 microseconds
+Message decryption: 17522 microseconds
+Divisor to text: 1594 microseconds
+[1m[32mReceived accept from RSU on node: 24[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14438 microseconds
+[1m[32mReceived symmetric key from RSU, node: 24[0m
+[1mRegistered vehicles in RSU: 23 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8779 microseconds
+[1m[32mReceived RSU public key, node: 25[0m
+Text to divisor: 97 microseconds
+Private key generation: 0 microseconds
+Public key generation: 9118 microseconds
+Certificate generation: 26820 microseconds
+Certificate public key extraction: 9437 microseconds
+Certificate private key reception: 18082 microseconds
+Message encryption: 18606 microseconds
+Signature generation: 22095 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16218 microseconds
+Divisor to text: 1197 microseconds
+[1m[32mReceived Join from vehicle: 25[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14430 microseconds
+Certificate public key extraction: 9257 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16678 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17625 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17723 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16921 microseconds
+Signature generation: 23799 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 19081 microseconds
+Divisor to text: 951 microseconds
+Message decryption: 17968 microseconds
+Divisor to text: 405 microseconds
+Message decryption: 16862 microseconds
+Divisor to text: 1581 microseconds
+Message decryption: 17496 microseconds
+Divisor to text: 356 microseconds
+[1m[32mReceived accept from RSU on node: 25[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14709 microseconds
+[1m[32mReceived symmetric key from RSU, node: 25[0m
+Text to divisor: 71 microseconds
+Certificate public key extraction: 8748 microseconds
+[1m[32mReceived RSU public key, node: 26[0m
+Text to divisor: 107 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8776 microseconds
+Certificate generation: 25084 microseconds
+Certificate public key extraction: 8748 microseconds
+Certificate private key reception: 17307 microseconds
+Message encryption: 16394 microseconds
+Signature generation: 23920 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16306 microseconds
+Divisor to text: 771 microseconds
+[1m[32mReceived Join from vehicle: 26[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14638 microseconds
+Certificate public key extraction: 8707 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 20619 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17020 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17600 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17203 microseconds
+Signature generation: 22350 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17529 microseconds
+Divisor to text: 666 microseconds
+Message decryption: 16613 microseconds
+Divisor to text: 938 microseconds
+Message decryption: 17731 microseconds
+Divisor to text: 621 microseconds
+Message decryption: 17180 microseconds
+Divisor to text: 354 microseconds
+[1m[32mReceived accept from RSU on node: 26[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14712 microseconds
+[1m[32mReceived symmetric key from RSU, node: 26[0m
+[1mRegistered vehicles in RSU: 25 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8758 microseconds
+[1m[32mReceived RSU public key, node: 28[0m
+Text to divisor: 269 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8493 microseconds
+Certificate generation: 25166 microseconds
+Certificate public key extraction: 9686 microseconds
+Certificate private key reception: 17489 microseconds
+Message encryption: 16321 microseconds
+Signature generation: 22602 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9122 microseconds
+[1m[32mReceived RSU public key, node: 29[0m
+Text to divisor: 86 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8590 microseconds
+Certificate generation: 25284 microseconds
+Certificate public key extraction: 9730 microseconds
+Certificate private key reception: 17611 microseconds
+Message encryption: 17133 microseconds
+Signature generation: 24221 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16598 microseconds
+Divisor to text: 1453 microseconds
+[1m[32mReceived Join from vehicle: 28[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14140 microseconds
+Certificate public key extraction: 8518 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16779 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17276 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 16496 microseconds
+Text to divisor: 248 microseconds
+Message encryption: 17462 microseconds
+Signature generation: 22461 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16898 microseconds
+Divisor to text: 1165 microseconds
+Message decryption: 17411 microseconds
+Divisor to text: 993 microseconds
+Message decryption: 17408 microseconds
+Divisor to text: 612 microseconds
+Message decryption: 17293 microseconds
+Divisor to text: 413 microseconds
+[1m[32mReceived accept from RSU on node: 28[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14779 microseconds
+[1m[32mReceived symmetric key from RSU, node: 28[0m
+Message decryption: 16588 microseconds
+Divisor to text: 812 microseconds
+[1m[32mReceived Join from vehicle: 29[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14704 microseconds
+Certificate public key extraction: 8650 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17927 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16971 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 17618 microseconds
+Text to divisor: 125 microseconds
+Message encryption: 17250 microseconds
+Signature generation: 22721 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16617 microseconds
+Divisor to text: 884 microseconds
+Message decryption: 16638 microseconds
+Divisor to text: 495 microseconds
+Message decryption: 17310 microseconds
+Divisor to text: 656 microseconds
+Message decryption: 16742 microseconds
+Divisor to text: 354 microseconds
+[1m[32mReceived accept from RSU on node: 29[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14081 microseconds
+[1m[32mReceived symmetric key from RSU, node: 29[0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8651 microseconds
+[1m[32mReceived RSU public key, node: 30[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8479 microseconds
+Certificate generation: 25143 microseconds
+Certificate public key extraction: 8863 microseconds
+Certificate private key reception: 17689 microseconds
+Message encryption: 18699 microseconds
+Signature generation: 22407 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8888 microseconds
+[1m[32mReceived RSU public key, node: 31[0m
+Text to divisor: 76 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8542 microseconds
+Certificate generation: 24994 microseconds
+Certificate public key extraction: 9371 microseconds
+Certificate private key reception: 18916 microseconds
+Message encryption: 16629 microseconds
+Signature generation: 22877 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16386 microseconds
+Divisor to text: 541 microseconds
+[1m[32mReceived Join from vehicle: 31[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15924 microseconds
+Certificate public key extraction: 9771 microseconds
+Text to divisor: 99 microseconds
+Message encryption: 17313 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17748 microseconds
+Text to divisor: 97 microseconds
+Message encryption: 16975 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 19139 microseconds
+Signature generation: 22043 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17125 microseconds
+Divisor to text: 984 microseconds
+Message decryption: 18054 microseconds
+Divisor to text: 730 microseconds
+Message decryption: 16642 microseconds
+Divisor to text: 355 microseconds
+Message decryption: 16621 microseconds
+Divisor to text: 374 microseconds
+[1m[32mReceived accept from RSU on node: 31[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14093 microseconds
+[1m[32mReceived symmetric key from RSU, node: 31[0m
+Message decryption: 16524 microseconds
+Divisor to text: 837 microseconds
+[1m[32mReceived Join from vehicle: 30[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15489 microseconds
+Certificate public key extraction: 8934 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17950 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 17050 microseconds
+Text to divisor: 82 microseconds
+Message encryption: 17590 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16996 microseconds
+Signature generation: 22241 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17287 microseconds
+Divisor to text: 543 microseconds
+Message decryption: 16630 microseconds
+Divisor to text: 748 microseconds
+Message decryption: 17171 microseconds
+Divisor to text: 520 microseconds
+Message decryption: 17706 microseconds
+Divisor to text: 897 microseconds
+[1m[32mReceived accept from RSU on node: 30[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14425 microseconds
+[1m[32mReceived symmetric key from RSU, node: 30[0m
+[1mRegistered vehicles in RSU: 29 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 [0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8640 microseconds
+[1m[32mReceived RSU public key, node: 32[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8407 microseconds
+Certificate generation: 25300 microseconds
+Certificate public key extraction: 9377 microseconds
+Certificate private key reception: 17682 microseconds
+Message encryption: 16835 microseconds
+Signature generation: 23430 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17084 microseconds
+Divisor to text: 753 microseconds
+[1m[32mReceived Join from vehicle: 32[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14064 microseconds
+Certificate public key extraction: 9427 microseconds
+Text to divisor: 249 microseconds
+Message encryption: 16912 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16768 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17526 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17363 microseconds
+Signature generation: 22025 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17054 microseconds
+Divisor to text: 832 microseconds
+Message decryption: 16738 microseconds
+Divisor to text: 597 microseconds
+Message decryption: 16548 microseconds
+Divisor to text: 1557 microseconds
+Message decryption: 17531 microseconds
+Divisor to text: 898 microseconds
+[1m[32mReceived accept from RSU on node: 32[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14396 microseconds
+[1m[32mReceived symmetric key from RSU, node: 32[0m
+Text to divisor: 71 microseconds
+Certificate public key extraction: 9657 microseconds
+[1m[32mReceived RSU public key, node: 34[0m
+Text to divisor: 75 microseconds
+Private key generation: 1 microseconds
+Public key generation: 8542 microseconds
+Certificate generation: 25324 microseconds
+Certificate public key extraction: 9245 microseconds
+Certificate private key reception: 17645 microseconds
+Message encryption: 16488 microseconds
+Signature generation: 23048 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8893 microseconds
+[1m[32mReceived RSU public key, node: 33[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8727 microseconds
+Certificate generation: 25037 microseconds
+Certificate public key extraction: 9016 microseconds
+Certificate private key reception: 17394 microseconds
+Message encryption: 16398 microseconds
+Signature generation: 22865 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 76 microseconds
+Certificate public key extraction: 8999 microseconds
+[1m[32mReceived RSU public key, node: 35[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8446 microseconds
+Certificate generation: 25417 microseconds
+Certificate public key extraction: 9052 microseconds
+Certificate private key reception: 19478 microseconds
+Message encryption: 17530 microseconds
+Signature generation: 23046 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17043 microseconds
+Divisor to text: 356 microseconds
+[1m[32mReceived Join from vehicle: 33[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14293 microseconds
+Certificate public key extraction: 8587 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17175 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16949 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16825 microseconds
+Text to divisor: 711 microseconds
+Message encryption: 16778 microseconds
+Signature generation: 22007 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 18048 microseconds
+Divisor to text: 512 microseconds
+Message decryption: 18450 microseconds
+Divisor to text: 907 microseconds
+Message decryption: 17237 microseconds
+Divisor to text: 981 microseconds
+Message decryption: 17396 microseconds
+Divisor to text: 629 microseconds
+[1m[32mReceived accept from RSU on node: 33[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14536 microseconds
+[1m[32mReceived symmetric key from RSU, node: 33[0m
+Message decryption: 16521 microseconds
+Divisor to text: 402 microseconds
+[1m[32mReceived Join from vehicle: 34[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14596 microseconds
+Certificate public key extraction: 8614 microseconds
+Text to divisor: 208 microseconds
+Message encryption: 16623 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17680 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16961 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17145 microseconds
+Signature generation: 22085 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16924 microseconds
+Divisor to text: 417 microseconds
+Message decryption: 16620 microseconds
+Divisor to text: 1995 microseconds
+Message decryption: 17160 microseconds
+Divisor to text: 489 microseconds
+Message decryption: 17077 microseconds
+Divisor to text: 1480 microseconds
+[1m[32mReceived accept from RSU on node: 34[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14115 microseconds
+[1m[32mReceived symmetric key from RSU, node: 34[0m
+Message decryption: 17648 microseconds
+Divisor to text: 547 microseconds
+[1m[32mReceived Join from vehicle: 35[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14312 microseconds
+Certificate public key extraction: 9152 microseconds
+Text to divisor: 223 microseconds
+Message encryption: 18165 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16600 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16473 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17787 microseconds
+Signature generation: 22217 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16977 microseconds
+Divisor to text: 1453 microseconds
+Message decryption: 19699 microseconds
+Divisor to text: 349 microseconds
+Message decryption: 18837 microseconds
+Divisor to text: 614 microseconds
+Message decryption: 17605 microseconds
+Divisor to text: 643 microseconds
+[1m[32mReceived accept from RSU on node: 35[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14568 microseconds
+[1m[32mReceived symmetric key from RSU, node: 35[0m
+[1mRegistered vehicles in RSU: 33 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8684 microseconds
+[1m[32mReceived RSU public key, node: 37[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8967 microseconds
+Certificate generation: 24964 microseconds
+Certificate public key extraction: 8590 microseconds
+Certificate private key reception: 17267 microseconds
+Message encryption: 16334 microseconds
+Signature generation: 22607 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8690 microseconds
+[1m[32mReceived RSU public key, node: 36[0m
+Text to divisor: 75 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8419 microseconds
+Certificate generation: 26900 microseconds
+Certificate public key extraction: 9453 microseconds
+Certificate private key reception: 17120 microseconds
+Message encryption: 16632 microseconds
+Signature generation: 23514 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16630 microseconds
+Divisor to text: 1041 microseconds
+[1m[32mReceived Join from vehicle: 36[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14884 microseconds
+Certificate public key extraction: 8687 microseconds
+Text to divisor: 219 microseconds
+Message encryption: 16942 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16904 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 18291 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17382 microseconds
+Signature generation: 22896 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17178 microseconds
+Divisor to text: 372 microseconds
+Message decryption: 17086 microseconds
+Divisor to text: 497 microseconds
+Message decryption: 17059 microseconds
+Divisor to text: 654 microseconds
+Message decryption: 16647 microseconds
+Divisor to text: 1169 microseconds
+[1m[32mReceived accept from RSU on node: 36[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15440 microseconds
+[1m[32mReceived symmetric key from RSU, node: 36[0m
+Message decryption: 16573 microseconds
+Divisor to text: 978 microseconds
+[1m[32mReceived Join from vehicle: 37[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14542 microseconds
+Certificate public key extraction: 8571 microseconds
+Text to divisor: 246 microseconds
+Message encryption: 17889 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 16610 microseconds
+Text to divisor: 235 microseconds
+Message encryption: 16605 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17126 microseconds
+Signature generation: 22758 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17890 microseconds
+Divisor to text: 490 microseconds
+Message decryption: 16790 microseconds
+Divisor to text: 1144 microseconds
+Message decryption: 17600 microseconds
+Divisor to text: 362 microseconds
+Message decryption: 16645 microseconds
+Divisor to text: 1166 microseconds
+[1m[32mReceived accept from RSU on node: 37[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14691 microseconds
+[1m[32mReceived symmetric key from RSU, node: 37[0m
+[1mRegistered vehicles in RSU: 35 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 [0m
+Text to divisor: 104 microseconds
+Certificate public key extraction: 9517 microseconds
+[1m[32mReceived RSU public key, node: 39[0m
+Text to divisor: 107 microseconds
+Private key generation: 1 microseconds
+Public key generation: 12253 microseconds
+Certificate generation: 25665 microseconds
+Certificate public key extraction: 9613 microseconds
+Certificate private key reception: 21238 microseconds
+Message encryption: 16452 microseconds
+Signature generation: 22332 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 85 microseconds
+Certificate public key extraction: 8651 microseconds
+[1m[32mReceived RSU public key, node: 38[0m
+Text to divisor: 76 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8563 microseconds
+Certificate generation: 24947 microseconds
+Certificate public key extraction: 9640 microseconds
+Certificate private key reception: 17790 microseconds
+Message encryption: 17154 microseconds
+Signature generation: 23706 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17018 microseconds
+Divisor to text: 772 microseconds
+[1m[32mReceived Join from vehicle: 38[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15676 microseconds
+Certificate public key extraction: 8675 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16476 microseconds
+Text to divisor: 213 microseconds
+Message encryption: 16496 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16470 microseconds
+Text to divisor: 287 microseconds
+Message encryption: 17543 microseconds
+Signature generation: 22225 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16675 microseconds
+Divisor to text: 1632 microseconds
+Message decryption: 16631 microseconds
+Divisor to text: 1452 microseconds
+Message decryption: 16930 microseconds
+Divisor to text: 2077 microseconds
+Message decryption: 16955 microseconds
+Divisor to text: 1160 microseconds
+[1m[32mReceived accept from RSU on node: 38[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14951 microseconds
+[1m[32mReceived symmetric key from RSU, node: 38[0m
+Message decryption: 16784 microseconds
+Divisor to text: 776 microseconds
+[1m[32mReceived Join from vehicle: 39[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15548 microseconds
+Certificate public key extraction: 8545 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 16460 microseconds
+Text to divisor: 99 microseconds
+Message encryption: 16702 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 18947 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17451 microseconds
+Signature generation: 22228 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16490 microseconds
+Divisor to text: 494 microseconds
+Message decryption: 16578 microseconds
+Divisor to text: 1122 microseconds
+Message decryption: 16915 microseconds
+Divisor to text: 1028 microseconds
+Message decryption: 17623 microseconds
+Divisor to text: 670 microseconds
+[1m[32mReceived accept from RSU on node: 39[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14697 microseconds
+[1m[32mReceived symmetric key from RSU, node: 39[0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8946 microseconds
+[1m[32mReceived RSU public key, node: 40[0m
+Text to divisor: 79 microseconds
+Private key generation: 0 microseconds
+Public key generation: 9087 microseconds
+Certificate generation: 27077 microseconds
+Certificate public key extraction: 8821 microseconds
+Certificate private key reception: 19096 microseconds
+Message encryption: 16717 microseconds
+Signature generation: 22470 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 18566 microseconds
+Divisor to text: 1475 microseconds
+[1m[32mReceived Join from vehicle: 40[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14805 microseconds
+Certificate public key extraction: 8960 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16663 microseconds
+Text to divisor: 298 microseconds
+Message encryption: 18641 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 17957 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16785 microseconds
+Signature generation: 22543 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16573 microseconds
+Divisor to text: 892 microseconds
+Message decryption: 16611 microseconds
+Divisor to text: 935 microseconds
+Message decryption: 17079 microseconds
+Divisor to text: 511 microseconds
+Message decryption: 16695 microseconds
+Divisor to text: 628 microseconds
+[1m[32mReceived accept from RSU on node: 40[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14415 microseconds
+[1m[32mReceived symmetric key from RSU, node: 40[0m
+[1mRegistered vehicles in RSU: 38 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9444 microseconds
+[1m[32mReceived RSU public key, node: 42[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8715 microseconds
+Certificate generation: 27472 microseconds
+Certificate public key extraction: 9012 microseconds
+Certificate private key reception: 17408 microseconds
+Message encryption: 16532 microseconds
+Signature generation: 23747 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9138 microseconds
+[1m[32mReceived RSU public key, node: 41[0m
+Text to divisor: 75 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8581 microseconds
+Certificate generation: 25904 microseconds
+Certificate public key extraction: 8824 microseconds
+Certificate private key reception: 17829 microseconds
+Message encryption: 16583 microseconds
+Signature generation: 23811 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16376 microseconds
+Divisor to text: 1103 microseconds
+[1m[32mReceived Join from vehicle: 42[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14312 microseconds
+Certificate public key extraction: 8600 microseconds
+Text to divisor: 231 microseconds
+Message encryption: 17928 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 16510 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 17101 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 16344 microseconds
+Signature generation: 22139 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17661 microseconds
+Divisor to text: 609 microseconds
+Message decryption: 17105 microseconds
+Divisor to text: 604 microseconds
+Message decryption: 16745 microseconds
+Divisor to text: 879 microseconds
+Message decryption: 16870 microseconds
+Divisor to text: 1742 microseconds
+[1m[32mReceived accept from RSU on node: 42[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14416 microseconds
+[1m[32mReceived symmetric key from RSU, node: 42[0m
+Message decryption: 16537 microseconds
+Divisor to text: 777 microseconds
+[1m[32mReceived Join from vehicle: 41[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14611 microseconds
+Certificate public key extraction: 8559 microseconds
+Text to divisor: 206 microseconds
+Message encryption: 18575 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16839 microseconds
+Text to divisor: 143 microseconds
+Message encryption: 16643 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 18071 microseconds
+Signature generation: 23990 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16935 microseconds
+Divisor to text: 929 microseconds
+Message decryption: 19302 microseconds
+Divisor to text: 631 microseconds
+Message decryption: 16754 microseconds
+Divisor to text: 659 microseconds
+Message decryption: 16941 microseconds
+Divisor to text: 678 microseconds
+[1m[32mReceived accept from RSU on node: 41[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14619 microseconds
+[1m[32mReceived symmetric key from RSU, node: 41[0m
+Text to divisor: 74 microseconds
+Certificate public key extraction: 8614 microseconds
+[1m[32mReceived RSU public key, node: 44[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8495 microseconds
+Certificate generation: 25019 microseconds
+Certificate public key extraction: 10385 microseconds
+Certificate private key reception: 17129 microseconds
+Message encryption: 16393 microseconds
+Signature generation: 22317 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 341 microseconds
+Certificate public key extraction: 8624 microseconds
+[1m[32mReceived RSU public key, node: 43[0m
+Text to divisor: 76 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8564 microseconds
+Certificate generation: 26200 microseconds
+Certificate public key extraction: 9147 microseconds
+Certificate private key reception: 18297 microseconds
+Message encryption: 17273 microseconds
+Signature generation: 22049 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16346 microseconds
+Divisor to text: 660 microseconds
+[1m[32mReceived Join from vehicle: 44[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14596 microseconds
+Certificate public key extraction: 8584 microseconds
+Text to divisor: 351 microseconds
+Message encryption: 16834 microseconds
+Text to divisor: 752 microseconds
+Message encryption: 16638 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17481 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17005 microseconds
+Signature generation: 23339 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16806 microseconds
+Divisor to text: 753 microseconds
+Message decryption: 16532 microseconds
+Divisor to text: 752 microseconds
+Message decryption: 17173 microseconds
+Divisor to text: 506 microseconds
+Message decryption: 17108 microseconds
+Divisor to text: 933 microseconds
+[1m[32mReceived accept from RSU on node: 44[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14336 microseconds
+[1m[32mReceived symmetric key from RSU, node: 44[0m
+Message decryption: 16290 microseconds
+Divisor to text: 931 microseconds
+[1m[32mReceived Join from vehicle: 43[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14363 microseconds
+Certificate public key extraction: 8550 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16350 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 19572 microseconds
+Text to divisor: 82 microseconds
+Message encryption: 16675 microseconds
+Text to divisor: 82 microseconds
+Message encryption: 16838 microseconds
+Signature generation: 22481 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16604 microseconds
+Divisor to text: 515 microseconds
+Message decryption: 16958 microseconds
+Divisor to text: 1065 microseconds
+Message decryption: 16902 microseconds
+Divisor to text: 525 microseconds
+Message decryption: 16618 microseconds
+Divisor to text: 506 microseconds
+[1m[32mReceived accept from RSU on node: 43[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14485 microseconds
+[1m[32mReceived symmetric key from RSU, node: 43[0m
+[1mRegistered vehicles in RSU: 42 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 [0m
+Text to divisor: 74 microseconds
+Certificate public key extraction: 8752 microseconds
+[1m[32mReceived RSU public key, node: 45[0m
+Text to divisor: 204 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8532 microseconds
+Certificate generation: 25086 microseconds
+Certificate public key extraction: 9618 microseconds
+Certificate private key reception: 17175 microseconds
+Message encryption: 16553 microseconds
+Signature generation: 22289 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 93 microseconds
+Certificate public key extraction: 9002 microseconds
+[1m[32mReceived RSU public key, node: 46[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8476 microseconds
+Certificate generation: 26198 microseconds
+Certificate public key extraction: 9120 microseconds
+Certificate private key reception: 17752 microseconds
+Message encryption: 16308 microseconds
+Signature generation: 22042 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16657 microseconds
+Divisor to text: 387 microseconds
+[1m[32mReceived Join from vehicle: 46[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14178 microseconds
+Certificate public key extraction: 8558 microseconds
+Text to divisor: 207 microseconds
+Message encryption: 16775 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17527 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17069 microseconds
+Text to divisor: 87 microseconds
+Message encryption: 17643 microseconds
+Signature generation: 23326 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16684 microseconds
+Divisor to text: 359 microseconds
+Message decryption: 16656 microseconds
+Divisor to text: 621 microseconds
+Message decryption: 17003 microseconds
+Divisor to text: 838 microseconds
+Message decryption: 17039 microseconds
+Divisor to text: 636 microseconds
+[1m[32mReceived accept from RSU on node: 46[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15441 microseconds
+[1m[32mReceived symmetric key from RSU, node: 46[0m
+Message decryption: 16696 microseconds
+Divisor to text: 516 microseconds
+[1m[32mReceived Join from vehicle: 45[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14174 microseconds
+Certificate public key extraction: 8592 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17008 microseconds
+Text to divisor: 82 microseconds
+Message encryption: 17078 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 17701 microseconds
+Text to divisor: 97 microseconds
+Message encryption: 18327 microseconds
+Signature generation: 23198 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16722 microseconds
+Divisor to text: 493 microseconds
+Message decryption: 16384 microseconds
+Divisor to text: 2182 microseconds
+Message decryption: 17758 microseconds
+Divisor to text: 761 microseconds
+Message decryption: 17377 microseconds
+Divisor to text: 774 microseconds
+[1m[32mReceived accept from RSU on node: 45[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15077 microseconds
+[1m[32mReceived symmetric key from RSU, node: 45[0m
+Text to divisor: 72 microseconds
+Certificate public key extraction: 8658 microseconds
+[1m[32mReceived RSU public key, node: 47[0m
+Text to divisor: 74 microseconds
+Private key generation: 1 microseconds
+Public key generation: 8847 microseconds
+Certificate generation: 26540 microseconds
+Certificate public key extraction: 9244 microseconds
+Certificate private key reception: 17141 microseconds
+Message encryption: 16789 microseconds
+Signature generation: 22410 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17398 microseconds
+Divisor to text: 703 microseconds
+[1m[32mReceived Join from vehicle: 47[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14653 microseconds
+Certificate public key extraction: 8603 microseconds
+Text to divisor: 791 microseconds
+Message encryption: 17465 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17341 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16803 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 18947 microseconds
+Signature generation: 22693 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16843 microseconds
+Divisor to text: 2104 microseconds
+Message decryption: 21633 microseconds
+Divisor to text: 872 microseconds
+Message decryption: 16932 microseconds
+Divisor to text: 1434 microseconds
+Message decryption: 17111 microseconds
+Divisor to text: 483 microseconds
+[1m[32mReceived accept from RSU on node: 47[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14181 microseconds
+[1m[32mReceived symmetric key from RSU, node: 47[0m
+[1mRegistered vehicles in RSU: 45 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 [0m
+Text to divisor: 74 microseconds
+Certificate public key extraction: 9408 microseconds
+[1m[32mReceived RSU public key, node: 48[0m
+Text to divisor: 280 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8697 microseconds
+Certificate generation: 25240 microseconds
+Certificate public key extraction: 9744 microseconds
+Certificate private key reception: 17629 microseconds
+Message encryption: 16492 microseconds
+Signature generation: 22276 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16304 microseconds
+Divisor to text: 509 microseconds
+[1m[32mReceived Join from vehicle: 48[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14404 microseconds
+Certificate public key extraction: 8528 microseconds
+Text to divisor: 512 microseconds
+Message encryption: 16891 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 16951 microseconds
+Text to divisor: 86 microseconds
+Message encryption: 16705 microseconds
+Text to divisor: 81 microseconds
+Message encryption: 17091 microseconds
+Signature generation: 22246 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16623 microseconds
+Divisor to text: 509 microseconds
+Message decryption: 17451 microseconds
+Divisor to text: 553 microseconds
+Message decryption: 16586 microseconds
+Divisor to text: 2566 microseconds
+Message decryption: 16776 microseconds
+Divisor to text: 604 microseconds
+[1m[32mReceived accept from RSU on node: 48[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14803 microseconds
+[1m[32mReceived symmetric key from RSU, node: 48[0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9032 microseconds
+[1m[32mReceived RSU public key, node: 49[0m
+Text to divisor: 71 microseconds
+Private key generation: 0 microseconds
+Public key generation: 9236 microseconds
+Certificate generation: 25346 microseconds
+Certificate public key extraction: 9905 microseconds
+Certificate private key reception: 17164 microseconds
+Message encryption: 16295 microseconds
+Signature generation: 22554 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 74 microseconds
+Certificate public key extraction: 8894 microseconds
+[1m[32mReceived RSU public key, node: 50[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8809 microseconds
+Certificate generation: 24987 microseconds
+Certificate public key extraction: 10441 microseconds
+Certificate private key reception: 18073 microseconds
+Message encryption: 17170 microseconds
+Signature generation: 22244 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16697 microseconds
+Divisor to text: 560 microseconds
+[1m[32mReceived Join from vehicle: 50[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14602 microseconds
+Certificate public key extraction: 8804 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16928 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17231 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 18108 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 18724 microseconds
+Signature generation: 25225 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16813 microseconds
+Divisor to text: 495 microseconds
+Message decryption: 16897 microseconds
+Divisor to text: 1531 microseconds
+Message decryption: 17602 microseconds
+Divisor to text: 783 microseconds
+Message decryption: 18081 microseconds
+Divisor to text: 649 microseconds
+[1m[32mReceived accept from RSU on node: 50[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14497 microseconds
+[1m[32mReceived symmetric key from RSU, node: 50[0m
+Message decryption: 16711 microseconds
+Divisor to text: 658 microseconds
+[1m[32mReceived Join from vehicle: 49[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 13980 microseconds
+Certificate public key extraction: 8535 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 16516 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17599 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17103 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 18248 microseconds
+Signature generation: 22368 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17565 microseconds
+Divisor to text: 768 microseconds
+Message decryption: 17255 microseconds
+Divisor to text: 648 microseconds
+Message decryption: 16822 microseconds
+Divisor to text: 609 microseconds
+Message decryption: 16602 microseconds
+Divisor to text: 491 microseconds
+[1m[32mReceived accept from RSU on node: 49[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15010 microseconds
+[1m[32mReceived symmetric key from RSU, node: 49[0m
+[1mRegistered vehicles in RSU: 48 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 [0m
+[1mRegistered vehicles in RSU: 48 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 [0m
+Text to divisor: 71 microseconds
+Certificate public key extraction: 8860 microseconds
+[1m[32mReceived RSU public key, node: 51[0m
+Text to divisor: 201 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8596 microseconds
+Certificate generation: 26053 microseconds
+Certificate public key extraction: 9037 microseconds
+Certificate private key reception: 17743 microseconds
+Message encryption: 16302 microseconds
+Signature generation: 23016 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 336 microseconds
+Certificate public key extraction: 9215 microseconds
+[1m[32mReceived RSU public key, node: 52[0m
+Text to divisor: 73 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8750 microseconds
+Certificate generation: 26113 microseconds
+Certificate public key extraction: 8652 microseconds
+Certificate private key reception: 18106 microseconds
+Message encryption: 16288 microseconds
+Signature generation: 22897 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16318 microseconds
+Divisor to text: 2234 microseconds
+[1m[32mReceived Join from vehicle: 51[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15583 microseconds
+Certificate public key extraction: 8660 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16362 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 16775 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17771 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17361 microseconds
+Signature generation: 23104 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16994 microseconds
+Divisor to text: 640 microseconds
+Message decryption: 17045 microseconds
+Divisor to text: 1646 microseconds
+Message decryption: 17352 microseconds
+Divisor to text: 1377 microseconds
+Message decryption: 18542 microseconds
+Divisor to text: 613 microseconds
+[1m[32mReceived accept from RSU on node: 51[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14215 microseconds
+[1m[32mReceived symmetric key from RSU, node: 51[0m
+Message decryption: 18981 microseconds
+Divisor to text: 986 microseconds
+[1m[32mReceived Join from vehicle: 52[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14853 microseconds
+Certificate public key extraction: 8802 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 17760 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16964 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 17420 microseconds
+Text to divisor: 307 microseconds
+Message encryption: 16983 microseconds
+Signature generation: 23441 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16830 microseconds
+Divisor to text: 1080 microseconds
+Message decryption: 17527 microseconds
+Divisor to text: 486 microseconds
+Message decryption: 16881 microseconds
+Divisor to text: 545 microseconds
+Message decryption: 17825 microseconds
+Divisor to text: 358 microseconds
+[1m[32mReceived accept from RSU on node: 52[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14229 microseconds
+[1m[32mReceived symmetric key from RSU, node: 52[0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 9479 microseconds
+[1m[32mReceived RSU public key, node: 53[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8552 microseconds
+Certificate generation: 26405 microseconds
+Certificate public key extraction: 8893 microseconds
+Certificate private key reception: 18510 microseconds
+Message encryption: 16470 microseconds
+Signature generation: 22869 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16931 microseconds
+Divisor to text: 500 microseconds
+[1m[32mReceived Join from vehicle: 53[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15353 microseconds
+Certificate public key extraction: 8744 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17178 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17636 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 17257 microseconds
+Text to divisor: 431 microseconds
+Message encryption: 17639 microseconds
+Signature generation: 22970 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17019 microseconds
+Divisor to text: 1153 microseconds
+Message decryption: 17441 microseconds
+Divisor to text: 499 microseconds
+Message decryption: 16735 microseconds
+Divisor to text: 362 microseconds
+Message decryption: 18471 microseconds
+Divisor to text: 632 microseconds
+[1m[32mReceived accept from RSU on node: 53[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14824 microseconds
+[1m[32mReceived symmetric key from RSU, node: 53[0m
+[1mRegistered vehicles in RSU: 51 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 [0m
+[1mRegistered vehicles in RSU: 51 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 [0m
+Text to divisor: 91 microseconds
+Certificate public key extraction: 8609 microseconds
+[1m[32mReceived RSU public key, node: 54[0m
+Text to divisor: 204 microseconds
+Private key generation: 19 microseconds
+Public key generation: 8426 microseconds
+Certificate generation: 31674 microseconds
+Certificate public key extraction: 12776 microseconds
+Certificate private key reception: 21353 microseconds
+Message encryption: 18578 microseconds
+Signature generation: 22751 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17081 microseconds
+Divisor to text: 552 microseconds
+[1m[32mReceived Join from vehicle: 54[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14234 microseconds
+Certificate public key extraction: 8529 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17195 microseconds
+Text to divisor: 86 microseconds
+Message encryption: 17413 microseconds
+Text to divisor: 88 microseconds
+Message encryption: 16279 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 16843 microseconds
+Signature generation: 23877 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17533 microseconds
+Divisor to text: 904 microseconds
+Message decryption: 18438 microseconds
+Divisor to text: 781 microseconds
+Message decryption: 18700 microseconds
+Divisor to text: 1435 microseconds
+Message decryption: 16853 microseconds
+Divisor to text: 788 microseconds
+[1m[32mReceived accept from RSU on node: 54[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15185 microseconds
+[1m[32mReceived symmetric key from RSU, node: 54[0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8838 microseconds
+[1m[32mReceived RSU public key, node: 55[0m
+Text to divisor: 75 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8378 microseconds
+Certificate generation: 25089 microseconds
+Certificate public key extraction: 9090 microseconds
+Certificate private key reception: 18296 microseconds
+Message encryption: 16353 microseconds
+Signature generation: 22387 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 74 microseconds
+Certificate public key extraction: 8631 microseconds
+[1m[32mReceived RSU public key, node: 56[0m
+Text to divisor: 77 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8371 microseconds
+Certificate generation: 26557 microseconds
+Certificate public key extraction: 8992 microseconds
+Certificate private key reception: 19094 microseconds
+Message encryption: 16325 microseconds
+Signature generation: 21908 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17024 microseconds
+Divisor to text: 529 microseconds
+[1m[32mReceived Join from vehicle: 56[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14620 microseconds
+Certificate public key extraction: 8451 microseconds
+Text to divisor: 72 microseconds
+Message encryption: 17735 microseconds
+Text to divisor: 86 microseconds
+Message encryption: 18467 microseconds
+Text to divisor: 259 microseconds
+Message encryption: 17617 microseconds
+Text to divisor: 243 microseconds
+Message encryption: 16609 microseconds
+Signature generation: 22797 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16956 microseconds
+Divisor to text: 517 microseconds
+Message decryption: 16676 microseconds
+Divisor to text: 1007 microseconds
+Message decryption: 16650 microseconds
+Divisor to text: 620 microseconds
+Message decryption: 17048 microseconds
+Divisor to text: 794 microseconds
+[1m[32mReceived accept from RSU on node: 56[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14167 microseconds
+[1m[32mReceived symmetric key from RSU, node: 56[0m
+Message decryption: 16642 microseconds
+Divisor to text: 568 microseconds
+[1m[32mReceived Join from vehicle: 55[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15169 microseconds
+Certificate public key extraction: 8826 microseconds
+Text to divisor: 89 microseconds
+Message encryption: 17814 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17287 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 18626 microseconds
+Text to divisor: 80 microseconds
+Message encryption: 16443 microseconds
+Signature generation: 23901 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16789 microseconds
+Divisor to text: 1066 microseconds
+Message decryption: 18143 microseconds
+Divisor to text: 479 microseconds
+Message decryption: 17376 microseconds
+Divisor to text: 539 microseconds
+Message decryption: 17031 microseconds
+Divisor to text: 894 microseconds
+[1m[32mReceived accept from RSU on node: 55[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14392 microseconds
+[1m[32mReceived symmetric key from RSU, node: 55[0m
+[1mRegistered vehicles in RSU: 54 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8616 microseconds
+[1m[32mReceived RSU public key, node: 57[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8871 microseconds
+Certificate generation: 25018 microseconds
+Certificate public key extraction: 11546 microseconds
+Certificate private key reception: 17556 microseconds
+Message encryption: 16807 microseconds
+Signature generation: 22649 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17170 microseconds
+Divisor to text: 519 microseconds
+[1m[32mReceived Join from vehicle: 57[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 13800 microseconds
+Certificate public key extraction: 8682 microseconds
+Text to divisor: 73 microseconds
+Message encryption: 17384 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16470 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16683 microseconds
+Text to divisor: 83 microseconds
+Message encryption: 17869 microseconds
+Signature generation: 22481 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 16592 microseconds
+Divisor to text: 362 microseconds
+Message decryption: 16651 microseconds
+Divisor to text: 1191 microseconds
+Message decryption: 17359 microseconds
+Divisor to text: 1163 microseconds
+Message decryption: 16587 microseconds
+Divisor to text: 970 microseconds
+[1m[32mReceived accept from RSU on node: 57[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14652 microseconds
+[1m[32mReceived symmetric key from RSU, node: 57[0m
+[1mRegistered vehicles in RSU: 55 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 [0m
+Text to divisor: 71 microseconds
+Certificate public key extraction: 8965 microseconds
+[1m[32mReceived RSU public key, node: 58[0m
+Text to divisor: 71 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8917 microseconds
+Certificate generation: 25328 microseconds
+Certificate public key extraction: 9157 microseconds
+Certificate private key reception: 17822 microseconds
+Message encryption: 17151 microseconds
+Signature generation: 22445 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 16826 microseconds
+Divisor to text: 720 microseconds
+[1m[32mReceived Join from vehicle: 58[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14357 microseconds
+Certificate public key extraction: 8685 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17782 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17009 microseconds
+Text to divisor: 79 microseconds
+Message encryption: 17567 microseconds
+Text to divisor: 100 microseconds
+Message encryption: 16996 microseconds
+Signature generation: 21889 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17868 microseconds
+Divisor to text: 1326 microseconds
+Message decryption: 16662 microseconds
+Divisor to text: 653 microseconds
+Message decryption: 17503 microseconds
+Divisor to text: 788 microseconds
+Message decryption: 17004 microseconds
+Divisor to text: 1219 microseconds
+[1m[32mReceived accept from RSU on node: 58[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14180 microseconds
+[1m[32mReceived symmetric key from RSU, node: 58[0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+
+[1m[33mSelected GL: 58[0m
+Signature generation: 22926 microseconds
+RSU_INFORM_LEADER message size: 142
+[1m[32mNode 58 is selected as GL![0m
+[1m[32mTimestamp is valid.[0m
+Certificate public key extraction: 8743 microseconds
+Signature verification: 14217 microseconds
+[1m[33mGroup Leader 58 broadcasting proof of leadership for new vehicles...[0m
+
+GL_LEADERSHIP_PROOF message size: 137
+[1m[32mReceived Proof of Leadership on node: 34[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 34[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 18[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 18[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 48[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 48[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 40[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 40[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 38[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 38[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 56[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 56[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 36[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 36[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Proof of Leadership on node: 20[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 20[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Join on GL from vehicle: 36[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17107 microseconds
+Divisor to text: 352 microseconds
+Message decryption: 17205 microseconds
+Divisor to text: 408 microseconds
+Message decryption: 16593 microseconds
+Divisor to text: 1129 microseconds
+Message decryption: 16876 microseconds
+Divisor to text: 493 microseconds
+[1m[32mReceived accept from GL on node: 36[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14675 microseconds
+[1m[32mReceived symmetric key from GL, node: 36[0m
+Signature generation: 22462 microseconds
+VEHICLE_INFORM message size: 126
+[1m[32mReceived Join on GL from vehicle: 48[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 16728 microseconds
+Divisor to text: 535 microseconds
+Message decryption: 20019 microseconds
+Divisor to text: 805 microseconds
+Message decryption: 17018 microseconds
+Divisor to text: 776 microseconds
+Message decryption: 17068 microseconds
+Divisor to text: 878 microseconds
+[1m[32mReceived accept from GL on node: 48[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14409 microseconds
+[1m[32mReceived symmetric key from GL, node: 48[0m
+Signature generation: 23147 microseconds
+VEHICLE_INFORM message size: 126
+[1m[32mReceived Join on GL from vehicle: 38[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 18261 microseconds
+Divisor to text: 1701 microseconds
+Message decryption: 16864 microseconds
+Divisor to text: 1296 microseconds
+Message decryption: 17669 microseconds
+Divisor to text: 798 microseconds
+Message decryption: 16548 microseconds
+Divisor to text: 1767 microseconds
+[1m[32mReceived accept from GL on node: 38[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15927 microseconds
+[1m[32mReceived symmetric key from GL, node: 38[0m
+Signature generation: 23351 microseconds
+VEHICLE_INFORM message size: 126
+
+[1m[32mReceived info message from node: 48
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14714 microseconds
+[1m[32mReceived Join on GL from vehicle: 20[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17001 microseconds
+Divisor to text: 354 microseconds
+Message decryption: 16646 microseconds
+Divisor to text: 355 microseconds
+Message decryption: 17049 microseconds
+Divisor to text: 587 microseconds
+Message decryption: 16628 microseconds
+Divisor to text: 492 microseconds
+[1m[32mReceived accept from GL on node: 20[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14996 microseconds
+[1m[32mReceived symmetric key from GL, node: 20[0m
+Signature generation: 23020 microseconds
+VEHICLE_INFORM message size: 126
+[1m[32mReceived Join on GL from vehicle: 34[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17939 microseconds
+Divisor to text: 359 microseconds
+Message decryption: 16815 microseconds
+Divisor to text: 759 microseconds
+Message decryption: 16490 microseconds
+Divisor to text: 1922 microseconds
+Message decryption: 18167 microseconds
+Divisor to text: 493 microseconds
+[1m[32mReceived accept from GL on node: 34[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14323 microseconds
+[1m[32mReceived symmetric key from GL, node: 34[0m
+Signature generation: 24495 microseconds
+VEHICLE_INFORM message size: 126
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 5 Received Symmetric: 20 34 36 38 48 [0m
+
+[1m[32mReceived info message from node: 36
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14631 microseconds
+
+[1m[32mReceived info message from node: 38
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14086 microseconds
+[1m[32mReceived Join on GL from vehicle: 56[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 16621 microseconds
+Divisor to text: 2476 microseconds
+Message decryption: 16715 microseconds
+Divisor to text: 1891 microseconds
+Message decryption: 17650 microseconds
+Divisor to text: 608 microseconds
+Message decryption: 17802 microseconds
+Divisor to text: 572 microseconds
+[1m[32mReceived accept from GL on node: 56[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14767 microseconds
+[1m[32mReceived symmetric key from GL, node: 56[0m
+Signature generation: 22603 microseconds
+VEHICLE_INFORM message size: 126
+
+[1m[32mReceived info message from node: 34
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14772 microseconds
+
+[1m[32mReceived info message from node: 20
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15284 microseconds
+[1m[32mReceived Join on GL from vehicle: 18[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 16723 microseconds
+Divisor to text: 503 microseconds
+Message decryption: 16940 microseconds
+Divisor to text: 480 microseconds
+Message decryption: 16737 microseconds
+Divisor to text: 628 microseconds
+Message decryption: 16944 microseconds
+Divisor to text: 762 microseconds
+[1m[32mReceived accept from GL on node: 18[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14336 microseconds
+[1m[32mReceived symmetric key from GL, node: 18[0m
+Signature generation: 22563 microseconds
+VEHICLE_INFORM message size: 126
+[1m[32mReceived Join on GL from vehicle: 40[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17332 microseconds
+Divisor to text: 1152 microseconds
+Message decryption: 17266 microseconds
+Divisor to text: 912 microseconds
+Message decryption: 17394 microseconds
+Divisor to text: 622 microseconds
+Message decryption: 17406 microseconds
+Divisor to text: 353 microseconds
+[1m[32mReceived accept from GL on node: 40[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14997 microseconds
+[1m[32mReceived symmetric key from GL, node: 40[0m
+Signature generation: 23357 microseconds
+VEHICLE_INFORM message size: 126
+
+[1m[32mReceived info message from node: 56
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14603 microseconds
+
+[1m[32mReceived info message from node: 18
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14669 microseconds
+
+[1m[32mReceived info message from node: 40
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14762 microseconds
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1mRegistered vehicles in RSU: 56 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+Text to divisor: 202 microseconds
+Certificate public key extraction: 8889 microseconds
+[1m[32mReceived RSU public key, node: 60[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8721 microseconds
+Certificate generation: 26632 microseconds
+Certificate public key extraction: 9214 microseconds
+Certificate private key reception: 17750 microseconds
+Message encryption: 17382 microseconds
+Signature generation: 23158 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Text to divisor: 208 microseconds
+Certificate public key extraction: 9291 microseconds
+[1m[32mReceived RSU public key, node: 59[0m
+Text to divisor: 74 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8975 microseconds
+Certificate generation: 27020 microseconds
+Certificate public key extraction: 9172 microseconds
+Certificate private key reception: 17650 microseconds
+Message encryption: 16936 microseconds
+Signature generation: 23075 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17183 microseconds
+Divisor to text: 1161 microseconds
+[1m[32mReceived Join from vehicle: 59[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14154 microseconds
+Certificate public key extraction: 9041 microseconds
+Text to divisor: 418 microseconds
+Message encryption: 17424 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 16955 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17617 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 16899 microseconds
+Signature generation: 23585 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17373 microseconds
+Divisor to text: 763 microseconds
+Message decryption: 16673 microseconds
+Divisor to text: 478 microseconds
+Message decryption: 17366 microseconds
+Divisor to text: 1030 microseconds
+Message decryption: 16751 microseconds
+Divisor to text: 622 microseconds
+[1m[32mReceived accept from RSU on node: 59[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14629 microseconds
+[1m[32mReceived symmetric key from RSU, node: 59[0m
+Message decryption: 16655 microseconds
+Divisor to text: 1276 microseconds
+[1m[32mReceived Join from vehicle: 60[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14495 microseconds
+Certificate public key extraction: 10880 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17077 microseconds
+Text to divisor: 87 microseconds
+Message encryption: 17805 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17031 microseconds
+Text to divisor: 84 microseconds
+Message encryption: 17530 microseconds
+Signature generation: 22882 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17084 microseconds
+Divisor to text: 368 microseconds
+Message decryption: 16837 microseconds
+Divisor to text: 871 microseconds
+Message decryption: 17103 microseconds
+Divisor to text: 511 microseconds
+Message decryption: 16911 microseconds
+Divisor to text: 759 microseconds
+[1m[32mReceived accept from RSU on node: 60[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14847 microseconds
+[1m[32mReceived symmetric key from RSU, node: 60[0m
+[1mRegistered vehicles in RSU: 58 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 [0m
+[1mRegistered vehicles in GL: 8 Received Symmetric: 18 20 34 36 38 40 48 56 [0m
+[1m[32mReceived Proof of Leadership on node: 60[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 60[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Join on GL from vehicle: 60[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17149 microseconds
+Divisor to text: 876 microseconds
+Message decryption: 17046 microseconds
+Divisor to text: 774 microseconds
+Message decryption: 17107 microseconds
+Divisor to text: 724 microseconds
+Message decryption: 17530 microseconds
+Divisor to text: 833 microseconds
+[1m[32mReceived accept from GL on node: 60[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14719 microseconds
+[1m[32mReceived symmetric key from GL, node: 60[0m
+Signature generation: 23886 microseconds
+VEHICLE_INFORM message size: 126
+
+[1m[32mReceived info message from node: 60
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14633 microseconds
+[1mRegistered vehicles in RSU: 58 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 [0m
+[1mRegistered vehicles in GL: 9 Received Symmetric: 18 20 34 36 38 40 48 56 60 [0m
+[1mRegistered vehicles in RSU: 58 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 [0m
+[1mRegistered vehicles in GL: 9 Received Symmetric: 18 20 34 36 38 40 48 56 60 [0m
+[1mRegistered vehicles in RSU: 58 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 [0m
+[1mRegistered vehicles in GL: 9 Received Symmetric: 18 20 34 36 38 40 48 56 60 [0m
+Text to divisor: 74 microseconds
+Certificate public key extraction: 9032 microseconds
+[1m[32mReceived RSU public key, node: 61[0m
+Text to divisor: 72 microseconds
+Private key generation: 0 microseconds
+Public key generation: 9023 microseconds
+Certificate generation: 26411 microseconds
+Certificate public key extraction: 9018 microseconds
+Certificate private key reception: 17837 microseconds
+Message encryption: 17738 microseconds
+Signature generation: 22974 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17726 microseconds
+Divisor to text: 882 microseconds
+[1m[32mReceived Join from vehicle: 61[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15617 microseconds
+Certificate public key extraction: 9578 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17332 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 17240 microseconds
+Text to divisor: 76 microseconds
+Message encryption: 17228 microseconds
+Text to divisor: 75 microseconds
+Message encryption: 17031 microseconds
+Signature generation: 22855 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17473 microseconds
+Divisor to text: 622 microseconds
+Message decryption: 17873 microseconds
+Divisor to text: 432 microseconds
+Message decryption: 17509 microseconds
+Divisor to text: 494 microseconds
+Message decryption: 17325 microseconds
+Divisor to text: 483 microseconds
+[1m[32mReceived accept from RSU on node: 61[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14553 microseconds
+[1m[32mReceived symmetric key from RSU, node: 61[0m
+[1mRegistered vehicles in RSU: 59 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 [0m
+[1mRegistered vehicles in GL: 9 Received Symmetric: 18 20 34 36 38 40 48 56 60 [0m
+Text to divisor: 73 microseconds
+Certificate public key extraction: 8937 microseconds
+[1m[32mReceived RSU public key, node: 62[0m
+Text to divisor: 88 microseconds
+Private key generation: 0 microseconds
+Public key generation: 8926 microseconds
+Certificate generation: 26189 microseconds
+Certificate public key extraction: 9502 microseconds
+Certificate private key reception: 18329 microseconds
+Message encryption: 16940 microseconds
+Signature generation: 22826 microseconds
+VEHICLE_SEND_JOIN_RSU message size: 176
+Message decryption: 17517 microseconds
+Divisor to text: 876 microseconds
+[1m[32mReceived Join from vehicle: 62[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14568 microseconds
+Certificate public key extraction: 9174 microseconds
+Text to divisor: 74 microseconds
+Message encryption: 17031 microseconds
+Text to divisor: 77 microseconds
+Message encryption: 16868 microseconds
+Text to divisor: 82 microseconds
+Message encryption: 18370 microseconds
+Text to divisor: 78 microseconds
+Message encryption: 17310 microseconds
+Signature generation: 22732 microseconds
+RSU_ACCEPT message size: 310
+Message decryption: 17125 microseconds
+Divisor to text: 905 microseconds
+Message decryption: 17297 microseconds
+Divisor to text: 1485 microseconds
+Message decryption: 16987 microseconds
+Divisor to text: 353 microseconds
+Message decryption: 17500 microseconds
+Divisor to text: 484 microseconds
+[1m[32mReceived accept from RSU on node: 62[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 15023 microseconds
+[1m[32mReceived symmetric key from RSU, node: 62[0m
+[1m[32mReceived Proof of Leadership on node: 62[0m
+[1m[32mTimestamp is valid.[0m
+[1m[32mReceived GL public key, node: 62[0m
+VEHICLE_SEND_JOIN_GL message size: 176
+[1m[32mReceived Join on GL from vehicle: 62[0m
+[1m[32mTimestamp is valid.[0m
+GL_ACCEPT message size: 310
+Message decryption: 17468 microseconds
+Divisor to text: 757 microseconds
+Message decryption: 16850 microseconds
+Divisor to text: 770 microseconds
+Message decryption: 17588 microseconds
+Divisor to text: 884 microseconds
+Message decryption: 16928 microseconds
+Divisor to text: 1156 microseconds
+[1m[32mReceived accept from GL on node: 62[0m
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14613 microseconds
+[1m[32mReceived symmetric key from GL, node: 62[0m
+Signature generation: 23817 microseconds
+VEHICLE_INFORM message size: 126
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+
+[1m[32mReceived info message from node: 62
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14627 microseconds
+Signature generation: 23063 microseconds
+GL_AGGREGATED_INFORM_RSU message size: 543
+[1m[32mReceived info message from GL!
+[1m[32mTimestamp is valid.[0m
+Signature verification: 14586 microseconds
+
+[1m[33mNode 48 is at position: -22.925391 260.191970 Node 36 is at position: 117.705574 456.643313 Node 38 is at position: -37.920968 259.550005 Node 34 is at position: 126.761177 202.024376 Node 20 is at position: 108.907848 481.017659 Node 56 is at position: 117.909379 449.111934 Node 18 is at position:  18.396374 258.995001 Node 40 is at position: -30.427783 259.870011 Node 60 is at position: 123.215000 265.700000 Node 62 is at position: 132.965000 271.000000 [0m
+
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m
+[1mRegistered vehicles in RSU: 60 Received Symmetric: 0 1 2 3 4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 [0m
+[1mRegistered vehicles in GL: 10 Received Symmetric: 18 20 34 36 38 40 48 56 60 62 [0m

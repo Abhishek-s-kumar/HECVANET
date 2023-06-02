@@ -3,12 +3,6 @@
 
 using namespace ns3;
 
-void update_Vehicle_Energy(int vid, float value) {
-    vehicle_Energy_Consumption[vid] += prev_energy[vid] - value;
-    prev_energy[vid] = value;
-    std::cout << "Energy: " << prev_energy[vid] - value << std::endl;
-}
-
 void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {
     ZZ ptest = to_ZZ(pt);
     UnifiedEncoding enc(ptest, veh1g2->u, veh1g2->w, 2, ZZ_p::zero());
@@ -89,6 +83,10 @@ void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     veh1g2->state = RECEIVE_ACCEPT_GL;
+
+    prev_energy[destnode] = Vehicle_sources->Get(destnode)->GetRemainingEnergy();
+    prev_times[destnode] = Simulator::Now().GetSeconds();
+
     free(temp);
     free(cypherbuff);
 }
@@ -167,6 +165,10 @@ void send_GLJoin_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 
     veh1ec->state = RECEIVE_ACCEPT_GL;
+
+    prev_energy[destnode] = Vehicle_sources->Get(destnode)->GetRemainingEnergy();
+    prev_times[destnode] = Simulator::Now().GetSeconds();
+
     free(temp);
     free(cypherbuff);
 }
@@ -254,6 +256,10 @@ void send_GLJoing_g3(Vehicle_data_g3 *veh1g3, int vid, int destnode) {
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     veh1g3->state = RECEIVE_ACCEPT_GL;
+
+    prev_energy[destnode] = Vehicle_sources->Get(destnode)->GetRemainingEnergy();
+    prev_times[destnode] = Simulator::Now().GetSeconds();
+    
     free(temp);
     free(cypherbuff);
 }
@@ -650,6 +656,13 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         gl2.symm_perveh[vid] = keystr;
         gl2.iv_perveh[vid] = ivstr;
         gl2.states[vid] = RECEIVE_ACCEPT_GL;
+        if(get_metrics != 0) {
+            std::cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT consumption: " << prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT power: "
+                    << (prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[glid]) << " Watt" << endl;
+            prev_energy[glid] = Vehicle_sources->Get(glid)->GetRemainingEnergy();
+            prev_times[glid] = Simulator::Now().GetSeconds();
+        }
         free(siga);
         free(received_cert);
 
@@ -816,6 +829,13 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         tx.priority = 7;	//We set the AC to highest prior
         tx.txPowerLevel = 7; //When we define TxPowerStar
         wd0->SendX(packet_i, dest, protocol, tx);
+        if(get_metrics != 0) {
+            std::cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT consumption: " << prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT power: "
+                    << (prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[glid]) << " Watt" << endl;
+            prev_energy[glid] = Vehicle_sources->Get(glid)->GetRemainingEnergy();
+            prev_times[glid] = Simulator::Now().GetSeconds();
+        }
         glec.symm_perveh[vid] = keystr;
         glec.iv_perveh[vid] = ivstr;
         glec.states[vid] = RECEIVE_ACCEPT_GL;
@@ -1040,6 +1060,13 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         tx.priority = 7;	//We set the AC to highest prior
         tx.txPowerLevel = 7; //When we define TxPowerStar
         wd0->SendX(packet_i, dest, protocol, tx);
+        if(get_metrics != 0) {
+            std::cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT consumption: " << prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_JOIN_GL_SEND_ACCEPT power: "
+                    << (prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[glid]) << " Watt" << endl;
+            prev_energy[glid] = Vehicle_sources->Get(glid)->GetRemainingEnergy();
+            prev_times[glid] = Simulator::Now().GetSeconds();
+        }
         gl3.symm_perveh[vid] = keystr;
         gl3.iv_perveh[vid] = ivstr;
         gl3.states[vid] = RECEIVE_ACCEPT_GL;

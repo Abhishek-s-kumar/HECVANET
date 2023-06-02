@@ -166,9 +166,6 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     memcpy(cypherbuff+sizenosign+2, siga, 2*signsize+1);
     BytesFromZZ(cypherbuff+sizenosign+2+2*signsize+1, sigb, 21);
 
-    if(get_metrics != 0)
-      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
-
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -196,6 +193,12 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     veh1g2->state = RECEIVE_ACCEPT_KEY;
+    if(get_metrics != 0) {
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
+      
+      // std::cout << "SEND_JOIN consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      // prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+    }
     free(certveh1g2);
     free(temp);
     free(cypherbuff);
@@ -352,9 +355,6 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     memcpy(cypherbuff+sizenosign+2, siga, 6*sizesign);
     BytesFromZZ(cypherbuff+sizenosign+2+6*sizesign, sigb, 21);
 
-    if(get_metrics != 0)
-      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
-
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
     Ptr <WaveNetDevice> wd0 = DynamicCast<WaveNetDevice> (d0);
@@ -382,6 +382,12 @@ void send_Join_g3(int u, int w, Vehicle_data_g3 *veh1g3, int vid, int destnode) 
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
     
     veh1g3->state = RECEIVE_ACCEPT_KEY;
+    if(get_metrics != 0) {
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
+      
+      // std::cout << "SEND_JOIN consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      // prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+    }
     free(certveh1g3);
     free(temp);
     free(siga);
@@ -541,12 +547,6 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
 
-    if(get_metrics != 0) {
-      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
-      //update_Vehicle_Energy(vid, Vehicle_sources.Get(vid)->GetRemainingEnergy());
-    }
-
-
     Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
     Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
     uint16_t protocol = 0x88dc;
@@ -567,6 +567,12 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 
     veh1ec->state = RECEIVE_ACCEPT_KEY;
+    if(get_metrics != 0) {
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
+      
+      // std::cout << "SEND_JOIN consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      // prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+    }
     free(certec);
     free(temp);
     free(cypherbuff);
@@ -652,6 +658,14 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     rsupub = cert2.get_calculated_Qu();
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     divisor_to_bytes(veh1g2->rsupub, rsupub, veh1g2->curve, ptest);
+
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_CERT consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      cout << fixed << "RECEIVE_CERT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
     send_Join_g2(u, w, veh1g2, vid, rsuid);
     free(buffcert);
   }
@@ -699,6 +713,15 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     veh1ec->rsupub = rsupub;
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_CERT consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+
+      cout << fixed << "RECEIVE_CERT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
+    
     send_Join_ec(veh1ec, vid, rsuid);
     free(buffcert);
   }
@@ -796,7 +819,13 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     divisorg3_to_bytes(veh1g3->rsupub, rsupub, veh1g3->curve, ptest);
-
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_CERT consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      cout << "RECEIVE_CERT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
     send_Join_g3((int)u, (int)w, veh1g3, vid, rsuid);
     free(buffcert);
   }
@@ -1950,6 +1979,13 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
       std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1g2->symm = key;
     veh1g2->iv = iv;
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_ACCEPT_SYMMETRIC consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      cout << fixed << "RECEIVE_ACCEPT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
     if(mode == 0)
       veh1g2->state = ON_SYMMETRIC_ENC;
     else {
@@ -2118,6 +2154,13 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
       std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1ec->symm = key;
     veh1ec->iv = iv;
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_ACCEPT_SYMMETRIC consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      cout << fixed << "RECEIVE_ACCEPT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
     if(mode ==0 )
       veh1ec->state = ON_SYMMETRIC_ENC;
     else {
@@ -2293,6 +2336,13 @@ void extract_Symmetric(uint8_t *buffrc, int ec_algo, int vid, int rid, int mode)
       std::cout << BOLD_CODE << GREEN_CODE << "Received symmetric key from GL, node: " << vid << END_CODE << std::endl;
     veh1g3->symm = key;
     veh1g3->iv = iv;
+    if(get_metrics != 0) {
+      std::cout << fixed << "RECEIVE_ACCEPT_SYMMETRIC consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+      cout << fixed << "RECEIVE_ACCEPT power: "
+         << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+      prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+      prev_times[vid] = Simulator::Now().GetSeconds();
+    }
     if (mode == 0)
       veh1g3->state = ON_SYMMETRIC_ENC;
     else {

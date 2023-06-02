@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 def parse_metrics_file(filename):
     # Dictionary to store the mean values for each case
     means = {}
+    sizes = {}
+    energies = {}
 
     # Open the file and read lines
     with open(filename, 'r') as file:
@@ -55,30 +57,8 @@ def parse_metrics_file(filename):
                 means[case].append(time_value)
             else:
                 means[case] = [time_value]
-
-    # Calculate means for each case
-    for case, values in means.items():
-        means[case] = sum(values) / len(values)
-
-    return means
-
-
-import os
-import matplotlib.pyplot as plt
-
-# Function to parse the message sizes file and calculate sizes
-def parse_sizes_file(filename):
-    # Dictionary to store the size values for each case
-    sizes = {}
-
-    # Open the file and read lines
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-
-    # Parse lines and calculate sizes
-    for line in lines:
-        line = line.strip()
-        if line.startswith("RSU_CERT_BROADCAST message size:") or \
+        
+        elif line.startswith("RSU_CERT_BROADCAST message size:") or \
                 line.startswith("VEHICLE_SEND_JOIN_RSU message size:") or \
                 line.startswith("RSU_ACCEPT message size:") or \
                 line.startswith("RSU_INFORM_LEADER message size:") or \
@@ -95,7 +75,28 @@ def parse_sizes_file(filename):
             else:
                 sizes[case] = size_value
 
-    return sizes
+        elif line.startswith("RECEIVE_CERT consumption:") or \
+           line.startswith("RECEIVE_ACCEPT_SYMMETRIC consumption:") or \
+           line.startswith("EXTRACT_JOIN_GL_SEND_ACCEPT consumption:") or \
+           line.startswith("EXTRACT_GL_PROOF consumption:") or \
+           line.startswith("EXTRACT_INFO_GL consumption:"):
+
+            case, energy_value = line.split(":")
+            energy_value = float(energy_value.split(' ')[1].strip())
+            
+
+            if case in energies:
+                energies[case].append(energy_value)
+            else:
+                energies[case] = [energy_value]
+
+    # Calculate means for each case
+    for case, values in means.items():
+        means[case] = sum(values) / len(values)
+
+    for case, values in energies.items():
+        energies[case] = sum(values) / len(values)
+    return means, sizes, energies
 
 
 # Create the metrics_plots directory if it doesn't exist
@@ -104,25 +105,15 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Parse metrics_g2.txt and calculate means
 metrics_file_g2 = 'metrics_g2.txt'
-means_g2 = parse_metrics_file(metrics_file_g2)
+means_g2, sizes_g2, energies_g2 = parse_metrics_file(metrics_file_g2)
 
 # Parse metrics_g3.txt and calculate means
 metrics_file_g3 = 'metrics_g3.txt'
-means_g3 = parse_metrics_file(metrics_file_g3)
+means_g3, sizes_g3, energies_g3 = parse_metrics_file(metrics_file_g3)
 
 # Parse metrics_ec.txt and calculate means
 metrics_file_ec = 'metrics_ec.txt'
-means_ec = parse_metrics_file(metrics_file_ec)
-
-# Parse sizes files
-sizes_file_g2 = 'metrics_g2.txt'
-sizes_g2 = parse_sizes_file(sizes_file_g2)
-
-sizes_file_g3 = 'metrics_g3.txt'
-sizes_g3 = parse_sizes_file(sizes_file_g3)
-
-sizes_file_ec = 'metrics_ec.txt'
-sizes_ec = parse_sizes_file(sizes_file_ec)
+means_ec, sizes_ec, energies_ec = parse_metrics_file(metrics_file_ec)
 
 # Plot and save bar plots for times
 for case, mean_value_g2 in means_g2.items():
@@ -140,7 +131,6 @@ for case, mean_value_g2 in means_g2.items():
                     .replace('Divisor to text', 'Decoding')
                     .replace('Text to EC Point', 'Encoding')
                     .replace('EC Point to Text', 'Decoding'))
-    plt.legend(['HEC genus 2', 'HEC genus 3', 'EC'])
     plt.ylim(top=max(mean_value_g2, mean_value_g3, mean_value_ec) * 1.5)
     plt.savefig(os.path.join(output_dir, f"{case}.png"))
     plt.close()
@@ -164,7 +154,6 @@ for case, size_values_g2 in sizes_g2.items():
                     .replace('Divisor to text', 'Decoding')
                     .replace('Text to EC Point', 'Encoding')
                     .replace('EC Point to Text', 'Decoding'))
-    plt.legend(['HEC genus 2', 'HEC genus 3', 'EC'])
     plt.ylim(top=max(size_values_g2, size_values_g3, size_values_ec) * 1.5)
     
     plt.savefig(os.path.join(output_dir, f"{case}_sizes.png"))
@@ -172,3 +161,23 @@ for case, size_values_g2 in sizes_g2.items():
 
     # Print sizes
     print(f"{case}: HEC genus 2: {size_values_g2}, HEC genus 3: {size_values_g3}, EC: {size_values_ec}")
+
+# Plot and save bar plots for energies
+for case, energy_val_g2 in energies_g2.items():
+    energy_val_g3 = energies_g3.get(case, 0)
+    energy_val_ec = energies_ec.get(case, 0)
+
+    plt.figure(figsize=(8, 6))
+    plt.bar('EC', energy_val_ec, color='green', width=0.2)
+    plt.bar('HEC genus 2', energy_val_g2, color='blue', width=0.2)
+    plt.bar('HEC genus 3', energy_val_g3, color='orange', width=0.2)
+    
+
+    plt.ylabel('Energy (J)')
+    plt.title(case)
+    plt.ylim(top=max(energy_val_g2, energy_val_g3, energy_val_ec) * 1.5)
+    plt.savefig(os.path.join(output_dir, f"{case}.png"))
+    plt.close()
+
+    # Print mean values
+    print(f"{case}: HEC genus 2: {energy_val_g2:.5f} J, HEC genus 3: {energy_val_g3:.5f} J, EC: {energy_val_ec:.5f} J")

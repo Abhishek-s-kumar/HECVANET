@@ -405,8 +405,15 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sendbuff+2+sizenosign, siga, 2*signsize+1);
         memcpy(sendbuff+2+sizenosign+2*signsize+1, buffrc+sizemod16+2*signsize+1, 21);
         
-        if(get_metrics != 0)
-                std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
+        if(get_metrics != 0) {
+            std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
+            
+            std::cout << fixed << "EXTRACT_GL_PROOF consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_GL_PROOF power: "
+                << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+            prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+            prev_times[vid] = Simulator::Now().GetSeconds();
+        }
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -508,8 +515,15 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sendbuff+2, decrypted, sizenosign);
         memcpy(sendbuff+2+sizenosign, buffrc+sizemod16, 2*size+1);
 
-        if(get_metrics != 0)
-                std::cout << "GL_LEADERSHIP_PROOF message size: " << sendsize << std::endl;
+        if(get_metrics != 0) {
+            std::cout << "GL_LEADERSHIP_PROOF message size: " << sendsize << std::endl;
+            
+            std::cout << fixed << "EXTRACT_GL_PROOF consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_GL_PROOF power: "
+                << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+            prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+            prev_times[vid] = Simulator::Now().GetSeconds();
+        }
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -622,8 +636,15 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         memcpy(sendbuff+2+sizenosign, siga, 6*signsize);
         memcpy(sendbuff+2+sizenosign+6*signsize, buffrc+sizemod16+6*signsize, 21);
         
-        if(get_metrics != 0)
-                std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
+        if(get_metrics != 0) {
+            std::cout << "GL_LEADERSHIP_PROOF message size: " << finalsendsize << std::endl;
+            
+            std::cout << fixed << "EXTRACT_GL_PROOF consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
+            cout << fixed << "EXTRACT_GL_PROOF power: "
+                << (prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[vid]) << " Watt" << endl;
+            prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+            prev_times[vid] = Simulator::Now().GetSeconds();
+        }
 
         Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
         Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -797,8 +818,9 @@ void schedule_inform_message(int ec_algo, int vid, int glid) {
         BytesFromZZ(sendbuff+sizemod16+6*size+2, sigb, 21);
     }
 
-    if(get_metrics != 0)
-                std::cout << "VEHICLE_INFORM message size: " << fullsize+2 << std::endl;
+    if(get_metrics != 0) {
+        std::cout << "VEHICLE_INFORM message size: " << fullsize+2 << std::endl;
+    }
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> nd1 = n1->GetDevice(0);
@@ -980,6 +1002,13 @@ void send_Aggregated_toRSU(int ec_algo, int glid, std::string aggstr) {
     tx.txPowerLevel = 7; //When we define TxPowerStar
 
     wd0->SendX(packet_i, dest, protocol, tx);
+    // if(get_metrics != 0) {
+    //     std::cout << fixed << "SEND_AGGREGATED_INFO consumption: " << prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy() << std::endl;
+    //     cout << fixed << "SEND_AGGREGATED_INFO power: "
+    //             << (prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[glid]) << " Watt" << endl;
+    //     prev_energy[glid] = Vehicle_sources->Get(glid)->GetRemainingEnergy();
+    //     prev_times[glid] = Simulator::Now().GetSeconds();
+    // }
     //Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 
 }
@@ -1118,6 +1147,13 @@ void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         //std::cout << gl3.agg_messages << std::endl;
 
         dry[vid] = true;
+    }
+    if(get_metrics != 0) {
+        std::cout << fixed << "EXTRACT_INFO_GL consumption: " << prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy() << std::endl;
+        cout << fixed << "EXTRACT_INFO_GL power: "
+                << (prev_energy[glid] - Vehicle_sources->Get(glid)->GetRemainingEnergy())/(Simulator::Now().GetSeconds() - prev_times[glid]) << " Watt" << endl;
+        prev_energy[glid] = Vehicle_sources->Get(glid)->GetRemainingEnergy();
+        prev_times[glid] = Simulator::Now().GetSeconds();
     }
     if(vid >= 62) {
         std::string aggstr;
@@ -1260,5 +1296,4 @@ void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid) {
     std::cout << std::endl << BOLD_CODE << YELLOW_CODE << received << END_CODE << std::endl << std::endl;
 
     already_here = true;
-
 }

@@ -10,6 +10,7 @@
 #include "sign.h"
 #include "messages.h"
 #include "ns2-node-utility.h"
+#include "wave-energy-helper.h"
 
 #include <set>
 #include <chrono>
@@ -41,6 +42,9 @@ uint8_t hpk[23] = {0x87,0x75,0x6e,0x0e,0x30,0x8e,0x59,0xa4,0x04,0x48,0x01,
 double exit_time[63];
 float vehicle_Energy_Consumption[64];
 float prev_energy[64];
+double prev_times[64];
+Ptr<EnergySourceContainer> Vehicle_sources;
+
 
 //Note: this is a promiscuous trace for all packet reception. This is also on physical layer, so packets still have WifiMacHeader
 void Rx (std::string context, Ptr <const Packet> packet, uint16_t channelFreqMhz,  WifiTxVector txVector,MpduInfo aMpdu, SignalNoiseDbm signalNoise)
@@ -361,6 +365,12 @@ void SelectGL(std::set<double> endsim_cars) {
 
     std::cout << std::endl << BOLD_CODE << YELLOW_CODE << "Selected GL: " << rand_id << END_CODE << std::endl;
     
+    for (auto it: endsim_cars) {
+      prev_energy[(int)it] = Vehicle_sources->Get((int)it)->GetRemainingEnergy();
+      if((int) it != 60 && (int) it != 61 && (int) it != 62)
+        prev_times[(int)it] = Simulator::Now().GetSeconds();
+    }
+
     RSU_inform_GL(ec_algo, rand_id);
     std::string conn = "/NodeList/";
     conn += to_string(rand_id) + "/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/PhyRxDrop";
@@ -368,6 +378,9 @@ void SelectGL(std::set<double> endsim_cars) {
 
 }
 
+void set_Initial_Energy(int vid) {
+  prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
+}
 
 int main (int argc, char *argv[])
 {
@@ -850,16 +863,21 @@ int main (int argc, char *argv[])
 
   for(uint32_t i=0; i < nNodes; i++) {
     prev_energy[i] = 1000.0; 
+    prev_times[i] = 0;
   }
+
+  Vehicle_sources = new EnergySourceContainer();
 
   BasicEnergySourceHelper energyHelper;
   energyHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue (1000.0));
-  EnergySourceContainer Vehicle_sources = energyHelper.Install(nodes);
+  *Vehicle_sources = energyHelper.Install(nodes);
 
   // WifiRadioEnergyModelHelper wifiEnergyHelper;
   // DeviceEnergyModelContainer deviceModels = wifiEnergyHelper.Install(devices, Vehicle_sources);
+  WaveRadioEnergyModelHelper waveEnergyHelper;
+  DeviceEnergyModelContainer deviceModels = waveEnergyHelper.Install(devices, *Vehicle_sources);
   
-
+  
   /*************** Sending a packet ***************/
 
   /*
@@ -867,6 +885,8 @@ int main (int argc, char *argv[])
    */
   Ptr <NetDevice> d0 = devices.Get (rsuid);
   Ptr <WaveNetDevice> wd0 = DynamicCast <WaveNetDevice> (d0);
+
+  //wd0->GetPhy(0)->SetWifiRadioEnergyModel(energymodel);
 
   /*
    * We want to call
@@ -900,10 +920,17 @@ int main (int argc, char *argv[])
     }
     std::string conn = "/NodeList/";
     conn = conn + to_string(i);
-    conn = conn + "/DeviceList/*/$ns3::WaveNetDevice/PhyEntities/*/MonitorSnifferRx";
+    conn = conn + "/DeviceList/0/$ns3::WaveNetDevice/PhyEntities/0/MonitorSnifferRx";
     //Config::Connect(conn, MakeCallback(&Rx));
     Simulator::Schedule(Seconds(entryt), &Config::Connect, conn, MakeCallback(&Rx));
-
+    if(i != 0) {
+      Simulator::Schedule(Seconds(entryt + (int)entryt%2), &set_Initial_Energy, i);
+      prev_times[i] = entryt + (int)entryt%2;
+    }
+    else {
+      Simulator::Schedule(Seconds(entryt + 2), &set_Initial_Energy, i);
+      prev_times[i] = entryt + 2;
+    }
     double exit=0;
     if(ns2_util.GetExitTimeForNode(i) > 200) {
       exit = 426;

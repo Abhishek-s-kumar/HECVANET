@@ -13,7 +13,6 @@
 #include "ns3/network-module.h"
 #include "custom-mobility-model.h"
 #include "ns3/node.h"
-#include "ns3/basic-energy-source-helper.h"
 
 #endif
 
@@ -26,6 +25,7 @@
 #include "cryptopp/hex.h"
 #include "cryptopp/modarith.h"
 #include "cryptopp/pkcspad.h"
+#include "ns3/basic-energy-source-helper.h"
 
 #include <thread>
 #include <random>
@@ -164,7 +164,9 @@ extern uint8_t hpk3[48];
 
 extern uint32_t get_metrics;
 extern float prev_energy[64];
-extern float vehicle_Energy_Consumption[64];
+extern double prev_times[64];
+extern ns3::Ptr<ns3::EnergySourceContainer> Vehicle_sources;
+
 
 void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid);
 
@@ -186,5 +188,3 @@ void schedule_inform_message(int ec_algo, int vid, int glid);
 void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid);
 
 void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid);
-
-void update_Vehicle_Energy(int vid, float value);

@@ -132,6 +132,7 @@ for case, mean_value_g2 in means_g2.items():
                     .replace('Text to EC Point', 'Encoding')
                     .replace('EC Point to Text', 'Decoding'))
     plt.ylim(top=max(mean_value_g2, mean_value_g3, mean_value_ec) * 1.5)
+    plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.3, zorder=0)
     plt.savefig(os.path.join(output_dir, f"{case}.png"))
     plt.close()
 
@@ -150,11 +151,9 @@ for case, size_values_g2 in sizes_g2.items():
     
 
     plt.ylabel('Size (bytes)')
-    plt.title(case.replace('Text to divisor', 'Encoding')
-                    .replace('Divisor to text', 'Decoding')
-                    .replace('Text to EC Point', 'Encoding')
-                    .replace('EC Point to Text', 'Decoding'))
+    plt.title(case)
     plt.ylim(top=max(size_values_g2, size_values_g3, size_values_ec) * 1.5)
+    plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.3, zorder=0)
     
     plt.savefig(os.path.join(output_dir, f"{case}_sizes.png"))
     plt.close()
@@ -162,22 +161,90 @@ for case, size_values_g2 in sizes_g2.items():
     # Print sizes
     print(f"{case}: HEC genus 2: {size_values_g2}, HEC genus 3: {size_values_g3}, EC: {size_values_ec}")
 
-# Plot and save bar plots for energies
-for case, energy_val_g2 in energies_g2.items():
+
+# Plot and save bar plots for energies of whole exchanges
+plt.figure(figsize=(20, 15))
+cases = list(case for case in energies_g2.keys() if (case != "RECEIVE_CERT consumption" and case != "EXTRACT_GL_PROOF consumption"))  # Get the list of cases
+
+# Set the x-axis positions for the bars
+x_positions1 = list(range(len(cases)))
+x_positions = [0.8*x for x in x_positions1]
+
+# Set the width of each bar
+bar_width = 0.15
+
+# Plot the bars for EC
+plt.bar([x - bar_width for x in x_positions], [val for key, val in energies_ec.items() if (key != "RECEIVE_CERT consumption" and key != "EXTRACT_GL_PROOF consumption")], width=bar_width, color='green', alpha=0.8, label='EC')
+
+# Plot the bars for HEC genus 2
+plt.bar(x_positions, [val for key, val in energies_g2.items() if (key != "RECEIVE_CERT consumption" and key != "EXTRACT_GL_PROOF consumption")], width=bar_width, color='blue', alpha=0.8, label='HEC genus 2')
+
+# Plot the bars for HEC genus 3
+plt.bar([x + bar_width for x in x_positions], [val for key, val in energies_g3.items() if (key != "RECEIVE_CERT consumption" and key != "EXTRACT_GL_PROOF consumption")], width=bar_width, color='orange', alpha=0.8, label='HEC genus 3')
+
+# Set the x-axis labels
+plt.xticks(x_positions, cases, rotation=45, fontsize=18)
+
+# Set the y-axis label
+plt.ylabel('Energy (J)', fontsize=18)
+plt.ylim(top=max(max(energies_ec.values()), max(energies_g2.values()), max(energies_g3.values())) * 1.5)
+plt.yticks(fontsize=18)
+
+# Set the title
+plt.title('Energy Consumption', fontsize=18)
+
+# Add legend
+plt.legend(fontsize=18)
+plt.tight_layout()
+plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
+
+# Save the plot
+plt.savefig(os.path.join(output_dir, "Energy_consumption1.png"))
+plt.close()
+
+
+#Plot energies of simple cert reception
+plt.figure(figsize=(20, 15))
+cases = list(case for case in energies_g2.keys() if (case == "RECEIVE_CERT consumption" or case == "EXTRACT_GL_PROOF consumption"))  # Get the list of cases
+
+# Set the x-axis positions for the bars
+x_positions1 = list(range(len(cases)))
+x_positions = [0.8*x for x in x_positions1]
+
+# Set the width of each bar
+bar_width = 0.1
+
+# Plot the bars for EC
+plt.bar([x - bar_width for x in x_positions], [val for key, val in energies_ec.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='green', alpha=0.8, label='EC')
+
+# Plot the bars for HEC genus 2
+plt.bar(x_positions, [val for key, val in energies_g2.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='blue', alpha=0.8, label='HEC genus 2')
+
+# Plot the bars for HEC genus 3
+plt.bar([x + bar_width for x in x_positions], [val for key, val in energies_g3.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='orange', alpha=0.8, label='HEC genus 3')
+
+# Set the x-axis labels
+plt.xticks(x_positions, cases, rotation=45, fontsize=18)
+
+# Set the y-axis label
+plt.ylabel('Energy (J)', fontsize=18)
+plt.ylim(top=max(max(energies_ec["RECEIVE_CERT consumption"], energies_ec["EXTRACT_GL_PROOF consumption"]), max(energies_g2["RECEIVE_CERT consumption"], energies_g2["EXTRACT_GL_PROOF consumption"]), max(energies_g3["RECEIVE_CERT consumption"], energies_g3["EXTRACT_GL_PROOF consumption"])) * 1.5)
+plt.yticks(fontsize=18)
+
+# Set the title
+plt.title('Energy Consumption', fontsize=18)
+
+# Add legend
+plt.legend(fontsize=18)
+plt.tight_layout()
+plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
+
+# Save the plot
+plt.savefig(os.path.join(output_dir, "Energy_consumption2.png"))
+plt.close()
+
+for case, energy_val_ec in energies_ec.items():
+    energy_val_g2 = energies_g2.get(case, 0)
     energy_val_g3 = energies_g3.get(case, 0)
-    energy_val_ec = energies_ec.get(case, 0)
-
-    plt.figure(figsize=(8, 6))
-    plt.bar('EC', energy_val_ec, color='green', width=0.2)
-    plt.bar('HEC genus 2', energy_val_g2, color='blue', width=0.2)
-    plt.bar('HEC genus 3', energy_val_g3, color='orange', width=0.2)
-    
-
-    plt.ylabel('Energy (J)')
-    plt.title(case)
-    plt.ylim(top=max(energy_val_g2, energy_val_g3, energy_val_ec) * 1.5)
-    plt.savefig(os.path.join(output_dir, f"{case}.png"))
-    plt.close()
-
-    # Print mean values
     print(f"{case}: HEC genus 2: {energy_val_g2:.5f} J, HEC genus 3: {energy_val_g3:.5f} J, EC: {energy_val_ec:.5f} J")
+

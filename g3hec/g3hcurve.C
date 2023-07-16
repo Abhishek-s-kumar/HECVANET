@@ -692,7 +692,7 @@ namespace g3HEC {
 
         for (long ntrial = 100; ntrial > 0; ntrial--) {
             NTL_NNS random(fpoly, 8);
-            SetCoeff(fpoly, 7, 1); // Make sure of degree 5 and monic
+            SetCoeff(fpoly, 7, 1); // Make sure of degree 7 and monic
             NTL_NNS random(hpoly, 4);
             update();
 
@@ -861,57 +861,3 @@ namespace g3HEC {
         return s;
     }
 }
-
-// int main() {
-//     /* Set PRNG seed */
-//   SetSeed(to_ZZ(19800729));
-
-//   char p[300];
-
-//   cout << "Please choose your modulus p (up to " 
-//        << 300 << " decimal digits):" << endl;
-//   cout << "p = ";
-//   cin.getline(p, 300);
-
-//   ZZ pZZ = to_ZZ(p);
-
-//   field_t::init(pZZ); // define GF(p)
-
-//   ZZ x, k;
-
-//   g3HEC::g3hcurve curve;
-
-//   g3HEC::g3divisor m, g, h, a, b;
-
-//   curve.random();
-
-//    /* private key x */
-//   RandomBnd(x, pZZ*pZZ);
-//    /* random number k */
-//   RandomBnd(k, pZZ*pZZ);
-
-//   m.set_curve(curve);
-//    /* random message m as divisor */
-//   m.random();
-
-//   std::cout << m << std::endl;
-//    /* random base point */
-//   g.random();
-
-//    /* public key h */
-//   h = x * g;
-
-//    /* cipher text (a, b) */
-//   a = k * g;
-//   b = k * h + m;
-
-//   /* message decryption  */
-
-//   if ( b - x * a == m )
-//     cout << "ElGamal decryption succeeded!" << endl;
-//   else
-//     cout << "ElGamal decryption failed!" << endl;
-
-//    return 0;
-    
-// }

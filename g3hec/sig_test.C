@@ -5,6 +5,7 @@
 #include <NTL/pair.h>
 #include <NTL/vector.h>
 
+/* Based on "A class of hyperelliptic CM-curves of genus three" by Annegret Weng*/
 #define f5 "7"
 #define f3 "14"
 #define f1 "7"
@@ -22,7 +23,7 @@ static ZZ from_divisor_to_ZZ(const g3divisor& div, const ZZ& n)
 {
   poly_t u = div.get_upoly();
   ZZ temp = AddMod(sqr(rep(u.rep[0])), sqr(rep(u.rep[1])), n);
-  temp = AddMod(temp, rep(u.rep[2]), n);
+  temp = AddMod(temp, sqr(rep(u.rep[2])), n);
   return ( IsZero(temp) ? to_ZZ(1) : temp );
 }
 
@@ -36,22 +37,24 @@ int main()
 
   field_t::init(p); // define GF(p)
 
-  std::cout << "Size of p: " << NumBytes(p) << " bytes" << std::endl;
+  std::cout << "Size of p: " << NumBits(p) << " bits" << std::endl;
   
-
+  /* N is an "almost" prime (8q where q is a prime). The order is set to N/8 */
   ZZ order = to_ZZ(N);
-  std::cout << "Size of group: " << NumBytes(order) << " bytes" << std::endl;
+  order = order/8;
+  std::cout << "Size of group: " << NumBits(order) << " bits" << std::endl;
 
-  ZZ x, k, b, m; // Private key x, random number k, parameter b, message m
+  ZZ x, r, s, m; // Private key x, random number r, parameter s, message m
 
-  ZZ f_a;
+  ZZ f_e; // f(e) from divisor to ZZ
 
   g3hcurve curve;
 
-  g3divisor g, h, a;
+  g3divisor g, h, e; // Base divisor g, public key h, divisor e
 
   poly_t f;
 
+  /* Set the genus three curve of known almost prime order */
   SetCoeff(f, 7, 1);
   SetCoeff(f, 6, 0);
   SetCoeff(f, 5, str_to_ZZ_p(f5));
@@ -65,10 +68,10 @@ int main()
 
   g.set_curve(curve);
 
-  /* Base point g */
+  /* Base point g. It is mandatory for g to generate a Group of order elements. */
   do {
     g.random();
-  } while (g.is_unit());
+  } while (g.is_unit() || !(g*order).is_unit());
 
   /* message m */
   RandomBnd(m, order);
@@ -78,32 +81,28 @@ int main()
     RandomBnd(x, order);
   } while (IsZero(x));
 
-  /* public key h = [x]g */
-  h = x * g;
-
-  /* random number k <> 0*/
+  /* random number r <> 0*/
   do {
-    RandomBnd(k, order);
-  } while (IsZero(k));
+    RandomBnd(r, order);
+  } while (IsZero(r));
 
-  cout << "Generating ElGmal signature..." << endl;
-  sleep(3);
+  cout << "Generating HECC ElGamal signature..." << endl;
 
-  a = k * g;
+  e = r * g;
+  h = x*g;
 
-  f_a = from_divisor_to_ZZ(a, order);
+  f_e = from_divisor_to_ZZ(e, order);
 
-  /* b = (m - x*f(a))/k mod N */
-  b = MulMod(m - x * f_a, InvMod(k, order), order);
+  /* Using MulMod here for faster calculation seems to have a bug. Need to investigate. */
+  s = ((m - x*f_e)*InvMod(r, order))%order;
 
-  cout << "ElGmal signature generated!" << endl;
-  sleep(3);
-
+  cout << "HECC ElGamal signature generated!" << endl;
+  
   /* Signature verification */
-  if ( f_a * h + b * a == m * g )
-    cout << "ElGamal signature verification succeeded!" << endl;
+  if ( f_e*h + s*e == m*g )
+    cout << "HECC ElGamal signature verification succeeded!" << endl;
   else
-    cout << "ElGamal signature verification failed!" << endl;
+    cout << "HECC ElGamal signature verification failed!" << endl;
 
    return 0;
 }

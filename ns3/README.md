@@ -2,7 +2,7 @@
 
 NS-3 simulation for investigating potential ECC/HECC usage for improvements on security and efficiency of authentication and secure message exchange of vehicles and infrastructure in VANETs.
 
-Simulated scheme: [A Low-Overhead Message Authentication and Secure Message Dissemination Scheme for VANETs](https://www.mdpi.com/2673-8732/2/1/10)[[1]](#1).
+Simulated scheme: [A Low-Overhead Message Authentication and Secure Message Dissemination Scheme for VANETs](https://www.mdpi.com/2673-8732/2/1/10) [[1]](#1).
 
 Simulation tested on NS-3 version 3.30.
 
@@ -21,7 +21,7 @@ Implemented using Crypto++ library for ECC, libg2hec for HECC genus 2 and g3hec 
 * ElGamal Encryption/Decryption
 * ECDSA signatures for ECC, ElGamal signatures for HECC
 * HECQV certificates
-* Koblitz encodings for ECC, [UnifiedEncoding](https://link.springer.com/chapter/10.1007/978-3-319-89339-6_11#citeas)[[2]](#2) method for HECC
+* Koblitz encodings for ECC, [UnifiedEncoding](https://link.springer.com/chapter/10.1007/978-3-319-89339-6_11#citeas) [[2]](#2) method for HECC
 * Point compression for ECC, divisor compression for HECC genus 2
 
 **Note:** Since HECC is still being researched, not many algorithms for encodings have been produced. Also, there are not a lot of secure curves already generated in bibliography. UnifiedEncoding is used to generate the curves for genus 2 and 3 HECC for all the cryptographic methods instead of signatures, because the Group Order is required to be known. For simulation purposes, different curves are used for signatures (on same security level) that are known from bibliography to produce an "almost" prime Group Order. Different key-pairs are needed, but in the current implementation only one key-pair is exchanged per vehicle/RSU and the key-pair for signatures is fixed. This enables more realistic results of the simulation, because exchanging more key-pairs would create bigger traffic than actually needed.

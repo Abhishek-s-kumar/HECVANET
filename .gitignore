@@ -1,2 +1,4 @@
 .vscode/
-*.a
+g3hec/.vscode
+g3hec/build
+ns3/SecureVANET_HEC_Simulation/.vscode

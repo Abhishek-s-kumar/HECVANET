@@ -1,11 +1,9 @@
-#ifndef HEADERS_H 
-#define HEADERS_H
+#ifndef HEC_CERT_H 
+#define HEC_CERT_H
 
 #include "encoding.h"
 #include "cryptopp/cryptlib.h"
 #include "cryptopp/sha3.h"
-
-#endif
 
 class ECQV {
     private:
@@ -68,3 +66,5 @@ class g3HECQV {
         std::string get_issued_on();
         std::string get_expires_on();
 };
+
+#endif

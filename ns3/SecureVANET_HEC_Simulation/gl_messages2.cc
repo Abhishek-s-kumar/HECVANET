@@ -1,6 +1,5 @@
 #include "messages.h"
 
-
 using namespace ns3;
 
 void send_GLJoin_g2(Vehicle_data_g2 *veh1g2, int vid, int destnode) {

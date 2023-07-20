@@ -1,11 +1,9 @@
-#ifndef HEADERS_H 
-#define HEADERS_H
+#ifndef SIGN_H 
+#define SIGN_H
 
 #include "encoding.h"
 #include "cryptopp/cryptlib.h"
 #include "cryptopp/sha3.h"
-
-#endif
 
 #define f3g2 "2682810822839355644900736"
 #define f2g2 "226591355295993102902116"
@@ -39,3 +37,5 @@ int verify_ec(std::string sig, Element Pk, uint8_t *message, int size);
 int sign_genus3(uint8_t *siga, ZZ& sigb, uint8_t *mess, int size, ZZ pch);
 
 int verify_sig3(uint8_t *siga, ZZ sigb, uint8_t *mess, int size, uint8_t *pk);
+
+#endif

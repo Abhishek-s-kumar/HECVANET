@@ -43,7 +43,7 @@ For energy consumption measurements a slight modification was made to WifiEnergy
 
 1. Copy the SecureVANET_HEC_Simulation folder on your NS-3 scartch folder.
 2. Edit the wscript file by linking NS-3 with libraries Crypto++, libg2hec and g3HEC (see g3hec folder).
-3. run ./waf --run "SecureVANET_HEC_Simulation --algo=*0: HECC genus 2, 1: ECC, 2: HECC genus 3* --metrics=*0: no measurements, 1: take measurements*" --vis (if PyViz is enable)
+3. run ./waf --run "SecureVANET_HEC_Simulation --algo=*0: HECC genus 2, 1: ECC, 2: HECC genus 3* --metrics=*0: no measurements, 1: take measurements*" --vis (if PyViz is enabled)
 
 <a id="1">[1]</a>
 Hassan Mistareehi and D. Manivannan, "A Low-Overhead Message

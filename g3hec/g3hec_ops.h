@@ -1,3 +1,6 @@
+#ifndef HECg3_H
+#define HECg3_H
+
 /* This implementation is based on the implementation of the Genus 2
 HECC library, libg2hec. */
 
@@ -242,3 +245,5 @@ namespace g3HEC {
     std::ostream& operator<<(std::ostream& s, const g3hcurve& a);
     std::ostream& operator<<(std::ostream& s, const g3divisor& a);
 }
+
+#endif

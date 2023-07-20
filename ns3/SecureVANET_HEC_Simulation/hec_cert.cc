@@ -62,7 +62,7 @@ int ECQV::cert_generate(uint8_t *encoded, std::string uname, Element ru, CryptoP
     }
 
     CryptoPP::ModularArithmetic mod(n);
-
+    
     this->r = mod.Multiply(hashed_p, k1);
     this->r = mod.Add(this->r, capriv);
     return 0;

@@ -1,3 +1,6 @@
+#ifndef ENCODING_H 
+#define ENCODING_H
+
 #include <g2hec_nsfieldtype.h>
 #include <assert.h>
 #include <g2hec_Genus2_ops.h>
@@ -78,3 +81,5 @@ int bytes_to_divisor(NS_G2_NAMESPACE::divisor &D, uint8_t *buff, NS_G2_NAMESPACE
 int bytes_to_divisorg3(g3HEC::g3divisor &D, uint8_t *buff, g3HEC::g3hcurve curve, ZZ p);
 
 int validate_timestamp(std::string tmstmp);
+
+#endif

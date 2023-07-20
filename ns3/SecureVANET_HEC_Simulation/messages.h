@@ -1,9 +1,6 @@
-#ifndef HEADERS_H 
-#define HEADERS_H
+#ifndef MESSAGES_H 
+#define MESSAGES_H
 
-#include "encoding.h"
-#include "hec_cert.h"
-#include "sign.h"
 #include "cryptopp/cryptlib.h"
 #include "cryptopp/sha3.h"
 #include "ns3/wave-module.h"
@@ -14,8 +11,9 @@
 #include "custom-mobility-model.h"
 #include "ns3/node.h"
 
-#endif
-
+#include "hec_cert.h"
+#include "sign.h"
+#include "encoding.h"
 #include "cryptopp/aes.h"
 #include "cryptopp/cryptlib.h"
 #include "cryptopp/rijndael.h"
@@ -188,3 +186,5 @@ void schedule_inform_message(int ec_algo, int vid, int glid);
 void extract_Inform_Aggregate(uint8_t *buffrc, int ec_algo, int vid, int glid);
 
 void extract_Info_RSU(uint8_t *buffrc, int infnum, int ec_algo, int glid);
+
+#endif

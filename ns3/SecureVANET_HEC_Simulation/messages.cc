@@ -562,7 +562,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     std::uniform_real_distribution<> dis(0, 2);
     
     float timerand = dis(gen);
-
+    
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 

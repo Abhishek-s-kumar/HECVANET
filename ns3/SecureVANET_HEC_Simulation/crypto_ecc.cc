@@ -84,17 +84,17 @@ Element CryptoECC::encode(std::string txt)
     tuple<ZZ_p, ZZ_p> encoded_point;
     encoded_point = encode_koblitz(crv_F, to_enc, to_ZZ(1000), crv_p_zz);
 
-    vector<unsigned char> xp, yp;
-    NTL::BytesFromZZ(xp.data(), rep(std::get<0>(encoded_point)), size);
-    NTL::BytesFromZZ(yp.data(), rep(std::get<1>(encoded_point)), size);
+    byte xp[size], yp[size];
+    NTL::BytesFromZZ(xp, rep(std::get<0>(encoded_point)), size);
+    NTL::BytesFromZZ(yp, rep(std::get<1>(encoded_point)), size);
 
-    swap_endian(xp.data(), size);
-    swap_endian(yp.data(), size);
+    swap_endian(xp, size);
+    swap_endian(yp, size);
 
     Integer ret_x, ret_y;
-    ret_x.Decode(xp.data(), size);
-    ret_y.Decode(yp.data(), size);
-
+    ret_x.Decode(xp, size);
+    ret_y.Decode(yp, size);
+    
     return Element(ret_x, ret_y);
 }
 
@@ -108,4 +108,43 @@ string CryptoECC::decode(Element point, Integer k)
     mess[decoded.ByteCount()] = '\0';
     std::string message((char*)mess, decoded.ByteCount()+1);
     return message;
+}
+
+string CryptoECC::sign(Integer priv, vector<unsigned char> mess) 
+{
+    ECDSA<ECP, SHA256>::PrivateKey priv_key;
+    priv_key.Initialize(_group, priv);
+    ECDSA<ECP, SHA256>::Signer signer(priv_key);
+
+    size_t siglen = signer.MaxSignatureLength();
+    std::string signature(siglen, 0x00);
+    siglen = signer.SignMessage( prng, mess.data(), mess.size(), (byte*)&signature[0] );
+    signature.resize(siglen);
+
+    return signature;
+}
+
+bool CryptoECC::verify(string sig, Element Pk, vector<unsigned char> mess)
+{
+    ECDSA<ECP, SHA256>::PublicKey publicKey;
+    publicKey.Initialize(_group, Pk);
+    ECDSA<ECP, SHA256>::Verifier verifier(publicKey);
+
+    return verifier.VerifyMessage( mess.data(), mess.size(), (const byte*)&sig[0], sig.length());
+}
+
+void CryptoECC::serialize(Element point, vector<unsigned char> buff)
+{
+    int size = _group.GetCurve().FieldSize().ByteCount();
+    byte temp[size+1];
+    _group.GetCurve().EncodePoint(temp, point, true);
+    buff.insert(buff.end(), temp, temp + size);
+}
+
+Element CryptoECC::deserialize(vector<unsigned char> buff)
+{
+    int size = _group.GetCurve().FieldSize().ByteCount();
+    Element point;
+    _group.GetCurve().DecodePoint(point, buff.data(), size);
+    return point;
 }

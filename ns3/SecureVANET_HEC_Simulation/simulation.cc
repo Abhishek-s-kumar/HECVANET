@@ -8,6 +8,7 @@
 #include "ns3/basic-energy-source-helper.h"
 #include "hec_cert.h"
 #include "sign.h"
+#include "crypto_ecc.h"
 #include "messages.h"
 #include "ns2-node-utility.h"
 #include "wave-energy-helper.h"
@@ -528,10 +529,11 @@ int main (int argc, char *argv[])
     std::cout << "Using ElGamal with ECC for message encryption\nECQV for certificates\nECDSA signatures" << std::endl;
     std::cout << "Using curve secp256r1 parameters" << std::endl;
     
+    
     CryptoPP::AutoSeededRandomPool prng;    
     GroupParameters group;
     group.Initialize(CryptoPP::ASN1::secp256r1());
-
+    
     rsuec[0].group = group;
 
     ECQV cert(group);

@@ -74,6 +74,34 @@ class CryptoECC {
          * @param k The parameter k for Koblitz encoding procedure.
         */
         string decode(Element point, Integer k);
+
+        /**
+         * @brief Produce ECDSA signature.
+         * @param priv The private key.
+         * @param mess The message to sign as a vector of unsigned chars.
+        */
+        string sign(Integer priv, vector<unsigned char> mess);
+
+        /**
+         * @brief Verify ECDSA signature.
+         * @param sig The signature as a string.
+         * @param Pk The public key.
+         * @param mess The message to sign as a vector of unsigned chars.
+        */
+        bool verify(string sig, Element Pk, vector<unsigned char> mess);
+
+        /**
+         * @brief Serialize a point. Bytes are pushed back on buff vector.
+         * @param point The point to serialize.
+         * @param buff The vector to push the serialized point.
+        */
+        void serialize(Element point, vector<unsigned char> buff);
+
+        /**
+         * @brief Deserialize a point from bytes.
+         * @param buff The vector that contains the point in serialized form.
+        */
+        Element deserialize(vector<unsigned char> buff);
 };
 
 #endif

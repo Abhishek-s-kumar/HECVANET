@@ -14,6 +14,7 @@
 #include "hec_cert.h"
 #include "sign.h"
 #include "encoding.h"
+#include "crypto_ecc.h"
 #include "cryptopp/aes.h"
 #include "cryptopp/cryptlib.h"
 #include "cryptopp/rijndael.h"

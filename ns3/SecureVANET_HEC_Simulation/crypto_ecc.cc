@@ -1,5 +1,5 @@
 #include "crypto_ecc.h"
-
+#include "helpers.h"
 
 tuple<Element, Element> CryptoECC::encrypt_ElGamal(Element pub, Element mess)
 {

@@ -9,7 +9,6 @@
 #include "cryptopp/oids.h"
 
 #include "hec_cert.h"
-#include "helpers.h"
 #include "encoding.h"
 
 #include <tuple>

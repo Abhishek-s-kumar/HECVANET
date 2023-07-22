@@ -24,14 +24,6 @@
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> GroupParameters;
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP>::Element Element;
 
-void vli_print(uint8_t *vli, unsigned int size);
-
-void swap_endian(uint8_t* buffer, size_t size);
-
-/* Compute on of the square roots of the quadratic residue only if
-p = 3 mod 4 */
-ZZ_p squareRoot(ZZ_p n, ZZ p);
-
 
 /* Class for encoding integers in HEC of genus 1-3. Field should be of
 characteristic p = 7 mod 8 and p = 3 mod 4. */

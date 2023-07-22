@@ -95,7 +95,7 @@ class CryptoECC {
          * @param point The point to serialize.
          * @param buff The vector to push the serialized point.
         */
-        void serialize(Element point, vector<unsigned char> buff);
+        void serialize(Element point, vector<unsigned char> &buff);
 
         /**
          * @brief Deserialize a point from bytes.

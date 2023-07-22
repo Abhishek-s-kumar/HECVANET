@@ -399,10 +399,10 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
 
     CryptoPP::AutoSeededRandomPool prng;  
     int size = veh1ec->group.GetCurve().FieldSize().ByteCount();
-
+    CryptoECC crypto_ecc(veh1ec->group);
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
-    
+
     std::ostringstream oss;
     oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
     auto str = oss.str();
@@ -410,7 +410,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     std::string finalstr = str11 + str;
 
     auto start = chrono::high_resolution_clock::now();
-    Element m = text_to_ecpoint(finalstr, finalstr.length(), veh1ec->group, size);
+    Element m = crypto_ecc.encode(finalstr);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -490,15 +490,15 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
 
     veh1ec->pub = cert.get_calculated_Qu();
     veh1ec->priv = cert.get_extracted_du();
-
-    CryptoPP::Integer k(prng, CryptoPP::Integer::One(), veh1ec->group.GetMaxExponent());
-
-    Element a,b,btemp;
+ 
+    Element a,b;
+    tuple<Element, Element> encrypted_mess;
 
     start = chrono::high_resolution_clock::now();
-    a = veh1ec->group.ExponentiateBase(k);
-    btemp = veh1ec->group.GetCurve().ScalarMultiply(veh1ec->rsupub, k);
-    b = veh1ec->group.GetCurve().Add(btemp, m);
+    
+    encrypted_mess = crypto_ecc.encrypt_ElGamal(veh1ec->rsupub, m);
+    a = std::get<0>(encrypted_mess);
+    b = std::get<1>(encrypted_mess);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -508,19 +508,25 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
          << duration.count() << " microseconds" << endl;
     }
 
-    int sizenosign = 2*(size+1) + 31 + size + 1;
-    uint8_t *temp = new uint8_t[sizenosign];
+    // int sizenosign = 2*(size+1) + 31 + size + 1;
+    //uint8_t *temp = new uint8_t[sizenosign];
+    vector<unsigned char> temp;
+    crypto_ecc.serialize(a, temp);
+    crypto_ecc.serialize(b, temp);
 
+    // veh1ec->group.GetCurve().EncodePoint(temp, a, true);
+    // veh1ec->group.GetCurve().EncodePoint(temp+size+1, b, true);
 
-    veh1ec->group.GetCurve().EncodePoint(temp, a, true);
-    veh1ec->group.GetCurve().EncodePoint(temp+size+1, b, true);
+    // memcpy(temp+2*(size+1), certec, 31 + size+1);
 
-    memcpy(temp+2*(size+1), certec, 31 + size+1);
+    temp.insert(temp.end(), certec, certec + 31 + size+1);
 
     std::string sigecc;
+    vector<unsigned char> to_sign(finalstr.begin(), finalstr.end());
 
     start = chrono::high_resolution_clock::now();
-    sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
+    // sign_ec(sigecc, veh1ec->priv, (uint8_t*)finalstr.c_str(), finalstr.length());
+    sigecc = crypto_ecc.sign(veh1ec->priv, to_sign);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -530,15 +536,24 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
          << duration.count() << " microseconds" << endl;
     }
 
-    verify_ec(sigecc, veh1ec->pub, (uint8_t*)finalstr.c_str(), finalstr.length());
+    bool verified = crypto_ecc.verify(sigecc, veh1ec->pub, to_sign);
+    if(!verified)
+      throw std::runtime_error("Could not verify signature");
 
-    int fullsize = sizenosign + sigecc.length() + 1;
-    uint8_t *cypherbuff = new uint8_t[fullsize+2];
-    cypherbuff[0] = 0;
-    cypherbuff[1] = vid;
-    memcpy(cypherbuff+2, temp, sizenosign);
-    memcpy(cypherbuff+sizenosign+2, sigecc.c_str(), sigecc.length());
-    cypherbuff[fullsize+1] = 0;
+    // int fullsize = sizenosign + sigecc.length() + 1;
+    // uint8_t *cypherbuff = new uint8_t[fullsize+2];
+    // cypherbuff[0] = 0;
+    // cypherbuff[1] = vid;
+    // memcpy(cypherbuff+2, temp, sizenosign);
+    // memcpy(cypherbuff+sizenosign+2, sigecc.c_str(), sigecc.length());
+    // cypherbuff[fullsize+1] = 0;
+
+    vector<unsigned char> cypherbuff;
+    cypherbuff.push_back(0);
+    cypherbuff.push_back(vid);
+    cypherbuff.insert(cypherbuff.end(), temp.begin(), temp.end());
+    cypherbuff.insert(cypherbuff.end(), sigecc.begin(), sigecc.end());
+    cypherbuff.push_back(0);
 
     Ptr<Node> n1 =  ns3::NodeList::GetNode(vid);
     Ptr <NetDevice> d0 = n1->GetDevice(0);
@@ -547,7 +562,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     Ptr<Node> n0 = ns3::NodeList::GetNode(destnode);
     Ptr <NetDevice> nd0 = n0->GetDevice(0);
 
-    Ptr <Packet> packet_i = Create<Packet>(cypherbuff, fullsize+2);
+    Ptr <Packet> packet_i = Create<Packet>(cypherbuff.data(), cypherbuff.size());
     Mac48Address dest	= Mac48Address::ConvertFrom (nd0->GetAddress());
     uint16_t protocol = 0x88dc;
     TxInfo tx;
@@ -562,20 +577,20 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     std::uniform_real_distribution<> dis(0, 2);
     
     float timerand = dis(gen);
-    
+
     //wd0->SendX(packet_i, dest, protocol, tx);
     Simulator::Schedule(Seconds(timerand), &WaveNetDevice::SendX, wd0, packet_i, dest, protocol, tx);
 
     veh1ec->state = RECEIVE_ACCEPT_KEY;
     if(get_metrics != 0) {
-      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << fullsize+2 << std::endl;
+      std::cout << "VEHICLE_SEND_JOIN_RSU message size: " << cypherbuff.size() << std::endl;
       
       // std::cout << "SEND_JOIN consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
       // prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
     }
     free(certec);
-    free(temp);
-    free(cypherbuff);
+    // free(temp);
+    // free(cypherbuff);
 }
 
 void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
@@ -675,7 +690,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     CryptoPP::AutoSeededRandomPool prng;    
     GroupParameters group;
     group.Initialize(CryptoPP::ASN1::secp256r1());
-
+    
     veh1ec->group = group;
 
     int size = group.GetCurve().FieldSize().ByteCount();
@@ -1562,7 +1577,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     }
     
     std::string rec;
-
+    
     start = chrono::high_resolution_clock::now();
     rec = ecpoint_to_text(m);
 
@@ -1578,7 +1593,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     std::string tocmp = "Join";
 
     if(memcmp(rec.c_str(), tocmp.c_str(), 4) != 0) {
-      return;
+      return; 
     }
     std::cout << BOLD_CODE << GREEN_CODE << "Received Join from vehicle: " << vid << END_CODE << std::endl;
     rsu1ec->numveh++;

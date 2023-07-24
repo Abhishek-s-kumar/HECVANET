@@ -466,9 +466,11 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
 
 
         ECQV cert(veh1ec->group);
+        vector<unsigned char> cert_vec;
+        cert_vec.insert(cert_vec.end(), decrypted+27, decrypted+27+31+size+1);
 
         auto start = chrono::high_resolution_clock::now();
-        cert.cert_pk_extraction(decrypted+27, veh1ec->capub);
+        Element rec_pub = cert.cert_pk_extraction(cert_vec);
 
         if(get_metrics != 0) {
             auto stop = chrono::high_resolution_clock::now();

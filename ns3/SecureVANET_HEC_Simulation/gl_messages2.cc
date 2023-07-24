@@ -362,7 +362,10 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         }
 
         ECQV cert(veh1ec->group);
-        cert.cert_pk_extraction(buffrc+27, veh1ec->capub);
+        vector<unsigned char> cert_vec;
+        cert_vec.insert(cert_vec.end(), buffrc+27, buffrc+27+31+size+1);
+
+        veh1ec->glpub = cert.cert_pk_extraction(cert_vec);
         std::string issued_by, expires_on;
         issued_by = cert.get_issued_by();
         expires_on = cert.get_expires_on();
@@ -372,7 +375,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
             return;
         }
 
-        veh1ec->glpub = cert.get_calculated_Qu();
+        // veh1ec->glpub = cert.get_calculated_Qu();
         std::cout << BOLD_CODE << GREEN_CODE << "Received GL public key, node: " << vid << END_CODE << std::endl;
         veh1ec->glid = glid;
         send_GLJoin_ec(veh1ec, vid, glid);
@@ -673,8 +676,11 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         int size = group.GetCurve().FieldSize().ByteCount();
 
         ECQV cert(group);
-        cert.cert_pk_extraction(buffrc+2*size+2, glec.mydata->capub);
-        Element vehpub = cert.get_calculated_Qu();
+        vector<unsigned char> cert_vec;
+        cert_vec.insert(cert_vec.end(), buffrc+2*size+2, buffrc+2*size+2+31+size+1);
+
+        Element vehpub = cert.cert_pk_extraction(cert_vec);
+        //Element vehpub = cert.get_calculated_Qu();
         glec.vehpk[vid] = vehpub;
 
         int sizenosign = 2*(size+1) + 31 + size + 1;

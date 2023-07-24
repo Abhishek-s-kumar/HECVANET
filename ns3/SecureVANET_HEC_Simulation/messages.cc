@@ -447,10 +447,12 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     }
 
     ECQV cert(veh1ec->group);
+    
     uint8_t *certec = new uint8_t[31 + size + 1];
-
+    vector<unsigned char> cert_vec;
+    
     start = chrono::high_resolution_clock::now();
-    cert.cert_generate(certec, "VEH0001", h, capriv);
+    cert_vec = cert.cert_generate("VEH0001", h);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -459,9 +461,10 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
       cout << "Certificate generation: "
          << duration.count() << " microseconds" << endl;
     }
-    
+    memcpy(certec, cert_vec.data(), 31 + size + 1);
+
     start = chrono::high_resolution_clock::now();
-    cert.cert_pk_extraction(certec, capub);
+    veh1ec->pub = cert.cert_pk_extraction(cert_vec);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -472,7 +475,7 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
     }
 
     start = chrono::high_resolution_clock::now();
-    int nok = cert.cert_reception(certec, x);
+    veh1ec->priv = cert.cert_reception(cert_vec, x);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -482,14 +485,10 @@ void send_Join_ec(Vehicle_data_ec *veh1ec, int vid, int destnode) {
          << duration.count() << " microseconds" << endl;
     }
 
-    if(nok) {
-      return;
-    }
-
     memcpy(veh1ec->cert, certec, 31 + size+1);
 
-    veh1ec->pub = cert.get_calculated_Qu();
-    veh1ec->priv = cert.get_extracted_du();
+    // veh1ec->pub = cert.get_calculated_Qu();
+    // veh1ec->priv = cert.get_extracted_du();
  
     Element a,b;
     tuple<Element, Element> encrypted_mess;
@@ -703,9 +702,11 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
     Element capub(cax, cay);
 
     veh1ec->capub = capub;
+    vector<unsigned char> cert_vec;
+    cert_vec.insert(cert_vec.end(), buffcert, buffcert+31+size+1);
 
     auto start = chrono::high_resolution_clock::now();
-    cert.cert_pk_extraction(buffcert, capub);
+    Element rsupub = cert.cert_pk_extraction(cert_vec);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -715,7 +716,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
          << duration.count() << " microseconds" << endl;
     }
 
-    Element rsupub = cert.get_calculated_Qu();
+    //Element rsupub = cert.get_calculated_Qu();
 
     std::string issued_by, expires_on;
     issued_by = cert.get_issued_by();
@@ -1539,9 +1540,11 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
     int size = group.GetCurve().FieldSize().ByteCount();
 
     ECQV cert(group);
+    vector<unsigned char> cert_vec;
+    cert_vec.insert(cert_vec.end(), buffrc+2*size+2, buffrc+2*size+2 + 31 + size + 1);
     
     auto start = chrono::high_resolution_clock::now();
-    cert.cert_pk_extraction(buffrc+2*size+2, rsu1ec->capub);
+    Element vehpub = cert.cert_pk_extraction(cert_vec);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -1551,7 +1554,7 @@ void extract_RSU_SendAccept_ec(uint8_t *buffrc, int vid, int rid) {
          << duration.count() << " microseconds" << endl;
     }
 
-    Element vehpub = cert.get_calculated_Qu();
+    // Element vehpub = cert.get_calculated_Qu();
     rsu1ec->vehpk[vid] = vehpub;
 
     int sizenosign = 2*(size+1) + 31 + size + 1;

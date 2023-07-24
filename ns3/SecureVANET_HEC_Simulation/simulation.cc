@@ -568,10 +568,11 @@ int main (int argc, char *argv[])
 
     int size = group.GetCurve().FieldSize().ByteCount();
     uint8_t *encoded = new uint8_t[31 + size+1];
+    vector<unsigned char> cert_vec;
     
     start = chrono::high_resolution_clock::now();
 
-    cert.cert_generate(encoded, "RSU0001", pub, capriv);
+    cert_vec = cert.cert_generate("RSU0001", pub);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -581,9 +582,11 @@ int main (int argc, char *argv[])
          << duration.count() << " microseconds" << endl;
     }
 
+    memcpy(encoded, cert_vec.data(), 31 + size + 1);
+
     start = chrono::high_resolution_clock::now();
 
-    cert.cert_pk_extraction(encoded, group.ExponentiateBase(capriv));
+    Element rsupub = cert.cert_pk_extraction(cert_vec);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -595,7 +598,7 @@ int main (int argc, char *argv[])
     
     start = chrono::high_resolution_clock::now();
 
-    cert.cert_reception(encoded, priv_ecc);
+    CryptoPP::Integer rsupriv = cert.cert_reception(cert_vec, priv_ecc);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -607,8 +610,8 @@ int main (int argc, char *argv[])
 
     rsuec[0].capub = group.ExponentiateBase(capriv);
 
-    Element rsupub = cert.get_calculated_Qu();
-    CryptoPP::Integer rsupriv = cert.get_extracted_du();
+    // Element rsupub = cert.get_calculated_Qu();
+    // CryptoPP::Integer rsupriv = cert.get_extracted_du();
 
     rsuec[0].priv = rsupriv;
     rsuec[0].rsupub = rsupub;

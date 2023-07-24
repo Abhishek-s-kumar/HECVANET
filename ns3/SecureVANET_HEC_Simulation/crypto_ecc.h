@@ -51,12 +51,18 @@ class ECQV {
  * @brief Class for ECC cryptographic operations. ECQV Certificates, ECDSA signatures, ElGamal Encryption/Decription, Koblitz Encodings, Serialize
 */
 class CryptoECC {
-    
+   
     private:
         GroupParameters _group;
         ECQV cert;
         AutoSeededRandomPool prng;
     public:
+        /**
+         * @brief Type alias used for generalization of cryptographic methods so that 
+         * they can be used with an abstract class.
+        */
+        using element_type = Element;
+
         /**
          * @brief Constructor
          * @param group Group Parameters: Curve, Base Element etc.
@@ -66,9 +72,9 @@ class CryptoECC {
 
         /**
          * @brief Enrypt message using ElGamal
-         * @param pub The public key
-         * @param mess The message as Element
-         * @return a tuple with encrypted message Elements a, b
+         * @param pub The public key.
+         * @param mess The message as Element.
+         * @return a tuple with encrypted message Elements a, b....
         */
         tuple<Element, Element> encrypt_ElGamal(Element pub, Element mess);
 
@@ -145,6 +151,7 @@ class CryptoECC {
          * @param buff The vector that contains the point in serialized form.
         */
         Element deserialize(vector<unsigned char> buff);
+
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include "hec_cert.h"
 #include "sign.h"
 #include "crypto_ecc.h"
+#include "crypto_heccg2.h"
 #include "messages.h"
 #include "ns2-node-utility.h"
 #include "wave-energy-helper.h"

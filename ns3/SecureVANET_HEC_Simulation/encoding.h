@@ -25,8 +25,10 @@ typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> GroupParameters;
 typedef CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP>::Element Element;
 
 
-/* Class for encoding integers in HEC of genus 1-3. Field should be of
-characteristic p = 7 mod 8 and p = 3 mod 4. */
+/** 
+ * @brief Class for encoding integers in HEC of genus 1-3. Field should be of
+ * characteristic p = 7 mod 8 and p = 3 mod 4. 
+ */
 class UnifiedEncoding {
     private:
         int inu, inw, ing;

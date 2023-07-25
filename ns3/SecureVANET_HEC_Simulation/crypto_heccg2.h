@@ -16,13 +16,28 @@
 
 using namespace NS_G2_NAMESPACE;
 
-// template<typename T>
-// class Test final{
-//     public:
-//         Test(const T &inst){
-//             typename T::element_type p;
-//         }
-// };
+#define MAX_ENCODING_LEN_G2 26
+#define u_param 10
+#define w_param 4
+
+/* Signature curve params */
+#define f3g2 "2682810822839355644900736"
+#define f2g2 "226591355295993102902116"
+#define f1g2 "2547674715952929717899918"
+#define f0g2 "4797309959708489673059350"
+#define pg2 "5000000000000000008503491"
+#define Ng2 "24999999999994130438600999402209463966197516075699"
+
+/* Signature base element, generated randomly */
+#define gu1g2 "409749322465428199289370"
+#define gu0g2 "1500254891071677800292861"
+#define gv1g2 "2946046430909971157752018"
+#define gv0g2 "165511752575791314109190"
+
+/* Random private key for signing, same for every node
+See explenation on README.md */
+#define priv_g2 "8163892367034733443576960192244419582898514854451"
+
 
 class CryptoHECCg2 {
 
@@ -31,6 +46,10 @@ class CryptoHECCg2 {
         g2hcurve curve;
         divisor base;
         g2HECQV cert;
+        CryptoPP::SHA3_224 hash;
+
+    protected:
+        static ZZ from_divisor_to_ZZ(const divisor& div, const ZZ& n);
 
     public:
         /**
@@ -63,6 +82,52 @@ class CryptoHECCg2 {
          * @return The decrypted message as a genus 2 divisor.
         */
         divisor decrypt_ElGamal(ZZ priv, divisor a, divisor b);
+
+        /**
+         * @brief Method for converting two points to a valid genus 2 divisor.
+         * @param x1,y1 First HEC point.
+         * @param x2,y2 Second HEC point.
+         * @return A valid genus 2 divisor.
+        */
+        divisor points_to_divisor(ZZ_p x1, ZZ_p y1, ZZ_p x2, ZZ_p y2);
+
+        /**
+         * @brief Method for converting a genus 2 divisor to two HEC points.
+         * @param D The divisor
+         * @param x1,y1 First HEC point.
+         * @param x2,y2 Second HEC point.
+        */
+        void divisor_to_points (divisor D, ZZ_p &x1, ZZ_p &y1, ZZ_p &x2, ZZ_p &y2);
+
+        /**
+         * @brief Encode text to a valid genus 2 divisor. This method uses UnifiedEncodings
+         * to encode an integer as a HEC point and then uses points_to_divisor to create the
+         * divisor.
+         * @param txt The text to encode.
+         * @return A valid genus 2 divisor. 
+        */
+        divisor encode(string txt);
+
+        /**
+         * @brief Decode a valid divisor to text. This method uses divisor_to_points method to
+         * convert a divisor to 2 HEC points and then the points are converted to text using the
+         * UnifiedEncoding method.
+         * @param D The divisor to decode.
+         * @return The decoded text. 
+        */
+        string decode(divisor D);
+        
+        void serialize(divisor D, vector<unsigned char> &buff, g2hcurve crv, ZZ p);
+
+        void serialize(divisor D, vector<unsigned char> &buff);
+        
+        divisor deserialize(vector<unsigned char> buff, g2hcurve crv, ZZ p);
+
+        divisor deserialize(vector<unsigned char> buff);
+
+        string sign(ZZ priv, vector<unsigned char> mess);
+
+        bool verify(string sig, divisor Pk, vector<unsigned char> mess);
 };
 
 

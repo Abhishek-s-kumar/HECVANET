@@ -99,14 +99,14 @@ class CryptoECC {
          * @brief Convert to text to an Elliptic Curve Point using koblitz's method.
          * @param txt The text to convert, passed as string.
         */
-        Element encode(std::string txt);
+        Element encode(string txt);
 
         /**
          * @brief Convert an Elliptic Curve Point to text using koblitz's method.
          * @param point The point to convert.
          * @param k The parameter k for Koblitz encoding procedure.
         */
-        string decode(Element point, Integer k);
+        string decode(Element point, Integer k=1000);
 
         /**
          * @brief Produce ECDSA signature.

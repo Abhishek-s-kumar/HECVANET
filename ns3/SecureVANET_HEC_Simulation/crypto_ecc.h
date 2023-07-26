@@ -112,6 +112,7 @@ class CryptoECC {
          * @brief Produce ECDSA signature.
          * @param priv The private key.
          * @param mess The message to sign as a vector of unsigned chars.
+         * @return The signature as a string.
         */
         string sign(Integer priv, vector<unsigned char> mess);
 
@@ -119,7 +120,8 @@ class CryptoECC {
          * @brief Verify ECDSA signature.
          * @param sig The signature as a string.
          * @param Pk The public key.
-         * @param mess The message to sign as a vector of unsigned chars.
+         * @param mess The message to verify as a vector of unsigned chars.
+         * @return True if the verification succeeds, false otherwise.
         */
         bool verify(string sig, Element Pk, vector<unsigned char> mess);
 

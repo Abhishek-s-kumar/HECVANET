@@ -11,8 +11,14 @@ uint8_t hpk3[48] = {0x2a,0xdd,0x8a,0x2f,0x4a,0x6f,0x77,0x00,0x71,0x34,0x76,
 0x7c,0xbf,0x3d,0x3d,0x91,0x6b,0x00};
 
 void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
+    
     ZZ ptest = to_ZZ(pt);
     UnifiedEncoding enc(ptest, u, w, 2, ZZ_p::zero());
+    NS_G2_NAMESPACE::divisor m, g, h, capub, mypub, a, b, rsupub;
+    bytes_to_divisor(g, veh1g2->g, veh1g2->curve, ptest);
+    bytes_to_divisor(capub, veh1g2->capub, veh1g2->curve, ptest);
+
+    CryptoHECCg2 crypto_heccg2(ptest, veh1g2->curve, g);
 
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -23,14 +29,14 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     std::string str11 = "Join ";
     std::string finalstr = str11 + str;
 
-    NS_G2_NAMESPACE::divisor m, g, h, capub, mypub, a, b, rsupub;
+    
     ZZ x, k, mypriv;
     ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
 
     auto start = chrono::high_resolution_clock::now();
 
-    int rt = text_to_divisor(m, finalstr, ptest, veh1g2->curve, enc);
-
+    //int rt = text_to_divisor(m, finalstr, ptest, veh1g2->curve, enc);
+    m = crypto_heccg2.encode(finalstr);
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
       auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
@@ -39,13 +45,11 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
          << duration.count() << " microseconds" << endl;
     }
 
-    if(rt) {
-      exit(1);
-    }
+    // if(rt) {
+    //   exit(1);
+    // }
 
-    bytes_to_divisor(g, veh1g2->g, veh1g2->curve, ptest);
-    bytes_to_divisor(capub, veh1g2->capub, veh1g2->curve, ptest);
-
+    
     start = chrono::high_resolution_clock::now();
     RandomBnd(x, ptest*ptest);
 
@@ -121,8 +125,10 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
 
     start = chrono::high_resolution_clock::now();
 
-    a = k*g;
-    b = k*rsupub + m;
+    // a = k*g;
+    // b = k*rsupub + m;
+
+    tuple<divisor, divisor> encrypted = crypto_heccg2.encrypt_ElGamal(rsupub, m);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -131,6 +137,9 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
       cout << "Message encryption: "
          << duration.count() << " microseconds" << endl;
     }
+
+    a = get<0>(encrypted);
+    b = get<1>(encrypted);
 
     int sizenosign = 2*(2*size + 1) + 31 + 2*size+1;
     uint8_t *temp = new uint8_t[sizenosign];
@@ -142,9 +151,14 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     ZZ sigb;
     uint8_t *siga = new uint8_t[2*signsize+1];
 
+    /* Test */
+    vector<unsigned char> mess(finalstr.begin(), finalstr.end());
+    
     start = chrono::high_resolution_clock::now();
     sign_genus2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), ptest);
-
+    
+    string sig = crypto_heccg2.sign(veh1g2->priv, mess);
+  
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
       auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
@@ -157,6 +171,10 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
 
     if(nok)
       return;
+
+    bool verified = crypto_heccg2.verify(sig, mypub, mess);
+    if(!verified)
+      throw std::runtime_error("Could not verify");
 
     int fullsize = sizenosign + 2*signsize + 1 + 21;
     uint8_t *cypherbuff = new uint8_t[fullsize+2];

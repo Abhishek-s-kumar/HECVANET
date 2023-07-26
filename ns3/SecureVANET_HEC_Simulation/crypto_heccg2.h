@@ -117,17 +117,65 @@ class CryptoHECCg2 {
         */
         string decode(divisor D);
         
+        /**
+         * @brief Serialize a genus 2 divisor to a vector of bytes (unsigned char).
+         * @param D The divisor.
+         * @param buff The output buffer.
+         * @param crv The curve that is used for the cryptographic operations.
+         * @param p The field characteristic p.
+        */
         void serialize(divisor D, vector<unsigned char> &buff, g2hcurve crv, ZZ p);
 
+        /**
+         * @brief Serialize a genus 2 divisor to a vector of bytes (unsigned char).
+         * By default the curve and the characteristic of this instance are used.
+         * @param D The divisor.
+         * @param buff The output buffer.
+        */
         void serialize(divisor D, vector<unsigned char> &buff);
         
+        /**
+         * @brief Deserialize a genus 2 divisor from a vector of bytes (unsigned char).
+         * @param buff The input buffer.
+         * @param crv The curve that is used for the cryptographic operations.
+         * @param p The field characteristic p.
+         * @return A valid genus 2 divisor defined on the crv parameter curve and on the
+         * field of characteristic p.
+        */
         divisor deserialize(vector<unsigned char> buff, g2hcurve crv, ZZ p);
 
+        /**
+         * @brief Deserialize a genus 2 divisor from a vector of bytes (unsigned char).
+         * By default the curve and the characteristic of this instance are used.
+         * @param buff The input buffer.
+         * @return A valid genus 2 divisor.
+        */
         divisor deserialize(vector<unsigned char> buff);
 
+        /**
+         * @brief Produce an ElGamal signature.
+         * @param priv The private key.
+         * Note: a standard private key is used since a different curve is required for
+         * signatures for simulation purposes. The parameter is used for compatibility with CryptoECC.
+         * @param mess The message to sign as a vector of unsigned chars.
+         * @return The signature as a string.
+        */
         string sign(ZZ priv, vector<unsigned char> mess);
 
+        /**
+         * @brief Verify the ElGamal signature.
+         * @param sig The signature string.
+         * @param Pk The public key. 
+         * Note: a standard public key is used since a different curve is required for
+         * signatures for simulation purposes. The parameter is used for compatibility with CryptoECC.
+         * @param mess The message to verify as a vector of unsigned chars.
+         * @return True if the verification succeeds, false otherwise.
+        */
         bool verify(string sig, divisor Pk, vector<unsigned char> mess);
+
+        tuple<ZZ, divisor> generate_cert_get_keypair(vector<unsigned char> &gen_cert, string uname);
+
+        divisor extract_public(vector<unsigned char> rec_cert);
 };
 
 

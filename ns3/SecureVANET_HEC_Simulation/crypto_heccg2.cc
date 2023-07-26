@@ -193,7 +193,7 @@ void CryptoHECCg2::serialize(divisor D, vector<unsigned char> &buff, g2hcurve cr
     /* Get divisor polys and curve poly f */
     poly_t u = D.get_upoly();
     poly_t v = D.get_vpoly();
-    poly_t f = curve.get_f();
+    poly_t f = crv.get_f();
 
     /* u poly coefficients to bytes */
     ZZ_p c1, c2;
@@ -213,7 +213,7 @@ void CryptoHECCg2::serialize(divisor D, vector<unsigned char> &buff, g2hcurve cr
     ZZ_p s0, v0, f0;
     GetCoeff(v0, v, 0);
     GetCoeff(f0, f, 0);
-    
+
     ZZ_p f1, f2, f3, f4, v1;
     GetCoeff(v1, v, 1);
     GetCoeff(f1, f, 1);
@@ -222,8 +222,9 @@ void CryptoHECCg2::serialize(divisor D, vector<unsigned char> &buff, g2hcurve cr
     GetCoeff(f4, f, 4);
     if(c2 != 0)
         s0 = (v0*v0-f0)/c2;
-    else 
+    else {
         s0 = v1*v1 - f2 +f3*c1 + f4*(c2 - c1*c1) - c1*(2*c2 - c1*c1);
+    }
 
     if((c1*c1 - 4*c2) != 0) {
         poly_t bsq, ap, gp;
@@ -289,7 +290,7 @@ divisor CryptoHECCg2::deserialize(vector<unsigned char> buff, g2hcurve crv, ZZ p
     /* Based on Handbook of Elliptic and Hyperelliptic Curve Cryptography,
     chapter 14.2 - compression techniques */
     uint8_t bits = buff[2*size];
-    poly_t f = curve.get_f();
+    poly_t f = crv.get_f();
     poly_t bsq, ap, gp;
     ZZ_p f0, f1, f2, f3, f4;
     GetCoeff(f0, f, 0);
@@ -354,7 +355,7 @@ divisor CryptoHECCg2::deserialize(vector<unsigned char> buff, g2hcurve crv, ZZ p
     SetCoeff(v, 0, v0);
 
     divisor D;
-    D.set_curve(curve);
+    D.set_curve(crv);
     D.set_upoly(u);
     D.set_vpoly(v);
     D.update();
@@ -397,7 +398,7 @@ string CryptoHECCg2::sign(ZZ priv, vector<unsigned char> mess)
     ZZ f_a;
 
     // The signature curve
-    g2hcurve curve;
+    g2hcurve crv;
 
     // The divisor a of the signature, the base element g, the public key h
     divisor a, g, h;
@@ -413,11 +414,11 @@ string CryptoHECCg2::sign(ZZ priv, vector<unsigned char> mess)
     NTL::SetCoeff(f, 0, str_to_ZZ_p(f0g2));
 
     /* Construct the curve */
-    curve.set_f(f);
-    curve.update();
+    crv.set_f(f);
+    crv.update();
 
     /* Construct the base element */
-    g.set_curve(curve);
+    g.set_curve(crv);
     poly_t gu, gv;
     NTL::SetCoeff(gu, 2, 1);
     NTL::SetCoeff(gu, 1, str_to_ZZ_p(gu1g2));
@@ -451,7 +452,7 @@ string CryptoHECCg2::sign(ZZ priv, vector<unsigned char> mess)
     /* Check if the signature is correctly generated */
     if ( f_a * h + b * a == m * g ) {
         vector<unsigned char> sig;
-        serialize(a, sig, curve, p);
+        serialize(a, sig, crv, p);
 
         byte bsig[order_size];
         BytesFromZZ(bsig, b, order_size);
@@ -469,5 +470,116 @@ string CryptoHECCg2::sign(ZZ priv, vector<unsigned char> mess)
 
 bool CryptoHECCg2::verify(string sig, divisor Pk, vector<unsigned char> mess)
 {
-    return false;
+    /* Save the NTL field context, because arithmetic here is done on a different field */
+    NTL::ZZ_pContext context;
+    context.save();
+
+    /* Calculate hash digest */
+    hash.Update(mess.data(), mess.size());
+    std::string digest;
+    digest.resize(hash.DigestSize());
+    hash.Final((byte*)&digest[0]);
+    
+    /* Convert hash digest to ZZ big integer of 28 bytes (224 bits) */
+    ZZ m; 
+    m = ZZFromBytes((unsigned char*)digest.data(), 28);
+
+    /* Initialize NTL field */
+    SetSeed(to_ZZ(1234567890));
+    ZZ p = to_ZZ(pg2); 
+    field_t::init(p); 
+    ZZ order = to_ZZ(Ng2);
+
+    int order_size = NTL::NumBytes(order);
+
+    // Private key x, random number k
+    ZZ x, k; 
+
+    // f(a), bijection of divisor a to ZZ
+    ZZ f_a;
+
+    // The signature curve
+    g2hcurve crv;
+
+    // The divisor a of the signature, the base element g, the public key h
+    divisor a, g, h;
+
+    // Construct the f polyonym of the curve
+    poly_t f;
+
+    NTL::SetCoeff(f, 5, 1);
+    NTL::SetCoeff(f, 4, 0);
+    NTL::SetCoeff(f, 3, str_to_ZZ_p(f3g2));
+    NTL::SetCoeff(f, 2, str_to_ZZ_p(f2g2));
+    NTL::SetCoeff(f, 1, str_to_ZZ_p(f1g2));
+    NTL::SetCoeff(f, 0, str_to_ZZ_p(f0g2));
+
+    /* Construct the curve */
+    crv.set_f(f);
+    crv.update();
+
+    /* Construct the base element */
+    g.set_curve(crv);
+    poly_t gu, gv;
+    NTL::SetCoeff(gu, 2, 1);
+    NTL::SetCoeff(gu, 1, str_to_ZZ_p(gu1g2));
+    NTL::SetCoeff(gu, 0, str_to_ZZ_p(gu0g2));
+    NTL::SetCoeff(gv, 1, str_to_ZZ_p(gv1g2));
+    NTL::SetCoeff(gv, 0, str_to_ZZ_p(gv0g2));
+    g.set_upoly(gu);
+    g.set_vpoly(gv);
+    g.update();
+
+    /* Extract a divisor and b big integer of the signature */
+    vector<unsigned char> siga(sig.begin(), sig.end()-order_size);
+    byte sigb[order_size];
+    memcpy(sigb, sig.data()+sig.size()-order_size, order_size);
+
+    a = deserialize(siga, crv, p);
+    ZZ b = ZZFromBytes(sigb, order_size);
+
+    /* Reconstruct the public key from the private key for simulation purposes */
+    x = to_ZZ(priv_g2);
+    h = x*g;
+
+    f_a = from_divisor_to_ZZ(a, order);
+
+    if ( f_a * h + b * a == m * g ) {
+        context.restore();
+        return true;
+    }
+    else {
+        cout << "ElGamal signature verification did not succeed!" << endl;
+        context.restore();
+        return false;
+    }
 }
+
+tuple<ZZ, divisor> CryptoHECCg2::generate_cert_get_keypair(vector<unsigned char> &gen_cert, string uname)
+{
+    /* Generate a random keypair */
+    ZZ x;
+    RandomBnd(x, p*p);
+
+    divisor h = x*base;
+
+    ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
+    cert.cert_generate(gen_cert.data(), uname, h, capriv);
+
+    cert.cert_pk_extraction(gen_cert.data(), capriv*base);
+    cert.cert_reception(gen_cert.data(), x);
+
+    ZZ priv = cert.get_extracted_du();
+    divisor pub = cert.get_calculated_Qu();
+
+    return tuple<ZZ, divisor>(priv, pub);
+}
+
+divisor CryptoHECCg2::extract_public(vector<unsigned char> rec_cert)
+{
+    ZZ capriv = to_ZZ("15669032110011017415376799675649225245106855015484313618141721121181084494176");
+
+    cert.cert_pk_extraction(rec_cert.data(), capriv*base);
+    return cert.get_calculated_Qu();
+}
+

@@ -23,8 +23,6 @@ void ECQV::encode_to_bytes(uint8_t *buff) {
 }
 
 vector<unsigned char> ECQV::cert_generate(std::string uname, Element ru) {
-    this->capriv = capriv;
-    this->capk = group.ExponentiateBase(capriv);
     if(uname.length() != 7) {
         throw std::runtime_error("Name must consist of 7 chars");
     }

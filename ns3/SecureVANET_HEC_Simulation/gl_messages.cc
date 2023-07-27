@@ -349,8 +349,11 @@ void extract_GLProof_Broadcast(uint8_t *buffrc, int ec_algo, int vid) {
         bytes_to_divisor(mypub, veh1g2->pub, veh1g2->curve, ptest);
         g2HECQV cert2(veh1g2->curve, ptest, g);
 
+        vector<unsigned char> rec_cert;
+        rec_cert.insert(rec_cert.end(), decrypted+27, decrypted + 27 + 31 + 2*size + 1);
+
         auto start = chrono::high_resolution_clock::now();
-        cert2.cert_pk_extraction(decrypted+27, capub);
+        cert2.cert_pk_extraction(rec_cert);
 
         if(get_metrics != 0) {
             auto stop = chrono::high_resolution_clock::now();

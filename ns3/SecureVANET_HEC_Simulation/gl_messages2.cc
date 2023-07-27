@@ -310,7 +310,11 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
         bytes_to_divisor(capub, veh1g2->capub, veh1g2->curve, ptest);
 
         g2HECQV cert2(veh1g2->curve, ptest, g);
-        cert2.cert_pk_extraction(buffrc+27, capub);
+
+        vector<unsigned char> rec_cert;
+        rec_cert.insert(rec_cert.end(), buffrc+27, buffrc + 27 + 31 + 2*size + 1);
+
+        glpub = cert2.cert_pk_extraction(rec_cert);
 
         std::string issued_by, expires_on;
         issued_by = cert2.get_issued_by();
@@ -320,7 +324,7 @@ void receive_GLCert_Send_Join(uint8_t *buffrc, int ec_algo, int vid, int glid) {
             return;
         }
 
-        glpub = cert2.get_calculated_Qu();
+        // glpub = cert2.get_calculated_Qu();
         std::cout << BOLD_CODE << GREEN_CODE << "Received GL public key, node: " << vid << END_CODE << std::endl;
         divisor_to_bytes(veh1g2->glpub, glpub, veh1g2->curve, ptest);
         veh1g2->glid = glid;
@@ -516,8 +520,11 @@ void extract_GLJoin_SendAccept(uint8_t *buffrc, int ec_algo, int vid, int glid) 
         uint8_t *received_cert = new uint8_t[31 + 2*size+1];
         memcpy(received_cert, buffrc+4*size+2, 31 + 2*size+1);
 
-        recert.cert_pk_extraction(received_cert, capub);
-        vehpk = recert.get_calculated_Qu();
+        vector<unsigned char> rec_cert;
+        rec_cert.insert(rec_cert.end(), received_cert, received_cert + 31 + 2*size+1);
+
+        vehpk = recert.cert_pk_extraction(rec_cert);
+        //vehpk = recert.get_calculated_Qu();
         if(!vehpk.is_valid_divisor()) {
             return;
         }

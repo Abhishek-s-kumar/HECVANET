@@ -38,6 +38,32 @@ using namespace NS_G2_NAMESPACE;
 See explenation on README.md */
 #define priv_g2 "8163892367034733443576960192244419582898514854451"
 
+/**
+ * @brief Class representing the genus 2 HECQV certificate structure and operations.
+ * For the simulation the chosen format is: Name, Issued By, Issued On, Expires On, Public key.
+ * Based on: https://www.secg.org/sec4-1.0.pdf
+*/
+class g2HECQV {
+    private:
+        g2hcurve curve;
+        ZZ p, capriv, ku, r, du;
+        divisor G, capk, pu, qu;
+        std::string name, issued_by, issued_on, expires_on;
+        CryptoPP::SHA3_256 hash;
+    protected:
+        void encode_to_bytes(uint8_t *buff);
+    public:
+        g2HECQV(g2hcurve curve, ZZ p, divisor G);
+        vector<unsigned char> cert_generate(std::string uname, divisor ru);
+        divisor cert_pk_extraction(vector<unsigned char> cert);
+        ZZ cert_reception(vector<unsigned char> cert, ZZ ku);
+        divisor get_calculated_Qu();
+        ZZ get_extracted_du();
+        std::string get_name();
+        std::string get_issued_by();
+        std::string get_issued_on();
+        std::string get_expires_on();
+};
 
 class CryptoHECCg2 {
 
@@ -119,31 +145,12 @@ class CryptoHECCg2 {
         
         /**
          * @brief Serialize a genus 2 divisor to a vector of bytes (unsigned char).
-         * @param D The divisor.
-         * @param buff The output buffer.
-         * @param crv The curve that is used for the cryptographic operations.
-         * @param p The field characteristic p.
-        */
-        void serialize(divisor D, vector<unsigned char> &buff, g2hcurve crv, ZZ p);
-
-        /**
-         * @brief Serialize a genus 2 divisor to a vector of bytes (unsigned char).
          * By default the curve and the characteristic of this instance are used.
          * @param D The divisor.
          * @param buff The output buffer.
         */
         void serialize(divisor D, vector<unsigned char> &buff);
         
-        /**
-         * @brief Deserialize a genus 2 divisor from a vector of bytes (unsigned char).
-         * @param buff The input buffer.
-         * @param crv The curve that is used for the cryptographic operations.
-         * @param p The field characteristic p.
-         * @return A valid genus 2 divisor defined on the crv parameter curve and on the
-         * field of characteristic p.
-        */
-        divisor deserialize(vector<unsigned char> buff, g2hcurve crv, ZZ p);
-
         /**
          * @brief Deserialize a genus 2 divisor from a vector of bytes (unsigned char).
          * By default the curve and the characteristic of this instance are used.
@@ -173,8 +180,20 @@ class CryptoHECCg2 {
         */
         bool verify(string sig, divisor Pk, vector<unsigned char> mess);
 
+        /**
+         * @brief Wrapper for generating a new certificate and obtaining the key-pair.
+         * @param gen_cert The certificate that is generated as a vector of unsigned chars.
+         * @param uname The name to include to the certificate. Must be 7 characters exactly.
+         * @return A tuple containing the private and public keys.
+        */
         tuple<ZZ, divisor> generate_cert_get_keypair(vector<unsigned char> &gen_cert, string uname);
 
+        /**
+         * @brief Wrapper for obtaining the public key of a certificate, so that the user
+         * does not have to use an HECQV instance.
+         * @param rec_cert The received certificate as a vector of unsigned chars.
+         * @return The extracted public key. 
+        */
         divisor extract_public(vector<unsigned char> rec_cert);
 };
 

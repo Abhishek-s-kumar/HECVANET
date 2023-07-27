@@ -464,11 +464,12 @@ int main (int argc, char *argv[])
 
     g2HECQV cert2(curve, ptest, g);
     int size = NumBytes(ptest);
-    uint8_t *encoded2 = new uint8_t[31 + 2*size+1];
+    //uint8_t *encoded2 = new uint8_t[31 + 2*size+1];
+    vector<unsigned char> encoded2;
 
     start = chrono::high_resolution_clock::now();
 
-    cert2.cert_generate(encoded2, "RSU0001", h, capriv);
+    encoded2 = cert2.cert_generate("RSU0001", h);
 
 
     if(get_metrics != 0) {
@@ -481,7 +482,7 @@ int main (int argc, char *argv[])
 
     start = chrono::high_resolution_clock::now();
     
-    cert2.cert_pk_extraction(encoded2, capub);
+    rsupub = cert2.cert_pk_extraction(encoded2);
     
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -493,7 +494,7 @@ int main (int argc, char *argv[])
 
     start = chrono::high_resolution_clock::now();
 
-    cert2.cert_reception(encoded2, x);
+    rsupriv = cert2.cert_reception(encoded2, x);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -503,8 +504,8 @@ int main (int argc, char *argv[])
          << duration.count() << " microseconds" << endl;
     }
     
-    rsupub = cert2.get_calculated_Qu();
-    rsupriv = cert2.get_extracted_du();
+    //rsupub = cert2.get_calculated_Qu();
+    // rsupriv = cert2.get_extracted_du();
 
     rsug2[0].priv = rsupriv;
     rsug2[0].curve = curve;
@@ -515,7 +516,7 @@ int main (int argc, char *argv[])
 
     cypher_buff = new uint8_t[fullsize];
     cypher_buff[0] = 0;
-    memcpy(cypher_buff+1, encoded2, 31 + 2*size+1);
+    memcpy(cypher_buff+1, encoded2.data(), 31 + 2*size+1);
     uint8_t w, u;
     w = 10;
     u = 4;

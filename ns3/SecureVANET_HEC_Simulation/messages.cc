@@ -74,10 +74,11 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
 
     g2HECQV cert2(veh1g2->curve, ptest, g);
     int size = NumBytes(ptest);
-    uint8_t *certveh1g2 = new uint8_t[31 + 2*size+1];
+    //uint8_t *certveh1g2 = new uint8_t[31 + 2*size+1];
+    vector<unsigned char> certveh1g2;
 
     start = chrono::high_resolution_clock::now();
-    cert2.cert_generate(certveh1g2, "VEH0001", h, capriv);
+    certveh1g2 = cert2.cert_generate("VEH0001", h);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -88,7 +89,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     }
 
     start = chrono::high_resolution_clock::now();
-    cert2.cert_pk_extraction(certveh1g2, capub);
+    mypub = cert2.cert_pk_extraction(certveh1g2);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -99,7 +100,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
     }
 
     start = chrono::high_resolution_clock::now();
-    int nok = cert2.cert_reception(certveh1g2, x);
+    mypriv = cert2.cert_reception(certveh1g2, x);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -109,15 +110,12 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
          << duration.count() << " microseconds" << endl;
     }
 
-    if(nok)
-      exit(1);
-
-    mypub = cert2.get_calculated_Qu();
-    mypriv = cert2.get_extracted_du();
+    // mypub = cert2.get_calculated_Qu();
+    // mypriv = cert2.get_extracted_du();
 
     veh1g2->priv = mypriv;
     divisor_to_bytes(veh1g2->pub, mypub, veh1g2->curve, ptest);
-    memcpy(veh1g2->cert, certveh1g2, 31 + 2*size+1);
+    memcpy(veh1g2->cert, certveh1g2.data(), 31 + 2*size+1);
 
     bytes_to_divisor(rsupub, veh1g2->rsupub, veh1g2->curve, ptest);
 
@@ -167,7 +165,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
          << duration.count() << " microseconds" << endl;
     }
 
-    nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
+    int nok = verify_sig2(siga, sigb, (uint8_t*)finalstr.c_str(), finalstr.length(), hpk1);
 
     if(nok)
       return;
@@ -217,7 +215,7 @@ void send_Join_g2(int u, int w, Vehicle_data_g2 *veh1g2, int vid, int destnode){
       // std::cout << "SEND_JOIN consumption: " << prev_energy[vid] - Vehicle_sources->Get(vid)->GetRemainingEnergy() << std::endl;
       // prev_energy[vid] = Vehicle_sources->Get(vid)->GetRemainingEnergy();
     }
-    free(certveh1g2);
+    //free(certveh1g2);
     free(temp);
     free(cypherbuff);
 }
@@ -667,8 +665,11 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
 
     g2HECQV cert2(curve, ptest, g);
 
+    vector<unsigned char> cert_vec;
+    cert_vec.insert(cert_vec.end(), buffcert, buffcert+31+2*size+1);
+
     start = chrono::high_resolution_clock::now();
-    cert2.cert_pk_extraction(buffcert, capub);
+    rsupub = cert2.cert_pk_extraction(cert_vec);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -687,7 +688,7 @@ void receive_Cert_Send_Join(uint8_t *buffrc, int ec_algo, int vid) {
       return;
     }
 
-    rsupub = cert2.get_calculated_Qu();
+    // rsupub = cert2.get_calculated_Qu();
     std::cout << BOLD_CODE << GREEN_CODE << "Received RSU public key, node: " << vid << END_CODE << std::endl;
     divisor_to_bytes(veh1g2->rsupub, rsupub, veh1g2->curve, ptest);
 
@@ -961,8 +962,11 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
     uint8_t *received_cert = new uint8_t[31 + 2*size+1];
     memcpy(received_cert, buffrc+4*size+2, 31 + 2*size+1);
 
+    vector<unsigned char> rec_cert;
+    rec_cert.insert(rec_cert.end(), received_cert, received_cert + 31 + 2*size + 1);
+
     start = chrono::high_resolution_clock::now();
-    recert.cert_pk_extraction(received_cert, capub);
+    vehpk = recert.cert_pk_extraction(rec_cert);
 
     if(get_metrics != 0) {
       auto stop = chrono::high_resolution_clock::now();
@@ -972,7 +976,7 @@ void extract_RSU_SendAccept_g2(uint8_t *buffrc, int vid, int rid) {
          << duration.count() << " microseconds" << endl;
     }
 
-    vehpk = recert.get_calculated_Qu();
+    // vehpk = recert.get_calculated_Qu();
     if(!vehpk.is_valid_divisor()) {
       return;
     }

@@ -20,6 +20,9 @@ using namespace NS_G2_NAMESPACE;
 #define u_param 10
 #define w_param 4
 
+/* Genus 2 curve field characteristic */
+#define p_genus2 "340282366920938463463374607431768211223"
+
 /* Signature curve params */
 #define f3g2 "2682810822839355644900736"
 #define f2g2 "226591355295993102902116"

@@ -505,12 +505,23 @@ string CryptoHECCg2::decode(divisor D)
     int p1, p2;
     p1 = str1[0] - 49;
     p2 = str2[0] - 49;
+
+    if(p1 != 1 && p1 != 2)
+        throw std::runtime_error("Valid string was not found.");
+    
+    if(p2 != 1 && p2 != 2)
+        throw std::runtime_error("Valid string was not found.");
     
     /* Build the full text and insert a null byte at the end */
     memcpy(ret+p1*maxlen/2, str1+1, maxlen/2);
     memcpy(ret+p2*maxlen/2, str2+1, maxlen/2);
     ret[maxlen] = '\0';
     string txt = (char*)ret;
+
+    free(zer);
+    free(str1);
+    free(str2);
+
     return txt;
 }
 

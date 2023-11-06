@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Function to parse the metrics file and calculate means
 def parse_metrics_file(filename):
@@ -68,6 +69,7 @@ def parse_metrics_file(filename):
                 line.startswith("GL_ACCEPT message size:"):
             
             case, size_value = line.split(":")
+            case = case.replace(" message size", "")
             size_value = int(size_value.split(' ')[1].strip())
 
             if case in sizes:
@@ -98,6 +100,7 @@ def parse_metrics_file(filename):
         energies[case] = sum(values) / len(values)
     return means, sizes, energies
 
+""" ------------------------------------------- PARSE METRICS FROM THE SIMULATION OUTPUT FILES ------------------------------------------- """
 
 # Create the metrics_plots directory if it doesn't exist
 output_dir = "metrics_plots"
@@ -115,51 +118,123 @@ means_g3, sizes_g3, energies_g3 = parse_metrics_file(metrics_file_g3)
 metrics_file_ec = 'metrics_ec.txt'
 means_ec, sizes_ec, energies_ec = parse_metrics_file(metrics_file_ec)
 
+
+""" ------------------------------------------- PLOT TIME COMPARISONS FOR EACH CASE ------------------------------------------- """
+
 # Plot and save bar plots for times
-for case, mean_value_g2 in means_g2.items():
-    mean_value_g3 = means_g3.get(case, 0)
+# Collect unique cases from all implementations
+unique_cases = set(means_g2.keys())
+
+# Set the width of each bar
+bar_width = 0.4
+
+# Set integer positions for the bars
+positions = 2*np.arange(len(unique_cases))
+
+# Create a dictionary to map case names to their respective positions
+case_positions = {case: pos for pos, case in enumerate(unique_cases)}
+
+# Plot and save a bar plot for times
+plt.figure(figsize=(20, 14))
+
+# Define the colors for the implementations
+colors = {'EC': 'green', 'HEC genus 2': 'blue', 'HEC genus 3': 'orange'}
+
+# Iterate over the unique cases
+for i, case in enumerate(unique_cases):
+
+    # Get the mean values for each implementation, default to 0 if not found
     mean_value_ec = means_ec.get(case, 0)
+    mean_value_g2 = means_g2.get(case, 0)
+    mean_value_g3 = means_g3.get(case, 0)
 
-    plt.figure(figsize=(8, 6))
-    plt.bar('EC', mean_value_ec, color='green', width=0.2)
-    plt.bar('HEC genus 2', mean_value_g2, color='blue', width=0.2)
-    plt.bar('HEC genus 3', mean_value_g3, color='orange', width=0.2)
+    # Plot bars for each implementation
+    plt.bar(positions[i] - 0.4, mean_value_ec, color=colors['EC'], width=bar_width, label='EC' if positions[i] == 0 else '')
     
+    plt.bar(positions[i], mean_value_g2, color=colors['HEC genus 2'], width=bar_width, label='HEC genus 2' if positions[i] == 0 else '')
+   
+    plt.bar(positions[i] + 0.4, mean_value_g3, color=colors['HEC genus 3'], width=bar_width, label='HEC genus 3' if positions[i] == 0 else '')
 
-    plt.ylabel('Time (ms)')
-    plt.title(case.replace('Text to divisor', 'Encoding')
-                    .replace('Divisor to text', 'Decoding')
-                    .replace('Text to EC Point', 'Encoding')
-                    .replace('EC Point to Text', 'Decoding'))
-    plt.ylim(top=max(mean_value_g2, mean_value_g3, mean_value_ec) * 1.5)
-    plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.3, zorder=0)
-    plt.savefig(os.path.join(output_dir, f"{case}.png"))
-    plt.close()
+# Set the x-axis positions and labels
+plt.xticks(positions, unique_cases, rotation=30, fontsize=12)
 
-    # Print mean values
-    print(f"{case}: HEC genus 2: {mean_value_g2:.2f} ms, HEC genus 3: {mean_value_g3:.2f} ms, EC: {mean_value_ec:.2f} ms")
+# Set the y-axis label
+plt.ylabel('Time (ms)', fontsize=18)
+plt.yticks(fontsize=16)
 
-# Plot bar plots for sizes
-for case, size_values_g2 in sizes_g2.items():
-    size_values_g3 = sizes_g3.get(case, 0)
-    size_values_ec = sizes_ec.get(case, 0)
+# Set the title
+plt.title('Execution Time Comparison per Cryptographic Operation', fontsize=22, pad=20)
 
-    plt.figure(figsize=(8, 6))
-    plt.bar('EC', size_values_ec, color='green', width=0.2)
-    plt.bar('HEC genus 2', size_values_g2, color='blue', width=0.2)
-    plt.bar('HEC genus 3', size_values_g3, color='orange', width=0.2)
-    
+# Add legend
+plt.legend(fontsize=15)
 
-    plt.ylabel('Size (bytes)')
-    plt.title(case)
-    plt.ylim(top=max(size_values_g2, size_values_g3, size_values_ec) * 1.5)
-    plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.3, zorder=0)
-    
-    plt.savefig(os.path.join(output_dir, f"{case}_sizes.png"))
-    plt.close()
+# Apply grid lines to the y-axis
+plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
 
-    # Print sizes
-    print(f"{case}: HEC genus 2: {size_values_g2}, HEC genus 3: {size_values_g3}, EC: {size_values_ec}")
+# Save the plot
+plt.savefig(os.path.join(output_dir, "time_comparison.png"))
+plt.close()
+
+
+""" ------------------------------------------- PLOT SIZES FOR EACH MESSAGE TYPE ------------------------------------------- """
+
+# Plot and save bar plots for message sizes
+# Collect unique cases from all implementations
+unique_cases = set(sizes_g2.keys())
+
+# Set the width of each bar
+bar_width = 0.4
+
+# Set integer positions for the bars
+positions = 2 * np.arange(len(unique_cases))
+
+# Create a dictionary to map case names to their respective positions
+case_positions = {case: pos for pos, case in enumerate(unique_cases)}
+
+# Plot and save a bar plot for sizes
+plt.figure(figsize=(20, 14))
+
+# Define the colors for the implementations
+colors = {'EC': 'green', 'HEC genus 2': 'blue', 'HEC genus 3': 'orange'}
+
+# Iterate over the unique cases
+for i, case in enumerate(unique_cases):
+
+    # Get the size values for each implementation, default to 0 if not found
+    size_value_ec = sizes_ec.get(case, 0)
+    size_value_g2 = sizes_g2.get(case, 0)
+    size_value_g3 = sizes_g3.get(case, 0)
+
+    # Plot bars for each implementation
+    plt.bar(positions[i] - 0.4, size_value_ec, color=colors['EC'], width=bar_width, label='EC' if positions[i] == 0 else '')
+
+    plt.bar(positions[i], size_value_g2, color=colors['HEC genus 2'], width=bar_width, label='HEC genus 2' if positions[i] == 0 else '')
+
+    plt.bar(positions[i] + 0.4, size_value_g3, color=colors['HEC genus 3'], width=bar_width, label='HEC genus 3' if positions[i] == 0 else '')
+
+# Set the x-axis positions and labels
+plt.xticks(positions, unique_cases, rotation=30, fontsize=12)
+
+# Set the y-axis label
+plt.ylabel('Size (bytes)', fontsize=18)
+plt.yticks(fontsize=16)
+
+# Set the title
+plt.title('Vehicle/RSU Message Size Comparison On Mistareehi\'s et. al Proposed Scheme [4]', fontsize=22, pad=20)
+
+# Add legend
+plt.legend(fontsize=15)
+
+# Apply grid lines to the y-axis
+plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
+
+# Save the plot
+plt.savefig(os.path.join(output_dir, "size_comparison.png"))
+plt.close()
+
+
+
+""" ------------------------------------------- PLOT ENERGY CONSUMPTION METRICS FOR EACH SIMULATION PHASE ------------------------------------------- """
 
 
 # Plot and save bar plots for energies of whole exchanges
@@ -183,18 +258,18 @@ plt.bar(x_positions, [val for key, val in energies_g2.items() if (key != "RECEIV
 plt.bar([x + bar_width for x in x_positions], [val for key, val in energies_g3.items() if (key != "RECEIVE_CERT consumption" and key != "EXTRACT_GL_PROOF consumption")], width=bar_width, color='orange', alpha=0.8, label='HEC genus 3')
 
 # Set the x-axis labels
-plt.xticks(x_positions, cases, rotation=45, fontsize=18)
+plt.xticks(x_positions, [case.replace(" consumption", "") for case in cases], rotation=30, fontsize=15)
 
 # Set the y-axis label
-plt.ylabel('Energy (J)', fontsize=18)
+plt.ylabel('Energy (J)', fontsize=22, labelpad=20)
 plt.ylim(top=max(max(energies_ec.values()), max(energies_g2.values()), max(energies_g3.values())) * 1.5)
-plt.yticks(fontsize=18)
+plt.yticks(fontsize=20)
 
 # Set the title
-plt.title('Energy Consumption', fontsize=18)
+plt.title('Energy Consumption of WAVE Devices on Steps that Involve Rx + Tx + Sleeping', fontsize=26, pad=20)
 
 # Add legend
-plt.legend(fontsize=18)
+plt.legend(fontsize=20)
 plt.tight_layout()
 plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
 
@@ -208,34 +283,36 @@ plt.figure(figsize=(20, 15))
 cases = list(case for case in energies_g2.keys() if (case == "RECEIVE_CERT consumption" or case == "EXTRACT_GL_PROOF consumption"))  # Get the list of cases
 
 # Set the x-axis positions for the bars
-x_positions1 = list(range(len(cases)))
-x_positions = [0.8*x for x in x_positions1]
+x_positions = [0.5, 2]
 
 # Set the width of each bar
-bar_width = 0.1
+bar_width = 0.2
 
 # Plot the bars for EC
-plt.bar([x - bar_width for x in x_positions], [val for key, val in energies_ec.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='green', alpha=0.8, label='EC')
+plt.bar([x - bar_width for x in x_positions], [val for key, val in energies_ec.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='green', alpha=0.8, label='EC', align='center')
 
 # Plot the bars for HEC genus 2
-plt.bar(x_positions, [val for key, val in energies_g2.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='blue', alpha=0.8, label='HEC genus 2')
+plt.bar(x_positions, [val for key, val in energies_g2.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='blue', alpha=0.8, label='HEC genus 2', align='center')
 
 # Plot the bars for HEC genus 3
-plt.bar([x + bar_width for x in x_positions], [val for key, val in energies_g3.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='orange', alpha=0.8, label='HEC genus 3')
+plt.bar([x + bar_width for x in x_positions], [val for key, val in energies_g3.items() if (key == "RECEIVE_CERT consumption" or key == "EXTRACT_GL_PROOF consumption")], width=bar_width, color='orange', alpha=0.8, label='HEC genus 3', align='center')
 
-# Set the x-axis labels
-plt.xticks(x_positions, cases, rotation=45, fontsize=18)
+plt.bar(0.3, 0)
+plt.bar(2.2, 0)
+
+
+plt.xticks(x_positions, [case.replace(" consumption", "") for case in cases], rotation=30, fontsize=15)
 
 # Set the y-axis label
-plt.ylabel('Energy (J)', fontsize=18)
+plt.ylabel('Energy (J)', fontsize=22, labelpad=20)
 plt.ylim(top=max(max(energies_ec["RECEIVE_CERT consumption"], energies_ec["EXTRACT_GL_PROOF consumption"]), max(energies_g2["RECEIVE_CERT consumption"], energies_g2["EXTRACT_GL_PROOF consumption"]), max(energies_g3["RECEIVE_CERT consumption"], energies_g3["EXTRACT_GL_PROOF consumption"])) * 1.5)
-plt.yticks(fontsize=18)
+plt.yticks(fontsize=20)
 
 # Set the title
-plt.title('Energy Consumption', fontsize=18)
+plt.title('Energy Consumption of WAVE Devices on Steps of Rx/Tx Only', fontsize=26, pad=20)
 
 # Add legend
-plt.legend(fontsize=18)
+plt.legend(fontsize=20)
 plt.tight_layout()
 plt.grid(axis='y', linestyle='-', linewidth=0.5, alpha=0.5)
 

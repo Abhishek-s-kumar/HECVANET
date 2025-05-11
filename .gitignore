@@ -1,4 +1,10 @@
-.vscode/
-g3hec/.vscode
-g3hec/build
-ns3/SecureVANET_HEC_Simulation/.vscode
+# Docker
+output/
+*.swp
+*.swo
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.env

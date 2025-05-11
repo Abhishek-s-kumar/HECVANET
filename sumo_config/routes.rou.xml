@@ -1,0 +1,6 @@
+<!-- routes.rou.xml -->
+<routes>
+    <vehicle id="v1" depart="0">
+        <route edges="0 1 2 3 4"/>
+    </vehicle>
+</routes>

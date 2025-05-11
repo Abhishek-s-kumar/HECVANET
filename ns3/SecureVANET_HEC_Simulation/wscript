@@ -1,0 +1,21 @@
+def build(bld):
+    module = bld.create_ns3_module('secure-vanet', ['core', 'network', 'internet', 'mobility'])
+    
+    module.source = [
+        'model/secure-routing-protocol.cc',
+        'model/crypto-helpers.cc',
+        'model/attack-simulator.cc',
+        'helper/vanet-helper.cc',
+        'examples/vanet-example.cc'
+    ]
+    
+    module.headers = [
+        'model/secure-routing-protocol.h',
+        'model/crypto-helpers.h',
+        'model/attack-simulator.h',
+        'helper/vanet-helper.h'
+    ]
+    
+    module.test_source = [
+        'test/secure-routing-test.cc'
+    ]
